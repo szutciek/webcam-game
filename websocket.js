@@ -3,7 +3,7 @@ const { WebSocketServer: WSS, WebSocket: ws } = require("ws");
 const UserError = require("./utils/UserError.js");
 const handleSendError = require("./utils/handleSendError.js");
 const { validateUUID } = require("./utils/validators");
-
+const clients = require("./state/clients");
 const {
   handleAuthClient,
   handleClientLeave,
@@ -21,25 +21,32 @@ const wss = new WSS({ port: 5501 });
 wss.on("connection", function connection(ws) {
   ws.on("message", async function message(data) {
     try {
-      // console.time("position");
       const message = JSON.parse(data);
       if (message.type === "authClient")
         return await handleAuthClient(message, ws);
 
       if (!message.uuid) throw new UserError("UUID required to sync");
+      if (!ws.uuid) throw new UserError("UUID required to sync");
+      if (ws.uuid !== message.uuid) throw new UserError("UUID is not the same");
       if (!validateUUID(message.uuid)) throw new UserError("UUID is not valid");
-
-      if (message.type === "pos") {
-        return handleSyncPosition(message, ws);
-        // console.timeEnd("position");
-      }
+      if (!clients.find(message.uuid)) throw new UserError("Unknown UUID");
 
       if (message.type === "cam") {
-        return handleSyncCam(message, ws);
+        return handleSyncCam(message, ws, uuid);
+      }
+
+      const client = clients.find(message.uuid);
+
+      if (message.type === "pos") {
+        return handleSyncPosition(message, client, ws);
       }
 
       if (message.type === "roomjoin") {
-        return handleRoomJoin(message, ws);
+        return handleRoomJoin(message, ws, client);
+      }
+
+      if (message.type === "roomleave") {
+        return handleRoomLeave(message, ws, client);
       }
 
       // if (message.type === "cam") {
@@ -60,11 +67,13 @@ wss.on("connection", function connection(ws) {
       if (err.name === "JsonWebTokenError")
         err = new UserError("Error while decoding token", 400);
 
+      console.log(err);
+
       handleSendError(err, ws);
     }
   });
 
   ws.on("close", () => {
-    handleClientLeave(ws.uuid);
+    handleClientLeave(ws.uuid, clients.find(ws.uuid));
   });
 });

@@ -3,6 +3,8 @@ const { jwtSecret } = require("../config");
 const { validateId } = require("../utils/validators");
 const UserError = require("../utils/UserError.js");
 const clients = require("../state/clients");
+const rooms = require("../state/rooms");
+const Client = require("../classes/Client");
 
 const signToken = (id) => {
   return jwt.sign(
@@ -41,7 +43,8 @@ exports.handleAuthClient = async (data, ws) => {
 
     const uuid = crypto.randomUUID();
 
-    clients.addClient(uuid, user, ws);
+    const client = new Client(uuid, user, ws);
+    clients.addClient(client);
     ws.uuid = uuid;
 
     ws.send(
@@ -58,7 +61,8 @@ exports.handleAuthClient = async (data, ws) => {
   }
 };
 
-exports.handleClientLeave = (uuid) => {
+exports.handleClientLeave = (uuid, client) => {
+  client.leaveRoom();
   clients.removeClient(uuid);
   console.log(`Client disconnected. Now online: ${clients.size}`);
 };

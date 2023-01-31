@@ -92,6 +92,7 @@ export default class ClientController {
     // if (message.type === "obj") {
     //   gameObjects.allObjects = message.data;
     // }
+    console.log(message);
 
     if (message.type === "error") {
       console.warn(message);

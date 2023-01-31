@@ -4,15 +4,15 @@ const { maxClients } = require("../config");
 class Clients {
   #clients = new Map();
 
-  addClient(uuid, user, ws) {
+  addClient(client) {
     if (this.#clients.size >= maxClients)
       throw new UserError("Too many players online. Please wait.");
 
     // prevent overriding a user (if another user tries to connect with it)
-    if (this.#clients.has(uuid))
+    if (this.#clients.has(client.uuid))
       throw new UserError("This uuid is already in use!");
 
-    this.#clients.set(uuid, { user, ws });
+    this.#clients.set(client.uuid, client);
   }
 
   removeClient(uuid) {
@@ -20,11 +20,15 @@ class Clients {
   }
 
   broadcast(message, uuid) {
-    for (const [id, data] of this.#clients) {
+    for (const [id, client] of this.#clients) {
       if (id !== uuid) {
-        data.ws.send(JSON.stringify(message));
+        client.sendTo(message);
       }
     }
+  }
+
+  allClients() {
+    return this.#clients;
   }
 
   find(uuid) {
