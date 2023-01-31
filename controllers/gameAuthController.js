@@ -49,7 +49,7 @@ exports.handleAuthClient = async (data, ws) => {
 
     ws.send(
       JSON.stringify({
-        type: "authClientOk",
+        type: "authclientOk",
         data: {
           uuid,
           name: user.name,

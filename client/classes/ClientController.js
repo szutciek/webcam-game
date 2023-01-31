@@ -1,4 +1,6 @@
 import { wsURL } from "/config.js";
+import Player from "/classes/Player.js";
+import GameController from "/classes/GameController.js";
 
 export default class ClientController {
   #ws = undefined;
@@ -45,7 +47,7 @@ export default class ClientController {
       console.log(`Sending ${this.user.username}'s token to authenticate`);
       this.#ws.send(
         JSON.stringify({
-          type: "authClient",
+          type: "authclient",
           // change into jwt eventually
           token: this.user.token,
         })
@@ -77,7 +79,43 @@ export default class ClientController {
     console.log("Listening to messages from the server...");
   }
   stopSync() {
-    this.#ws.removeEventListener("message");
+    this.#ws.removeEventListener("message", (message) => {
+      this.handleMessage(message);
+    });
+    console.log("No longer listening to server...");
+  }
+
+  startRender() {
+    this.gameController = new GameController(this.player);
+    this.gameController.startGame();
+  }
+
+  stopRender() {
+    this.gameController = undefined;
+    this.player = undefined;
+  }
+
+  syncPosition(x, y, w, h) {
+    this.sendJSON({
+      type: "pos",
+      uuid: this.user.uuid,
+      data: [x, y, w, h],
+    });
+  }
+
+  syncCamera(b64) {
+    this.sendJSON(
+      JSON.stringify({
+        type: "cam",
+        uuid: this.user.uuid,
+        data: b64,
+      })
+    );
+  }
+
+  sendJSON(payload) {
+    console.log(payload);
+    this.#ws.send(JSON.stringify(payload));
   }
 
   handleMessage(mes) {
@@ -97,9 +135,17 @@ export default class ClientController {
     if (message.type === "error") {
       console.warn(message);
     }
-    if (message.type === "authClientOk") {
+    if (message.type === "authclientOk") {
       this.user.uuid = message.data.uuid;
       console.log(`User assigned UUID ${this.user.uuid}`);
+    }
+    if (message.type === "roomjoinOk") {
+      console.log(`Successfully joined room ${this.room}`);
+      this.player = new Player([
+        message?.data?.position[0],
+        message?.data?.position[1],
+      ]);
+      this.startRender();
     }
   }
 

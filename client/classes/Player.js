@@ -1,5 +1,3 @@
-import { getPicture } from "../camera.js";
-import currentSync from "/currentSync.js";
 const maxX = 15;
 
 const f = (x) => {
@@ -8,8 +6,6 @@ const f = (x) => {
 };
 
 export default class Player {
-  id = undefined;
-
   #x = 0;
   #y = 0;
 
@@ -107,7 +103,8 @@ export default class Player {
   async syncWebcam() {
     try {
       const str = await getPicture();
-      currentSync.syncCamera(this.id, str);
+      // used id before but replace with uuid
+      // currentSync.syncCamera(this.id, str);
     } catch (err) {
       console.error(err);
     }

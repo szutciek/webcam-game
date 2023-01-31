@@ -6,7 +6,7 @@ exports.handleSyncPosition = (data, client, ws) => {
   console.log(message);
   console.log(client.roomRef);
 
-  if (data.data.length !== 5)
+  if (data.data.length !== 4)
     throw new UserError("Position data format invalid");
 
   client.roomRef?.broadcast("HOLA");
@@ -14,12 +14,11 @@ exports.handleSyncPosition = (data, client, ws) => {
 
 exports.handleSyncCam = (data, ws, uuid) => {
   // all based on room!
-  if (data.data.length !== 5)
-    throw new UserError("Position data format invalid");
 
   clients.broadcast(
     {
       type: "pPos",
+      player: uuid,
       data: message.data,
     },
     uuid

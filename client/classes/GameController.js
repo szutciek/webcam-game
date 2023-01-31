@@ -1,6 +1,5 @@
 import canvas from "/canvas.js";
-import gameObjects from "/gameObjects.js";
-import currentSync from "/currentSync.js";
+import { takePicture } from "/camera.js";
 
 export default class GameController {
   #x = 0;
@@ -12,13 +11,15 @@ export default class GameController {
   #interval = undefined;
   #webcamInterval = undefined;
 
-  constructor(player, sync) {
+  constructor(player, syncPosition, syncCamera) {
     if (!player) throw new Error("Can't create game - player undefined");
     this.player = player;
-    this.sync = sync;
+    this.sendSyncPosition = syncPosition;
+    this.sendSyncCamera = syncCamera;
   }
 
   startGame() {
+    console.log("STARTING TO RENDER GAME...");
     this.player.activateMovement();
     this.centerPlayer();
 
@@ -28,10 +29,9 @@ export default class GameController {
     }, 1000 / 60);
 
     this.#webcamInterval = setInterval(async () => {
-      this.player.syncWebcam();
+      const picture = takePicture();
+      console.log(picture);
     }, 1000 / 15);
-
-    currentSync.startSync();
   }
   stopGame() {
     clearInterval(this.#interval);
@@ -45,7 +45,7 @@ export default class GameController {
 
   renderFrame() {
     this.player.calcMovement();
-    this.player.syncMovement();
+    this.syncPosition();
     // comment out to have stationary camera
     this.centerPlayer();
 
@@ -95,10 +95,15 @@ export default class GameController {
   };
 
   syncPosition() {
-    this.sync.syncPosition(x, y);
+    this.sendSyncPosition(
+      this.player.x,
+      this.player.y,
+      this.player.w,
+      this.player.h
+    );
   }
   syncCamera(id, b64) {
-    this.sync.syncCamera(id, b64);
+    this.sendSyncCamera(id, b64);
   }
 
   windowResize() {
