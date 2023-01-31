@@ -19,6 +19,18 @@ class Clients {
     this.#clients.delete(uuid);
   }
 
+  broadcast(message, uuid) {
+    for (const [id, data] of this.#clients) {
+      if (id !== uuid) {
+        data.ws.send(JSON.stringify(message));
+      }
+    }
+  }
+
+  find(uuid) {
+    return this.#clients.get(uuid);
+  }
+
   get size() {
     return this.#clients.size;
   }

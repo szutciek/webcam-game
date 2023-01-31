@@ -1,19 +1,30 @@
+const clients = require("../state/clients.js");
 const UserError = require("../utils/UserError.js");
 
-exports.handleSyncPosition = (data, ws) => {
+exports.handleSyncPosition = (data, uuid) => {
+  // all based on room!
   if (data.data.length !== 5)
     throw new UserError("Position data format invalid");
 
-  broadcast({
-    type: "pPos",
-    data: message.data,
-  });
+  clients.broadcast(
+    {
+      type: "pPos",
+      data: message.data,
+    },
+    uuid
+  );
 };
 
-const broadcast = (message) => {
-  wss.clients.forEach(function each(client) {
-    if (client !== ws && client.readyState === ws.OPEN) {
-      client.send(JSON.stringify(message));
-    }
-  });
+exports.handleSyncCam = (data, uuid) => {
+  // all based on room!
+  if (data.data.length !== 5)
+    throw new UserError("Position data format invalid");
+
+  clients.broadcast(
+    {
+      type: "pPos",
+      data: message.data,
+    },
+    uuid
+  );
 };

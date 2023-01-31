@@ -43,6 +43,7 @@ exports.handleAuthClient = async (data, ws) => {
 
     clients.addClient(uuid, user, ws);
     ws.uuid = uuid;
+
     ws.send(
       JSON.stringify({
         type: "authClientOk",

@@ -22,6 +22,13 @@ exports.validateJWT = (str) => {
   return pattern.test(str);
 };
 
+exports.validateUUID = (str) => {
+  if (typeof str !== "string" || str.length !== 36) return false;
+  const re =
+    /[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{8}/;
+  return re.test(str);
+};
+
 exports.validateNumbers = (str) => {
   if (!["number", "string"].includes(typeof str) || str.length > 150)
     return false;

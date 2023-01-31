@@ -1,4 +1,4 @@
 module.exports = {
-  jwtSecret: "32jf,oi8439?nljfds!i90u:f9yh]ad",
+  jwtSecret: "jlo>j#&*&378'sjo@ijdaoOVN482)(#'][s;",
   maxClients: 2,
 };

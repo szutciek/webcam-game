@@ -6,6 +6,9 @@ export default class ClientController {
   room = undefined;
   user = undefined;
 
+  gameObjects = undefined;
+  player = undefined;
+
   constructor(user) {
     if (!user) throw new Error("User required to run client");
     this.user = user;
@@ -39,6 +42,7 @@ export default class ClientController {
       console.log("Connecting to server...");
       await this.connectServer();
       console.log(`Successfully connected to ${wsURL}`);
+      console.log(`Sending ${this.user.username}'s token to authenticate`);
       this.#ws.send(
         JSON.stringify({
           type: "authClient",
@@ -46,16 +50,31 @@ export default class ClientController {
           token: this.user.token,
         })
       );
-      console.log(`Sending ${this.user.username}'s token to authenticate`);
       this.startSync();
-      console.log("Listening to messages from the server...");
+      await this.waitForUUID();
+      console.log(`Joining room ${this.room}`);
+      this.joinRoom();
     } catch (err) {
       console.log(err);
     }
   }
 
+  joinRoom() {
+    if (!this.user.uuid || !this.room) return;
+    this.#ws.send(
+      JSON.stringify({
+        type: "roomjoin",
+        uuid: this.user.uuid,
+        room: this.room,
+      })
+    );
+  }
+
   startSync() {
-    this.#ws.addEventListener("message", this.handleMessage);
+    this.#ws.addEventListener("message", (message) => {
+      this.handleMessage(message);
+    });
+    console.log("Listening to messages from the server...");
   }
   stopSync() {
     this.#ws.removeEventListener("message");
@@ -73,13 +92,25 @@ export default class ClientController {
     // if (message.type === "obj") {
     //   gameObjects.allObjects = message.data;
     // }
-    console.log(message);
-    if (message.type === "authClientOk") {
-      console.log(message.data);
-      this.user.uuid = message.data.uuid;
-    }
+
     if (message.type === "error") {
       console.warn(message);
     }
+    if (message.type === "authClientOk") {
+      this.user.uuid = message.data.uuid;
+      console.log(`User assigned UUID ${this.user.uuid}`);
+    }
+  }
+
+  async waitForUUID() {
+    return new Promise((resolve, reject) => {
+      const checker = setInterval(() => {
+        if (this.user.uuid) {
+          clearInterval(checker);
+          resolve();
+        }
+        // reject if some time passes
+      }, 50);
+    });
   }
 }
