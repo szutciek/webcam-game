@@ -1,3 +1,3 @@
-import SyncGame from "/classes/SyncGame.js";
+// import SyncGame from "/classes/SyncGame.js";
 
-export default new SyncGame();
+// export default new SyncGame();

@@ -1,49 +1,55 @@
-const [width, height] = [100, 100];
-
 const video = document.createElement("video");
 const canvasStream = document.createElement("canvas");
-
 const context = canvasStream.getContext("2d");
 
-try {
-  let stream = undefined;
+const [width, height] = [100, 100];
+let stream = undefined;
 
-  const startStream = async () => {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: false,
-    });
-    video.srcObject = stream;
-    video.play();
-  };
+export const requestCameraPermission = () => {
+  return new Promise(async (res, rej) => {
+    try {
+      const permission = await navigator.permissions.query({ name: "camera" });
+      if (permission.state === "granted") res();
+      rej(new Error("Couldn't get camera permissions"));
+    } catch (err) {
+      rej(new Error("Couldn't get camera permissions"));
+    }
+  });
+};
 
-  await startStream();
-} catch (err) {
-  throw err;
-}
+export const startStream = () => {
+  return new Promise(async (res, rej) => {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: false,
+      });
+      video.srcObject = stream;
+      video.play();
+      res(true);
+    } catch (err) {
+      rej(new Error("Couldn't get camera feed"));
+    }
+  });
+};
 
-let picture = undefined;
-const takepicture = () => {
+const capturePicture = async () => {
   canvasStream.width = width;
   canvasStream.height = height;
   context.drawImage(video, 0, 0, width, height);
 
-  canvasStream.toBlob(
-    (blob) => {
-      picture = blob;
-    },
-    "image/jpeg",
-    0.5
-  );
+  const pic = await new Promise((res) => {
+    canvasStream.toBlob((blob) => res(blob), "image/webp");
+  });
 
-  return picture;
+  return pic;
 };
 
+const reader = new FileReader();
 const convertBlobBase64 = (blob) => {
   return new Promise((res, rej) => {
     if (typeof blob !== "object") rej();
 
-    const reader = new FileReader();
     reader.addEventListener("load", () => {
       res(reader.result);
     });
@@ -52,10 +58,10 @@ const convertBlobBase64 = (blob) => {
   });
 };
 
-export const getPicture = () => {
+export const takePicture = () => {
   return new Promise(async (res, rej) => {
     try {
-      res(await convertBlobBase64(takepicture()));
+      res(await convertBlobBase64(await capturePicture()));
     } catch (err) {
       rej(err);
     }
