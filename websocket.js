@@ -24,7 +24,6 @@ wss.on("connection", function connection(ws) {
   ws.on("message", function message(data) {
     const message = JSON.parse(data);
     if (message.type === "pos") {
-      console.log(message.data);
       if (message.data.length !== 5) return;
       wss.clients.forEach(function each(client) {
         if (client !== ws && client.readyState === ws.OPEN) {

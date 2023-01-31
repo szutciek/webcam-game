@@ -21,7 +21,7 @@ export default class SyncGame {
         gameObjects.updatePlayer(id, { x, y, w, h, fc: "red" });
       }
       if (message.type === "pCam") {
-        // console.log(message);
+        gameObjects.updatePlayerCamera(message.player, message.data);
       }
       if (message.type === "obj") {
         gameObjects.allObjects = message.data;
@@ -43,7 +43,7 @@ export default class SyncGame {
     this.send(
       JSON.stringify({
         type: "pos",
-        data: [player.id, player.x, player.y, player.w, player.h],
+        data: [player.id, x, y, player.w, player.h],
       })
     );
   }

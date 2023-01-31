@@ -3,10 +3,13 @@ export default class GameObjects {
   #players = new Map();
 
   updatePlayer(key, value) {
+    const cam = this.#players.get(key)?.camera;
+    value.camera = cam;
     this.#players.set(key, value);
   }
   updatePlayerCamera(key, b64) {
     const p = this.#players.get(key);
+    if (!p) return;
     p.camera = b64;
     this.#players.set(key, p);
   }

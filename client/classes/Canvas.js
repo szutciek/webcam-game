@@ -18,6 +18,17 @@ export default class Canvas {
     }
   }
 
+  drawImage(coords, b64) {
+    if (coords.length !== 4) return;
+    if (!b64) return;
+
+    const img = new Image();
+    img.addEventListener("load", () => {
+      this.ctx.drawImage(img, coords[0], coords[1], 300, 100);
+    });
+    img.src = b64;
+  }
+
   clear() {
     this.ctx.clearRect(0, 0, this.el.width, this.el.height);
   }

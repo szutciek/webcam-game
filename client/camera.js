@@ -1,14 +1,9 @@
 const [width, height] = [100, 100];
 
 const video = document.createElement("video");
-const canvas = document.createElement("canvas");
+const canvasStream = document.createElement("canvas");
 
-const context = canvas.getContext("2d");
-
-video.setAttribute("width", width);
-video.setAttribute("height", height);
-canvas.setAttribute("width", width);
-canvas.setAttribute("height", height);
+const context = canvasStream.getContext("2d");
 
 try {
   let stream = undefined;
@@ -29,9 +24,11 @@ try {
 
 let picture = undefined;
 const takepicture = () => {
+  canvasStream.width = width;
+  canvasStream.height = height;
   context.drawImage(video, 0, 0, width, height);
 
-  canvas.toBlob(
+  canvasStream.toBlob(
     (blob) => {
       picture = blob;
     },

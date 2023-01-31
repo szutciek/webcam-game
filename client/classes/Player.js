@@ -120,9 +120,9 @@ export default class Player {
     return this.#y;
   }
   get w() {
-    return 40;
+    return 100;
   }
   get h() {
-    return 40;
+    return 100;
   }
 }

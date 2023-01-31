@@ -29,9 +29,8 @@ export default class GameController {
 
     this.#webcamInterval = setInterval(async () => {
       this.player.syncWebcam();
-    }, 1000 / 5);
+    }, 1000 / 15);
 
-    console.log("Starting sync...");
     currentSync.startSync();
   }
   stopGame() {
@@ -51,9 +50,14 @@ export default class GameController {
     this.centerPlayer();
 
     const items = this.returnItemsFrame(gameObjects.allObjects);
+    const players = this.returnItemsFrame(gameObjects.allPlayers);
+    // const players = gameObjects.allPlayers;
 
     canvas.clear();
     items.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], i.fc));
+
+    // players.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], i.fc));
+    players.forEach((i) => canvas.drawImage([i.x, i.y, i.w, i.h], i.camera));
 
     const pT = this.translateInView(this.player);
     canvas.draw([pT.x, pT.y, pT.w, pT.h], "purple");
@@ -66,6 +70,7 @@ export default class GameController {
       w: item.w,
       h: item.h,
       fc: item.fc,
+      camera: item.camera,
     };
   }
 
@@ -76,14 +81,16 @@ export default class GameController {
     const maxBottom = this.#y + this.#vh;
 
     let list = [];
-    items.forEach(
-      (i) =>
+    items.forEach((i) => {
+      if (
         i.x < maxRight &&
         i.y < maxBottom &&
         i.x + i.w > this.#x &&
-        i.y + i.h > this.#x &&
-        list.push(this.translateInView(i))
-    );
+        i.y + i.h > this.#x
+      ) {
+        list.push(this.translateInView(i));
+      }
+    });
     return list;
   };
 
