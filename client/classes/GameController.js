@@ -34,11 +34,11 @@ export default class GameController {
     this.#webcamInterval = setInterval(async () => {
       try {
         const picture = await takePicture();
-        console.log(picture);
+        this.syncCamera(this.uuid, picture);
       } catch (err) {
         console.log(err);
       }
-    }, 1000 / 15);
+    }, 1000 / 24);
   }
   stopGame() {
     clearInterval(this.#interval);
@@ -124,7 +124,7 @@ export default class GameController {
     this.send(
       JSON.stringify({
         type: "cam",
-        player: id,
+        uuid: id,
         data: b64,
       })
     );
@@ -133,16 +133,6 @@ export default class GameController {
   send(payload) {
     if (this.#ws.readyState === WebSocket.OPEN) this.#ws.send(payload);
   }
-
-  // async getCamera() {
-  //   try {
-  //     const str = await takePicture();
-  //     // used id before but replace with uuid
-  //     // currentSync.syncCamera(this.id, str);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // }
 
   windowResize() {
     canvas.el.width = window.innerWidth;

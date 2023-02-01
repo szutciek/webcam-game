@@ -27,6 +27,7 @@ const decodeToken = (token) => {
 const findUser = async (id) => {
   return {
     name: "Developer",
+    _id: crypto.randomUUID(),
   };
 };
 

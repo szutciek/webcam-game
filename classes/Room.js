@@ -15,8 +15,10 @@ module.exports = class Room {
     D: new Map(),
   };
 
-  constructor(code) {
+  constructor(code, creatorId, maxPlayers = maxPlayersRoom) {
     this.code = code;
+    this.creatorId = creatorId;
+    this.maxPlayers = maxPlayers;
 
     this.createStartChunks(2);
   }
@@ -49,28 +51,33 @@ module.exports = class Room {
   }
 
   findChunk(quadrant, x, y) {
-    return this.chunks[quadrant];
+    for (const [key, value] of this.chunks[quadrant]) {
+      if (key[0] === x && key[1] === y) return value;
+    }
+    return undefined;
   }
 
-  findObjectsRow(quadrant, x) {
+  findChunksRow(quadrant, x) {
     const list = [];
     for (const [key, value] of this.chunks[quadrant]) {
       if (key[0] === x) list.push(value);
     }
     return list;
   }
-  findObjectsColumn(quadrant, x) {
+  findChunksColumn(quadrant, y) {
     const list = [];
     for (const [key, value] of this.chunks[quadrant]) {
-      if (key[0] === x) list.push(value);
+      if (key[1] === y) list.push(value);
     }
     return list;
+  }
+
+  checkSpaceAvalible() {
+    if (this.#players.size >= this.maxPlayers) return false;
+    return true;
   }
 
   joinRoom(uuid) {
-    if (this.#players.size > maxPlayersRoom)
-      throw new UserError("Room is full.");
-
     this.#players.set(uuid, new Player(uuid, { x: 0, y: 0, w: 100, h: 200 }));
   }
 
@@ -80,11 +87,13 @@ module.exports = class Room {
 
   updatePlayerPosition(uuid, data) {
     const player = this.#players.get(uuid);
+    if (!player) return;
     player.updatePosition(data.data);
   }
 
   updatePlayerCamera(uuid, data) {
     const player = this.#players.get(uuid);
+    if (!player) return;
     player.camera = data;
     this.#players.set(uuid, player);
   }

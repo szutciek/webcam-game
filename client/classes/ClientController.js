@@ -123,26 +123,26 @@ export default class ClientController {
   }
 
   sendJSON(payload) {
-    console.log(payload);
     this.#ws.send(JSON.stringify(payload));
   }
 
   handleMessage(mes) {
     const message = JSON.parse(mes.data);
-    console.log(message);
     if (message.type === "pinf") {
       const [x, y, w, h] = message.data;
-      const id = message.uuid;
-      gameObjects.updatePlayer(id, { x, y, w, h, fc: "red" });
+      if (!message.uuid) return;
+      this.gameObjects.updatePlayerInfo(message.uuid, { x, y, w, h });
       return;
     }
-    // if (message.type === "pcam") {
-    //   gameObjects.updatePlayerCamera(message.player, message.data);
-    // }
+
+    if (message.type === "pcam") {
+      if (!message.uuid) return;
+      this.gameObjects.updatePlayerCamera(message.uuid, message.data);
+    }
+
     // if (message.type === "obj") {
     //   gameObjects.allObjects = message.data;
     // }
-    console.log(message);
 
     if (message.type === "error") {
       console.warn(message);

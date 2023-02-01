@@ -32,14 +32,14 @@ wss.on("connection", function connection(ws) {
       if (!validateUUID(message.uuid)) throw new UserError("UUID is not valid");
       if (!clients.find(message.uuid)) throw new UserError("Unknown UUID");
 
-      if (message.type === "cam") {
-        return handleSyncCam(message, ws, uuid);
-      }
-
       const client = clients.find(message.uuid);
 
       if (message.type === "inf") {
         return handleSyncPosition(message, client, ws);
+      }
+
+      if (message.type === "cam") {
+        return handleSyncCam(message, client, ws);
       }
 
       if (message.type === "roomjoin") {

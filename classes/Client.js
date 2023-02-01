@@ -3,6 +3,7 @@ const rooms = require("../state/rooms");
 
 module.exports = class Client {
   room = undefined;
+  roomRef = undefined;
 
   constructor(uuid, user, ws) {
     this.uuid = uuid;

@@ -2,7 +2,7 @@ const clients = require("../state/clients.js");
 const UserError = require("../utils/UserError.js");
 
 exports.handleSyncPosition = (data, client, ws) => {
-  if (!client.roomRef) throw new UserError("Position data format invalid");
+  if (!client.roomRef || !client.room) throw new UserError("Join a room first");
 
   if (data.data.length !== 4) {
     throw new UserError("Position data format invalid");
@@ -27,16 +27,20 @@ exports.handleSyncPosition = (data, client, ws) => {
   );
 };
 
-exports.handleSyncCam = (data, ws, uuid) => {
-  // all based on room!
-  console.log(data);
+exports.handleSyncCam = (data, client, ws) => {
+  if (!client.roomRef || !client.room) throw new UserError("Join a room first");
 
-  // clients.broadcast(
-  //   {
-  //     type: "pPos",
-  //     player: uuid,
-  //     data: message.data,
-  //   },
-  //   uuid
-  // );
+  if (typeof data.data !== "string")
+    throw new UserError("Camera data should be a string");
+
+  client.roomRef.updatePlayerCamera(ws.uuid, data.data);
+
+  client.roomRef.broadcast(
+    {
+      type: "pcam",
+      uuid: ws.uuid,
+      data: data.data,
+    },
+    ws.uuid
+  );
 };

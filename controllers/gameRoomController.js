@@ -1,29 +1,55 @@
 const rooms = require("../state/rooms");
+const UserError = require("../utils/UserError");
 
 exports.handleRoomJoin = (message, ws, client) => {
-  const room = rooms.find(message.room) || rooms.addRoom(message.room);
+  try {
+    const room =
+      rooms.find(message.room) ||
+      rooms.addRoom(message.room, client.user?._id, 2);
 
-  room.joinRoom(message.uuid);
-  client.changeRoom(message.room);
+    if (!room.checkSpaceAvalible()) {
+      throw new UserError(`Room ${message.room} is currently full`);
+    }
 
-  ws.send(
-    JSON.stringify({
-      type: "roomjoinOk",
-      room: message.room,
-      data: {
-        position: [
-          Math.floor(Math.random() * 100),
-          Math.floor(Math.random() * 100),
-        ],
-      },
-    })
-  );
+    room.joinRoom(message.uuid);
+    client.changeRoom(message.room);
 
-  const chunk = room.findChunk("A");
+    ws.send(
+      JSON.stringify({
+        type: "roomjoinOk",
+        room: message.room,
+        data: {
+          position: [
+            Math.floor(Math.random() * 100),
+            Math.floor(Math.random() * 100),
+          ],
+        },
+      })
+    );
 
-  setTimeout(() => {
-    console.log(room.chunks);
-  }, 100);
+    room.findChunksRow("A", 1).forEach((chunk) => {
+      chunk.createObject({ x: 0, y: 100 }, { type: "color", value: "white" });
+    });
+    room.findChunksRow("A", 1).forEach((chunk) => {
+      chunk.createObject(
+        { x: 3100, y: 100 },
+        { type: "color", value: "white" }
+      );
+    });
+    room.findChunksRow("A", 1).forEach((chunk) => {
+      chunk.createObject(
+        { x: 3100, y: 100 },
+        { type: "color", value: "white" }
+      );
+    });
+    // console.log(room.findChunksColumn("A", 1));
+
+    // setTimeout(() => {
+    //   console.log(room.chunks);
+    // }, 100);
+  } catch (err) {
+    throw err;
+  }
 };
 
 exports.handleRoomLeave = (message, ws, client) => {
