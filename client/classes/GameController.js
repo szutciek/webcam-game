@@ -22,6 +22,7 @@ export default class GameController {
   }
 
   startGame() {
+    this.windowResize();
     console.log("STARTING TO RENDER GAME...");
     this.player.activateMovement();
     this.centerPlayer();
@@ -33,8 +34,8 @@ export default class GameController {
 
     this.#webcamInterval = setInterval(async () => {
       try {
-        const picture = await takePicture();
-        this.syncCamera(this.uuid, picture);
+        this.player.camera = await takePicture();
+        this.syncCamera(this.uuid, this?.player?.camera);
       } catch (err) {
         console.log(err);
       }
@@ -50,7 +51,7 @@ export default class GameController {
     this.#y = this.player.y + this.player.h / 2 - this.#vh / 2;
   }
 
-  renderFrame() {
+  async renderFrame() {
     this.player.calcMovement();
     if (this.#ws.readyState === WebSocket.OPEN) this.syncPosition();
     // comment out to have stationary camera
@@ -58,16 +59,18 @@ export default class GameController {
 
     const items = this.returnItemsFrame(this.gameObjects.allObjects);
     const players = this.returnItemsFrame(this.gameObjects.allPlayers);
-    // const players = gameObjects.allPlayers;
+
+    const promises = players.map((player) => canvas.prepareCamera(player));
+    const pT = this.translateInView(this.player);
+    promises.push(canvas.prepareCamera(pT));
+    const prepared = await Promise.all(promises);
 
     canvas.clear();
     items.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], i.fc));
+    players.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], "#555555"));
+    prepared.forEach((i) => canvas.drawImage([i.x, i.y, i.w, i.h], i.image));
 
-    // players.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], i.fc));
-    players.forEach((i) => canvas.drawImage([i.x, i.y, i.w, i.h], i.camera));
-
-    const pT = this.translateInView(this.player);
-    canvas.draw([pT.x, pT.y, pT.w, pT.h], "purple");
+    // canvas.draw([pT.x, pT.y, pT.w, pT.h], "purple");
   }
 
   translateInView(item) {
@@ -76,7 +79,6 @@ export default class GameController {
       y: item.y - this.#y,
       w: item.w,
       h: item.h,
-      fc: item.fc,
       camera: item.camera,
     };
   }

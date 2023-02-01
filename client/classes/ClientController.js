@@ -137,12 +137,17 @@ export default class ClientController {
 
     if (message.type === "pcam") {
       if (!message.uuid) return;
+      // add convert script to this
       this.gameObjects.updatePlayerCamera(message.uuid, message.data);
     }
 
-    // if (message.type === "obj") {
-    //   gameObjects.allObjects = message.data;
-    // }
+    if (message.type === "mobj") {
+      console.log(message.data);
+      this.gameObjects.setObject(message.data);
+    }
+    if (message.type === "sobj") {
+      gameObjects.allObjects = message.data;
+    }
 
     if (message.type === "error") {
       console.warn(message);
@@ -158,6 +163,8 @@ export default class ClientController {
       this.player = new Player([
         message?.data?.position[0],
         message?.data?.position[1],
+        message?.data?.position[2],
+        message?.data?.position[3],
       ]);
       this.startRender();
       return;

@@ -9,6 +9,9 @@ export default class Player {
   #x = 0;
   #y = 0;
 
+  #w = 100;
+  #h = 200;
+
   #velX = 0;
   #velY = 0;
 
@@ -17,9 +20,11 @@ export default class Player {
   #inpN = false;
   #inpS = false;
 
-  constructor(position = [0, 0]) {
+  constructor(position = [0, 0, 100, 200]) {
     this.#x = position[0];
     this.#y = position[1];
+    this.#w = position[2];
+    this.#h = position[3];
   }
 
   #subtractVelocity = () => {
@@ -107,9 +112,9 @@ export default class Player {
     return this.#y;
   }
   get w() {
-    return 100;
+    return this.#w;
   }
   get h() {
-    return 100;
+    return this.#h;
   }
 }

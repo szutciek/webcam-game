@@ -2,7 +2,7 @@ const video = document.createElement("video");
 const canvasStream = document.createElement("canvas");
 const context = canvasStream.getContext("2d");
 
-const [width, height] = [100, 100];
+const [width, height] = [400, 300];
 let stream = undefined;
 
 export const requestCameraPermission = () => {
@@ -45,10 +45,11 @@ const capturePicture = async () => {
   return pic;
 };
 
-const reader = new FileReader();
 const convertBlobBase64 = (blob) => {
   return new Promise((res, rej) => {
     if (typeof blob !== "object") rej();
+
+    const reader = new FileReader();
 
     reader.addEventListener("load", () => {
       res(reader.result);
@@ -58,7 +59,7 @@ const convertBlobBase64 = (blob) => {
   });
 };
 
-export const takePicture = () => {
+const preloadPicture = () => {
   return new Promise(async (res, rej) => {
     try {
       res(await convertBlobBase64(await capturePicture()));
@@ -66,4 +67,13 @@ export const takePicture = () => {
       rej(err);
     }
   });
+};
+
+let lastPicture = "";
+setInterval(async () => {
+  lastPicture = await preloadPicture();
+}, 1000 / 60);
+
+export const takePicture = () => {
+  return lastPicture;
 };

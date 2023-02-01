@@ -18,15 +18,25 @@ export default class Canvas {
     }
   }
 
-  drawImage(coords, b64) {
-    if (coords.length !== 4) return;
-    if (!b64) return;
-
-    const img = new Image();
-    img.addEventListener("load", () => {
-      this.ctx.drawImage(img, coords[0], coords[1], 300, 100);
+  prepareCamera(player) {
+    return new Promise((res, rej) => {
+      const img = new Image();
+      img.addEventListener("load", () => {
+        player.image = img;
+        res(player);
+      });
+      img.src = player.camera;
+      setTimeout(() => {
+        rej();
+      }, 100);
     });
-    img.src = b64;
+  }
+
+  drawImage(coords, img) {
+    if (coords.length !== 4) return;
+    if (!img) return;
+
+    this.ctx.drawImage(img, coords[0], coords[1], coords[2], coords[3]);
   }
 
   clear() {
