@@ -12,48 +12,4 @@ export default class SyncGame {
 
     this.startSync();
   }
-
-  startSync() {
-    this.ws.addEventListener("message", (m) => {
-      const message = JSON.parse(m.data);
-      if (message.type === "pPos") {
-        const [id, x, y, w, h] = message.data;
-        gameObjects.updatePlayer(id, { x, y, w, h, fc: "red" });
-      }
-      if (message.type === "pCam") {
-        gameObjects.updatePlayerCamera(message.player, message.data);
-      }
-      if (message.type === "obj") {
-        gameObjects.allObjects = message.data;
-      }
-      if (message.type === "auth") {
-        player.id = message.data.id;
-      }
-    });
-  }
-  stopSync() {
-    this.ws.removeEventListener("message");
-  }
-
-  send(payload) {
-    if (this.ws.readyState === WebSocket.OPEN) this.ws.send(payload);
-  }
-
-  syncPosition(x, y) {
-    this.send(
-      JSON.stringify({
-        type: "pos",
-        data: [player.id, x, y, player.w, player.h],
-      })
-    );
-  }
-  syncCamera(id, b64) {
-    this.send(
-      JSON.stringify({
-        type: "cam",
-        player: id,
-        data: b64,
-      })
-    );
-  }
 }

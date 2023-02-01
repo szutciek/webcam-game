@@ -100,16 +100,6 @@ export default class Player {
     currentSync.syncPosition(this.#x, this.#y);
   }
 
-  async syncWebcam() {
-    try {
-      const str = await getPicture();
-      // used id before but replace with uuid
-      // currentSync.syncCamera(this.id, str);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
   get x() {
     return this.#x;
   }

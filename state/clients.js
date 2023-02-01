@@ -5,7 +5,7 @@ class Clients {
   #clients = new Map();
 
   addClient(client) {
-    if (this.#clients.size >= maxClients)
+    if (this.#clients.size > maxClients)
       throw new UserError("Too many players online. Please wait.");
 
     // prevent overriding a user (if another user tries to connect with it)

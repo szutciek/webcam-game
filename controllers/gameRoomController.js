@@ -18,6 +18,12 @@ exports.handleRoomJoin = (message, ws, client) => {
       },
     })
   );
+
+  const chunk = room.findChunk("A");
+
+  setTimeout(() => {
+    console.log(room.chunks);
+  }, 100);
 };
 
 exports.handleRoomLeave = (message, ws, client) => {

@@ -7,7 +7,7 @@ const clients = require("./state/clients");
 const {
   handleAuthClient,
   handleClientLeave,
-} = require("./controllers/gameAuthController");
+} = require("./controllers/gameClientController");
 const {
   handleSyncPosition,
   handleSyncCam,
@@ -38,7 +38,7 @@ wss.on("connection", function connection(ws) {
 
       const client = clients.find(message.uuid);
 
-      if (message.type === "pos") {
+      if (message.type === "inf") {
         return handleSyncPosition(message, client, ws);
       }
 

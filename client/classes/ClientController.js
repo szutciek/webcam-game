@@ -1,5 +1,6 @@
 import { wsURL } from "/config.js";
 import Player from "/classes/Player.js";
+import GameObjects from "/classes/GameObjects.js";
 import GameController from "/classes/GameController.js";
 
 export default class ClientController {
@@ -8,6 +9,7 @@ export default class ClientController {
   room = undefined;
   user = undefined;
 
+  gameController = undefined;
   gameObjects = undefined;
   player = undefined;
 
@@ -52,7 +54,7 @@ export default class ClientController {
           token: this.user.token,
         })
       );
-      this.startSync();
+      this.startListen();
       await this.waitForUUID();
       console.log(`Joining room ${this.room}`);
       this.joinRoom();
@@ -72,13 +74,13 @@ export default class ClientController {
     );
   }
 
-  startSync() {
+  startListen() {
     this.#ws.addEventListener("message", (message) => {
       this.handleMessage(message);
     });
     console.log("Listening to messages from the server...");
   }
-  stopSync() {
+  stopListen() {
     this.#ws.removeEventListener("message", (message) => {
       this.handleMessage(message);
     });
@@ -86,7 +88,13 @@ export default class ClientController {
   }
 
   startRender() {
-    this.gameController = new GameController(this.player);
+    this.gameObjects = new GameObjects();
+    this.gameController = new GameController(
+      this.player,
+      this.#ws,
+      this.user.uuid,
+      this.gameObjects
+    );
     this.gameController.startGame();
   }
 
@@ -96,8 +104,9 @@ export default class ClientController {
   }
 
   syncPosition(x, y, w, h) {
+    console.log("mes");
     this.sendJSON({
-      type: "pos",
+      type: "inf",
       uuid: this.user.uuid,
       data: [x, y, w, h],
     });
@@ -120,11 +129,14 @@ export default class ClientController {
 
   handleMessage(mes) {
     const message = JSON.parse(mes.data);
-    // if (message.type === "pPos") {
-    //   const [id, x, y, w, h] = message.data;
-    //   gameObjects.updatePlayer(id, { x, y, w, h, fc: "red" });
-    // }
-    // if (message.type === "pCam") {
+    console.log(message);
+    if (message.type === "pinf") {
+      const [x, y, w, h] = message.data;
+      const id = message.uuid;
+      gameObjects.updatePlayer(id, { x, y, w, h, fc: "red" });
+      return;
+    }
+    // if (message.type === "pcam") {
     //   gameObjects.updatePlayerCamera(message.player, message.data);
     // }
     // if (message.type === "obj") {
@@ -134,10 +146,12 @@ export default class ClientController {
 
     if (message.type === "error") {
       console.warn(message);
+      return;
     }
     if (message.type === "authclientOk") {
       this.user.uuid = message.data.uuid;
       console.log(`User assigned UUID ${this.user.uuid}`);
+      return;
     }
     if (message.type === "roomjoinOk") {
       console.log(`Successfully joined room ${this.room}`);
@@ -146,6 +160,7 @@ export default class ClientController {
         message?.data?.position[1],
       ]);
       this.startRender();
+      return;
     }
   }
 
