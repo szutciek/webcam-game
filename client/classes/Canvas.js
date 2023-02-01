@@ -26,9 +26,6 @@ export default class Canvas {
         res(player);
       });
       img.src = player.camera;
-      setTimeout(() => {
-        rej();
-      }, 100);
     });
   }
 

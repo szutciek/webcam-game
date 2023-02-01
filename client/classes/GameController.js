@@ -34,6 +34,7 @@ export default class GameController {
 
     this.#webcamInterval = setInterval(async () => {
       try {
+        if (!this.player) return;
         this.player.camera = await takePicture();
         this.syncCamera(this.uuid, this?.player?.camera);
       } catch (err) {
@@ -52,25 +53,27 @@ export default class GameController {
   }
 
   async renderFrame() {
-    this.player.calcMovement();
-    if (this.#ws.readyState === WebSocket.OPEN) this.syncPosition();
-    // comment out to have stationary camera
-    this.centerPlayer();
+    try {
+      this.player.calcMovement();
+      if (this.#ws.readyState === WebSocket.OPEN) this.syncPosition();
+      // comment out to have stationary camera
+      this.centerPlayer();
 
-    const items = this.returnItemsFrame(this.gameObjects.allObjects);
-    const players = this.returnItemsFrame(this.gameObjects.allPlayers);
+      const items = this.returnItemsFrame(this.gameObjects.allObjects);
+      const players = this.returnItemsFrame(this.gameObjects.allPlayers);
 
-    const promises = players.map((player) => canvas.prepareCamera(player));
-    const pT = this.translateInView(this.player);
-    promises.push(canvas.prepareCamera(pT));
-    const prepared = await Promise.all(promises);
+      const promises = players.map((player) => canvas.prepareCamera(player));
+      const pT = this.translateInView(this.player);
+      promises.push(canvas.prepareCamera(pT));
+      const prepared = await Promise.all(promises);
 
-    canvas.clear();
-    items.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], i.fc));
-    players.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], "#555555"));
-    prepared.forEach((i) => canvas.drawImage([i.x, i.y, i.w, i.h], i.image));
-
-    // canvas.draw([pT.x, pT.y, pT.w, pT.h], "purple");
+      canvas.clear();
+      items.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], i.fc));
+      players.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], "#555555"));
+      prepared.forEach((i) => canvas.drawImage([i.x, i.y, i.w, i.h], i.image));
+    } catch (err) {
+      console.warn(err);
+    }
   }
 
   translateInView(item) {
