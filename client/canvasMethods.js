@@ -1,0 +1,20 @@
+export const drawFace = (ctx, x, y, cam) => {
+  if (!ctx instanceof HTMLCanvasElement) return;
+  if (!cam) return;
+  const rad = 40;
+  const wAH = 2 * rad;
+  //   ctx.beginPath();
+  //   ctx.moveTo(x + rad, y);
+  //   ctx.lineTo(x + wAH - rad, y);
+  //   ctx.quadraticCurveTo(x + wAH, y, x + wAH, y + rad);
+  //   ctx.lineTo(x + wAH, y + wAH - rad);
+  //   ctx.quadraticCurveTo(x + wAH, y + wAH, x + wAH - rad, y + wAH);
+  //   ctx.lineTo(x + rad, y + wAH);
+  //   ctx.quadraticCurveTo(x, y + wAH, x, y + wAH - rad);
+  //   ctx.lineTo(x, y + rad);
+  //   ctx.quadraticCurveTo(x, y, x + rad, y);
+  //   ctx.closePath();
+  //   ctx.clip();
+  ctx.drawImage(cam, x, y, wAH, wAH);
+  //   ctx.restore();
+};

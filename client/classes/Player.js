@@ -36,17 +36,24 @@ export default class Player {
     }
   };
   #addVelocity = () => {
+    // if (this.#inpN && this.#velY < maxX) {
+    //   this.#velY += 0.6;
+    // }
+    // if (this.#inpS && this.#velY > -maxX) {
+    //   this.#velY -= 0.6;
+    // }
     if (this.#inpN && this.#velY > -maxX) {
-      this.#velY -= 1;
+      this.#velY -= 0.6;
     }
     if (this.#inpS && this.#velY < maxX) {
-      this.#velY += 1;
+      this.#velY += 0.6;
     }
+
     if (this.#inpE && this.#velX < maxX) {
-      this.#velX += 1;
+      this.#velX += 0.6;
     }
     if (this.#inpW && this.#velX > -maxX) {
-      this.#velX -= 1;
+      this.#velX -= 0.6;
     }
   };
 
@@ -99,6 +106,10 @@ export default class Player {
 
     // this.#x += this.#velX;
     // this.#y += this.#velY;
+
+    document.getElementById("position").innerText = `${Math.floor(
+      this.#x
+    )}, ${Math.floor(this.#y)}`;
   };
 
   syncMovement() {

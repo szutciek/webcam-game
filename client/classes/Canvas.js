@@ -1,3 +1,5 @@
+import { drawFace } from "/canvasMethods.js";
+
 export default class Canvas {
   constructor(id) {
     this.el = document.getElementById(id);
@@ -19,7 +21,8 @@ export default class Canvas {
   }
 
   prepareCamera(player) {
-    return new Promise((res, rej) => {
+    return new Promise((res) => {
+      if (!player.camera) res(player);
       const img = new Image();
       img.addEventListener("load", () => {
         player.image = img;
@@ -34,6 +37,11 @@ export default class Canvas {
     if (!img) return;
 
     this.ctx.drawImage(img, coords[0], coords[1], coords[2], coords[3]);
+  }
+
+  drawPlayer([x, y, w, h], cam) {
+    // drawStickman(x, y);
+    drawFace(this.ctx, x, y, cam);
   }
 
   clear() {

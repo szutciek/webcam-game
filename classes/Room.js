@@ -7,13 +7,8 @@ const Chunk = require("./Chunk");
 module.exports = class Room {
   #players = new Map();
 
-  // 16x16
-  chunks = {
-    A: new Map(),
-    B: new Map(),
-    C: new Map(),
-    D: new Map(),
-  };
+  // 1600px x 1600px
+  chunks = [];
 
   constructor(code, creatorId, maxPlayers = maxPlayersRoom) {
     this.code = code;
@@ -26,10 +21,7 @@ module.exports = class Room {
   createStartChunks(num) {
     for (let x = 0; x <= num; x++) {
       for (let y = 0; y <= num; y++) {
-        this.createChunk("A", x, y);
-        this.createChunk("B", x, y);
-        this.createChunk("C", x, y);
-        this.createChunk("D", x, y);
+        console.log(x, y);
       }
     }
   }

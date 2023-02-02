@@ -23,9 +23,33 @@ export default class GameController {
 
   startGame() {
     this.windowResize();
+    this.addResizeListener();
     console.log("STARTING TO RENDER GAME...");
     this.player.activateMovement();
     this.centerPlayer();
+
+    this.gameObjects.allObjects = [
+      [
+        "jaws",
+        {
+          x: 100,
+          y: 100,
+          w: 100,
+          h: 100,
+          fc: "red",
+        },
+      ],
+      [
+        "dsadsad",
+        {
+          x: 300,
+          y: 200,
+          w: 100,
+          h: 100,
+          fc: "white",
+        },
+      ],
+    ];
 
     this.renderFrame();
     this.#interval = setInterval(() => {
@@ -54,6 +78,7 @@ export default class GameController {
 
   async renderFrame() {
     try {
+      const s = performance.now();
       this.player.calcMovement();
       if (this.#ws.readyState === WebSocket.OPEN) this.syncPosition();
       // comment out to have stationary camera
@@ -69,8 +94,18 @@ export default class GameController {
 
       canvas.clear();
       items.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], i.fc));
-      players.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], "#555555"));
-      prepared.forEach((i) => canvas.drawImage([i.x, i.y, i.w, i.h], i.image));
+      // players.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], "#555555"));
+      prepared.forEach((i) => canvas.drawPlayer([i.x, i.y, i.w, i.h], i.image));
+
+      document.getElementById("renderTime").innerText = `${
+        performance.now() - s
+      }`;
+      document.getElementById(
+        "renderedPlayers"
+      ).innerText = `${prepared.length} Players`;
+      document.getElementById(
+        "renderedItems"
+      ).innerText = `${items.length} Objects, `;
     } catch (err) {
       console.warn(err);
     }
@@ -98,7 +133,7 @@ export default class GameController {
         i.x < maxRight &&
         i.y < maxBottom &&
         i.x + i.w > this.#x &&
-        i.y + i.h > this.#x
+        i.y + i.h > this.#y
       ) {
         list.push(this.translateInView(i));
       }
@@ -144,5 +179,11 @@ export default class GameController {
     canvas.el.height = window.innerHeight;
 
     this.renderFrame();
+  }
+
+  addResizeListener() {
+    window.addEventListener("resize", () => {
+      this.windowResize();
+    });
   }
 }

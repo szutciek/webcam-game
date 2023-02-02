@@ -3,8 +3,7 @@ const GameObject = require("./GameObject.js");
 module.exports = class Chunk {
   gameObjects = new Map();
 
-  constructor(quadrant, x, y) {
-    this.quadrant = quadrant;
+  constructor(x, y) {
     this.x = x;
     this.y = y;
 

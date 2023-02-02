@@ -20,9 +20,10 @@ exports.handleRoomJoin = (message, ws, client) => {
         room: message.room,
         data: {
           position: [
-            // Math.floor(Math.random() * 100),
-            // Math.floor(Math.random() * 100),
-            0, 0, 100, 200,
+            Math.floor(Math.random() * 100),
+            Math.floor(Math.random() * 100),
+            100,
+            200,
           ],
         },
       })

@@ -2,7 +2,7 @@ const video = document.createElement("video");
 const canvasStream = document.createElement("canvas");
 const context = canvasStream.getContext("2d");
 
-const [width, height] = [400, 300];
+const [width, height] = [100, 100];
 let stream = undefined;
 
 export const requestCameraPermission = () => {
@@ -21,7 +21,12 @@ export const startStream = () => {
   return new Promise(async (res, rej) => {
     try {
       stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
+        video: {
+          width: 100,
+          height: 100,
+          frameRate: 24,
+          facingMode: "user",
+        },
         audio: false,
       });
       video.srcObject = stream;
