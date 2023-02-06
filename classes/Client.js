@@ -24,7 +24,9 @@ module.exports = class Client {
 
   leaveRoom() {
     if (!this.room) return;
-    rooms.find(this.room)?.leaveRoom(this.uuid);
+    const room = rooms.find(this.room);
+    room?.leaveRoom(this.uuid);
+    if (room.isEmpty) rooms.removeRoom(this.room);
     this.room = undefined;
     this.roomRef = undefined;
   }

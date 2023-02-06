@@ -35,34 +35,22 @@ exports.handleRoomJoin = (message, ws, client) => {
     );
     setTimeout(() => {
       room.addObject(
-        { x: 190, y: 760, w: 200, h: 50 },
-        { type: "color", value: "blue" }
+        { x: -500, y: 250, w: 1000, h: 70 },
+        { type: "color", value: "red" }
       );
     }, 1 * 1000);
     setTimeout(() => {
-      room.updateObject({ x: 190, y: 760 }, { type: "color", value: "green" });
+      room.updateObject({ x: -500, y: 250 }, { type: "color", value: "blue" });
     }, 2 * 1000);
 
-    // room.findChunksRow("A", 1).forEach((chunk) => {
-    //   chunk.createObject({ x: 0, y: 100 }, { type: "color", value: "white" });
-    // });
-    // room.findChunksRow("A", 1).forEach((chunk) => {
-    //   chunk.createObject(
-    //     { x: 3100, y: 100 },
-    //     { type: "color", value: "white" }
-    //   );
-    // });
-    // room.findChunksRow("A", 1).forEach((chunk) => {
-    //   chunk.createObject(
-    //     { x: 3100, y: 100 },
-    //     { type: "color", value: "white" }
-    //   );
-    // });
-    // console.log(room.findChunksColumn("A", 1));
-
-    // setTimeout(() => {
-    //   console.log(room.chunks);
-    // }, 100);
+    for (let i = 0; i < 100; i++) {
+      setTimeout(() => {
+        room.addObject(
+          { x: i * 100, y: Math.sin(i) * 40 + 200, w: 100, h: 100 },
+          { type: "color", value: `${i % 2 ? "black" : "white"}` }
+        );
+      }, i * 100);
+    }
   } catch (err) {
     throw err;
   }

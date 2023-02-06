@@ -35,15 +35,22 @@ module.exports = class Room {
   }
 
   addObject(coords, texture) {
-    this.getChunk(coords.x, coords.y).createObject(coords, texture);
+    if (coords.x === undefined || coords.y === undefined) return;
+    const chunk = this.getChunk(coords.x, coords.y);
+    if (!chunk)
+      this.addChunk(this.identifyChunk(coords.x), this.identifyChunk(coords.y));
+    this.findChunk(
+      this.identifyChunk(coords.x),
+      this.identifyChunk(coords.y)
+    ).createObject(coords, texture);
   }
 
   getChunk(xI, yI) {
     // find the chunk
-    if (!xI || !yI) return;
+    if (xI === undefined || yI === undefined) return;
     const x = this.identifyChunk(xI);
+    if (!this.chunks.has(x)) this.chunks.set(x, new Map());
     const row = this.chunks.get(x);
-    if (!row) this.chunks.set(x, new Map());
     const y = this.identifyChunk(yI);
     const chunk = row.get(y);
     if (!chunk) row.set(y, new Chunk(x, y));
@@ -59,7 +66,15 @@ module.exports = class Room {
   identifyChunk(val) {
     if (typeof val !== "number") return NaN;
     // takes the value and finds closest smallest multiple of 1600
-    return val - (val % 1600);
+    if (val >= 0) return val - (val % 1600);
+    if (val < 0) {
+      let i = 0;
+      while (true) {
+        if (i < val) break;
+        i -= 1600;
+      }
+      return i;
+    }
   }
 
   addChunk(x, y) {
@@ -87,7 +102,9 @@ module.exports = class Room {
   }
 
   findChunk(x, y) {
-    return this.chunks.get(x).get(y);
+    const row = this.chunks.get(x);
+    if (!row) return undefined;
+    return row.get(y);
   }
 
   checkSpaceAvalible() {
@@ -167,5 +184,9 @@ module.exports = class Room {
 
   get size() {
     return this.#players.size;
+  }
+
+  get isEmpty() {
+    if (this.#players.size <= 0) return true;
   }
 };
