@@ -28,29 +28,6 @@ export default class GameController {
     this.player.activateMovement();
     this.centerPlayer();
 
-    this.gameObjects.allObjects = [
-      [
-        "jaws",
-        {
-          x: 100,
-          y: 100,
-          w: 100,
-          h: 100,
-          fc: "red",
-        },
-      ],
-      [
-        "dsadsad",
-        {
-          x: 300,
-          y: 200,
-          w: 100,
-          h: 100,
-          fc: "white",
-        },
-      ],
-    ];
-
     this.renderFrame();
     this.#interval = setInterval(() => {
       this.renderFrame();
@@ -93,7 +70,8 @@ export default class GameController {
       const prepared = await Promise.all(promises);
 
       canvas.clear();
-      items.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], i.fc));
+      // change to support image textures
+      items.forEach((i) => canvas.drawItem(i));
       // players.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], "#555555"));
       prepared.forEach((i) => canvas.drawPlayer([i.x, i.y, i.w, i.h], i.image));
 
@@ -112,13 +90,18 @@ export default class GameController {
   }
 
   translateInView(item) {
-    return {
-      x: item.x - this.#x,
-      y: item.y - this.#y,
-      w: item.w,
-      h: item.h,
-      camera: item.camera,
-    };
+    const change = { ...item };
+    change.x = item.x - this.#x;
+    change.y = item.y - this.#y;
+    return change;
+
+    // return {
+    //   x: item.x - this.#x,
+    //   y: item.y - this.#y,
+    //   w: item.w,
+    //   h: item.h,
+    //   camera: item.camera,
+    // };
   }
 
   returnItemsFrame = (items) => {

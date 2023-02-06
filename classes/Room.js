@@ -1,67 +1,84 @@
 const UserError = require("../utils/UserError");
 const clients = require("../state/clients");
 const Player = require("./Player.js");
-const { maxPlayersRoom } = require("../config");
+const { maxPlayersRoom, maxRenderDistance } = require("../config");
 const Chunk = require("./Chunk");
 
 module.exports = class Room {
   #players = new Map();
 
   // 1600px x 1600px
-  chunks = [];
+  chunks = new Map();
 
-  constructor(code, creatorId, maxPlayers = maxPlayersRoom) {
+  constructor(
+    code,
+    creatorId,
+    maxPlayers = maxPlayersRoom,
+    renderDistance = maxRenderDistance
+  ) {
     this.code = code;
     this.creatorId = creatorId;
     this.maxPlayers = maxPlayers;
+    this.renderDistance = renderDistance;
 
     this.createStartChunks(2);
   }
 
   createStartChunks(num) {
-    for (let x = 0; x <= num; x++) {
-      for (let y = 0; y <= num; y++) {
-        console.log(x, y);
+    const numPx = num * 1600;
+    for (let x = -numPx; x <= numPx; x += 1600) {
+      this.chunks.set(x, new Map());
+      for (let y = -numPx; y <= numPx; y += 1600) {
+        this.chunks.get(x).set(y, new Chunk(x, y));
       }
     }
   }
 
-  checkIfChunkExists(quadrant, x, y) {
-    for (const [key] of this.chunks[quadrant]) {
-      if (key[0] === x && key[1] === y) return true;
-    }
+  addObject(coords, texture) {
+    if (!coords.x || !coords.y) return;
+    // find the chunk
+    const x = this.identifyChunk(coords.x);
+    const row = this.chunks.get(x);
+    if (!row) this.chunks.set(x, new Map());
+    const y = this.identifyChunk(coords.y);
+    const chunk = row.get(y);
+    if (!chunk) row.set(y, new Chunk(x, y));
+    // create the object in the chunk
+    this.chunks.get(x).get(y).createObject(coords, texture);
   }
 
-  createChunk(quadrant, x, y) {
-    if (!quadrant || x === undefined || y === undefined) return;
-    if (this.checkIfChunkExists(quadrant, x, y)) return;
-    this.chunks[quadrant].set([x, y], new Chunk(quadrant, x, y));
+  identifyChunk(val) {
+    if (typeof val !== "number") return NaN;
+    // takes the value and finds closest smallest multiple of 1600
+    return val - (val % 1600);
   }
 
-  findChunkQuadrant(quadrant) {
-    return this.chunks[quadrant];
+  addChunk(x, y) {
+    if (!x || !y) return;
+    if (!this.checkIfAvalibleChunk(x, y)) return;
+    // if row missing, add
+    if (!this.chunks.has(x)) this.chunks.set(x, new Map());
+    this.chunks.get(x).set(y, new Chunk());
   }
 
-  findChunk(quadrant, x, y) {
-    for (const [key, value] of this.chunks[quadrant]) {
-      if (key[0] === x && key[1] === y) return value;
-    }
-    return undefined;
+  checkIfMultiple(num) {
+    if (typeof num !== "number") return false;
+    if (num % 1600) return false;
+    return true;
   }
 
-  findChunksRow(quadrant, x) {
-    const list = [];
-    for (const [key, value] of this.chunks[quadrant]) {
-      if (key[0] === x) list.push(value);
-    }
-    return list;
+  checkIfAvalibleChunk(x, y) {
+    if (!this.checkIfMultiple(x) || !this.checkIfMultiple(y)) return;
+    const row = this.chunks.get(x);
+    if (!row) return true;
+    // might not work
+    const chunk = row.get(y);
+    if (!chunk) return true;
+    return false;
   }
-  findChunksColumn(quadrant, y) {
-    const list = [];
-    for (const [key, value] of this.chunks[quadrant]) {
-      if (key[1] === y) list.push(value);
-    }
-    return list;
+
+  findChunk(x, y) {
+    return this.chunks.get(x).get(y);
   }
 
   checkSpaceAvalible() {
@@ -81,6 +98,7 @@ module.exports = class Room {
     const player = this.#players.get(uuid);
     if (!player) return;
     player.updatePosition(data.data);
+    this.sendChunks(player);
   }
 
   updatePlayerCamera(uuid, data) {
@@ -88,6 +106,40 @@ module.exports = class Room {
     if (!player) return;
     player.camera = data;
     this.#players.set(uuid, player);
+  }
+
+  sendChunks(player) {
+    const chunkX = this.identifyChunk(player.x);
+    const chunkY = this.identifyChunk(player.y);
+
+    const chunkLeft = chunkX - (1600 * maxRenderDistance) / 2;
+    const chunkRight = chunkX + (1600 * maxRenderDistance) / 2;
+
+    const chunkTop = chunkY - (1600 * maxRenderDistance) / 2;
+    const chunkBottom = chunkY + (1600 * maxRenderDistance) / 2;
+
+    const list = [];
+
+    for (let x = chunkLeft; x <= chunkRight; x += 1600) {
+      for (let y = chunkTop; y <= chunkBottom; y += 1600) {
+        const chunk = this.findChunk(x, y);
+        if (!chunk) continue;
+        if (chunk.gameObjects.size === 0) continue;
+        if (player.updatedChunks.get(`${x}:${y}`) >= chunk.lastUpdate) continue;
+        player.updatedChunks.set(`${x}:${y}`, Date.now());
+        list.push(...chunk.gameObjects.values());
+      }
+    }
+
+    if (list.length === 0) return;
+
+    // message containing multiple objects - mobj
+    const message = {
+      type: "mobj",
+      data: list,
+    };
+
+    clients.find(player.uuid).sendTo(message);
   }
 
   inside(uuid) {

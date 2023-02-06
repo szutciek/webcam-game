@@ -19,9 +19,10 @@ export default class GameObjects {
     this.#players.set(key, p);
   }
 
-  setObject(data) {
-    console.log(data);
-    this.#elements.set(data.id, data.data);
+  setObjects(data) {
+    data.forEach((i) => {
+      this.#elements.set(i.id, i);
+    });
   }
 
   set allObjects(elements) {

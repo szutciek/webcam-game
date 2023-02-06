@@ -30,9 +30,8 @@ wss.on("connection", function connection(ws) {
       if (!ws.uuid) throw new UserError("UUID required to sync");
       if (ws.uuid !== message.uuid) throw new UserError("UUID is not the same");
       if (!validateUUID(message.uuid)) throw new UserError("UUID is not valid");
-      if (!clients.find(message.uuid)) throw new UserError("Unknown UUID");
-
       const client = clients.find(message.uuid);
+      if (!client) throw new UserError("Unknown UUID");
 
       if (message.type === "inf") {
         return handleSyncPosition(message, client, ws);
@@ -49,21 +48,6 @@ wss.on("connection", function connection(ws) {
       if (message.type === "roomleave") {
         return handleRoomLeave(message, ws, client);
       }
-
-      // if (message.type === "cam") {
-      //   if (!message.uuid) return;
-      //   wss.clients.forEach(function each(client) {
-      //     if (client !== ws && client.readyState === ws.OPEN) {
-      //       client.send(
-      //         JSON.stringify({
-      //           type: "pCam",
-      //           uuid: message.uuid,
-      //           data: message.data,
-      //         })
-      //       );
-      //     }
-      //   });
-      // }
     } catch (err) {
       if (err.name === "JsonWebTokenError")
         err = new UserError("Error while decoding token", 400);

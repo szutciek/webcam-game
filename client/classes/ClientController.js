@@ -103,25 +103,6 @@ export default class ClientController {
     this.player = undefined;
   }
 
-  syncPosition(x, y, w, h) {
-    console.log("mes");
-    this.sendJSON({
-      type: "inf",
-      uuid: this.user.uuid,
-      data: [x, y, w, h],
-    });
-  }
-
-  syncCamera(b64) {
-    this.sendJSON(
-      JSON.stringify({
-        type: "cam",
-        uuid: this.user.uuid,
-        data: b64,
-      })
-    );
-  }
-
   sendJSON(payload) {
     this.#ws.send(JSON.stringify(payload));
   }
@@ -142,11 +123,7 @@ export default class ClientController {
     }
 
     if (message.type === "mobj") {
-      console.log(message.data);
-      this.gameObjects.setObject(message.data);
-    }
-    if (message.type === "sobj") {
-      gameObjects.allObjects = message.data;
+      this.gameObjects.setObjects(message.data);
     }
 
     if (message.type === "error") {

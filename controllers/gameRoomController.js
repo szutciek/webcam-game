@@ -20,8 +20,8 @@ exports.handleRoomJoin = (message, ws, client) => {
         room: message.room,
         data: {
           position: [
-            Math.floor(Math.random() * 100),
-            Math.floor(Math.random() * 100),
+            Math.floor(Math.random() * 500) - 250,
+            Math.floor(Math.random() * 500) - 250,
             100,
             200,
           ],
@@ -29,21 +29,32 @@ exports.handleRoomJoin = (message, ws, client) => {
       })
     );
 
-    room.findChunksRow("A", 1).forEach((chunk) => {
-      chunk.createObject({ x: 0, y: 100 }, { type: "color", value: "white" });
-    });
-    room.findChunksRow("A", 1).forEach((chunk) => {
-      chunk.createObject(
-        { x: 3100, y: 100 },
-        { type: "color", value: "white" }
+    room.addObject(
+      { x: 60, y: 60, w: 200, h: 50 },
+      { type: "color", value: "red" }
+    );
+    setTimeout(() => {
+      room.addObject(
+        { x: 190, y: 760, w: 200, h: 50 },
+        { type: "color", value: "red" }
       );
-    });
-    room.findChunksRow("A", 1).forEach((chunk) => {
-      chunk.createObject(
-        { x: 3100, y: 100 },
-        { type: "color", value: "white" }
-      );
-    });
+    }, 2 * 1000);
+
+    // room.findChunksRow("A", 1).forEach((chunk) => {
+    //   chunk.createObject({ x: 0, y: 100 }, { type: "color", value: "white" });
+    // });
+    // room.findChunksRow("A", 1).forEach((chunk) => {
+    //   chunk.createObject(
+    //     { x: 3100, y: 100 },
+    //     { type: "color", value: "white" }
+    //   );
+    // });
+    // room.findChunksRow("A", 1).forEach((chunk) => {
+    //   chunk.createObject(
+    //     { x: 3100, y: 100 },
+    //     { type: "color", value: "white" }
+    //   );
+    // });
     // console.log(room.findChunksColumn("A", 1));
 
     // setTimeout(() => {
