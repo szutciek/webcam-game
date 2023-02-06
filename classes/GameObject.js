@@ -7,6 +7,10 @@ module.exports = class GameObject {
     this.h = h;
     this.texture = texture;
   }
+
+  updateTexture(texture) {
+    this.texture = texture;
+  }
 };
 
 // extend this for special elements or stuff

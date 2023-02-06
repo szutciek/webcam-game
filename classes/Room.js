@@ -35,16 +35,25 @@ module.exports = class Room {
   }
 
   addObject(coords, texture) {
-    if (!coords.x || !coords.y) return;
+    this.getChunk(coords.x, coords.y).createObject(coords, texture);
+  }
+
+  getChunk(xI, yI) {
     // find the chunk
-    const x = this.identifyChunk(coords.x);
+    if (!xI || !yI) return;
+    const x = this.identifyChunk(xI);
     const row = this.chunks.get(x);
     if (!row) this.chunks.set(x, new Map());
-    const y = this.identifyChunk(coords.y);
+    const y = this.identifyChunk(yI);
     const chunk = row.get(y);
     if (!chunk) row.set(y, new Chunk(x, y));
-    // create the object in the chunk
-    this.chunks.get(x).get(y).createObject(coords, texture);
+    return chunk;
+  }
+
+  updateObject(coords, texture) {
+    const chunk = this.getChunk(coords.x, coords.y);
+    if (!chunk) return;
+    chunk.findUpdateObject({ x: coords.x, y: coords.y }, texture);
   }
 
   identifyChunk(val) {

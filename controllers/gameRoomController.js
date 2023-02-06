@@ -5,7 +5,7 @@ exports.handleRoomJoin = (message, ws, client) => {
   try {
     const room =
       rooms.find(message.room) ||
-      rooms.addRoom(message.room, client.user?._id, 2);
+      rooms.addRoom(message.room, client.user?._id, 20);
 
     if (!room.checkSpaceAvalible()) {
       throw new UserError(`Room ${message.room} is currently full`);
@@ -36,8 +36,11 @@ exports.handleRoomJoin = (message, ws, client) => {
     setTimeout(() => {
       room.addObject(
         { x: 190, y: 760, w: 200, h: 50 },
-        { type: "color", value: "red" }
+        { type: "color", value: "blue" }
       );
+    }, 1 * 1000);
+    setTimeout(() => {
+      room.updateObject({ x: 190, y: 760 }, { type: "color", value: "green" });
     }, 2 * 1000);
 
     // room.findChunksRow("A", 1).forEach((chunk) => {

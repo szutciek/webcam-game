@@ -7,10 +7,18 @@ module.exports = class Chunk {
     this.x = x;
     this.y = y;
 
-    this.maxX = x + 1600;
-    this.maxY = y + 1600;
+    // this.maxX = x + 1600;
+    // this.maxY = y + 1600;
 
     this.lastUpdate = Date.now();
+  }
+
+  get maxX() {
+    return this.x + 1600;
+  }
+
+  get maxY() {
+    return this.y + 1600;
   }
 
   // the chunk consists of 16 blocks each 100px in both dimensions
@@ -39,6 +47,14 @@ module.exports = class Chunk {
         return value;
       }
     }
+    return undefined;
+  }
+
+  findUpdateObject({ x, y }, texture) {
+    const object = this.findObject(x, y);
+    if (!object) return;
+    object.updateTexture(texture);
+    this.lastUpdate = Date.now();
   }
 
   checkIfExists(coordinates) {
