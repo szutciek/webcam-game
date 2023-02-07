@@ -107,34 +107,51 @@ export default class Player {
 
       if (colHor && colVert) {
         // PREVENT ENTERING FROM TOP
-        if (
-          bottom >= o.yMap &&
-          top <= o.yMap &&
-          left >= o.xMap &&
-          right <= o.xMap + o.w
-        ) {
+        if (bottom >= o.yMap && top <= o.yMap) {
           this.#velY = 0;
           this.#y = o.yMap - currPos.h;
+          break;
         }
+        // if (
+        //   bottom >= o.yMap &&
+        //   top <= o.yMap &&
+        //   left >= o.xMap &&
+        //   right <= o.xMap + o.w
+        // ) {
+        //   this.#velY = 0;
+        //   this.#y = o.yMap - currPos.h;
+        //   break;
+        // }
+
         // PREVENT ENTERING FROM BOTTOM
-        if (
-          top <= o.yMap + o.h &&
-          bottom >= o.yMap + o.h &&
-          left >= o.xMap &&
-          right <= o.xMap + o.w
-        ) {
+        if (top <= o.yMap + o.h && bottom >= o.yMap + o.h) {
           this.#velY = 0;
           this.#y = o.yMap + o.h;
+          break;
         }
+        // if (
+        //   top <= o.yMap + o.h &&
+        //   bottom >= o.yMap + o.h &&
+        //   left >= o.xMap &&
+        //   right <= o.xMap + o.w
+        // ) {
+        //   this.#velY = 0;
+        //   this.#y = o.yMap + o.h;
+        //   break;
+        // }
+
         // PREVENT ENTERING FROM LEFT
         if (left <= o.xMap && right >= o.xMap) {
           this.#velX = 0;
           this.#x = o.xMap - currPos.w;
+          break;
         }
+
         // PREVENT ENTERING FROM RIGHT
         if (right >= o.xMap + o.w && left <= o.xMap + o.w) {
           this.#velX = 0;
           this.#x = o.xMap + o.w;
+          break;
         }
       }
     }
