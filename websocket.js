@@ -42,7 +42,7 @@ wss.on("connection", function connection(ws) {
       }
 
       if (message.type === "roomjoin") {
-        return handleRoomJoin(message, ws, client);
+        return await handleRoomJoin(message, ws, client);
       }
 
       if (message.type === "roomleave") {

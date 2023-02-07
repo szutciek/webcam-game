@@ -1,11 +1,25 @@
 const rooms = require("../state/rooms");
 const UserError = require("../utils/UserError");
+const { loadMap } = require("./gameMapController");
 
-exports.handleRoomJoin = (message, ws, client) => {
+exports.handleRoomJoin = async (message, ws, client) => {
   try {
-    const room =
-      rooms.find(message.room) ||
-      rooms.addRoom(message.room, client.user?._id, 20);
+    let room = rooms.find(message.room);
+
+    if (!room) {
+      room = rooms.addRoom(message.room, client.user?._id, 20);
+
+      const map = await loadMap(room.code);
+      if (map) {
+        const data = JSON.parse(map);
+
+        data.objects.forEach((obj, i) => {
+          setTimeout(() => {
+            room.addObject(obj.coords, obj.texture);
+          }, i * 50);
+        });
+      }
+    }
 
     if (!room.checkSpaceAvalible()) {
       throw new UserError(`Room ${message.room} is currently full`);
@@ -28,29 +42,6 @@ exports.handleRoomJoin = (message, ws, client) => {
         },
       })
     );
-
-    room.addObject(
-      { x: 60, y: 60, w: 200, h: 50 },
-      { type: "color", value: "red" }
-    );
-    setTimeout(() => {
-      room.addObject(
-        { x: -500, y: 250, w: 1000, h: 70 },
-        { type: "color", value: "red" }
-      );
-    }, 1 * 1000);
-    setTimeout(() => {
-      room.updateObject({ x: -500, y: 250 }, { type: "color", value: "blue" });
-    }, 2 * 1000);
-
-    for (let i = 0; i < 100; i++) {
-      setTimeout(() => {
-        room.addObject(
-          { x: i * 100, y: Math.sin(i) * 40 + 200, w: 100, h: 100 },
-          { type: "color", value: `${i % 2 ? "black" : "white"}` }
-        );
-      }, i * 100);
-    }
   } catch (err) {
     throw err;
   }
