@@ -106,54 +106,106 @@ export default class Player {
       const colHor = left <= o.xMap + o.w && right >= o.xMap;
 
       if (colHor && colVert) {
-        // PREVENT ENTERING FROM TOP
-        if (bottom >= o.yMap && top <= o.yMap) {
+        const distanceX = left - o.xMap;
+        const distanceY = top - o.yMap;
+
+        if (
+          bottom <= o.yMap + o.h &&
+          bottom >= o.yMap &&
+          // check horizontal
+          right - 25 > o.xMap &&
+          left + 25 < o.xMap + o.w
+        ) {
           this.#velY = 0;
           this.#y = o.yMap - currPos.h;
-          break;
         }
-        // if (
-        //   bottom >= o.yMap &&
-        //   top <= o.yMap &&
-        //   left >= o.xMap &&
-        //   right <= o.xMap + o.w
-        // ) {
-        //   this.#velY = 0;
-        //   this.#y = o.yMap - currPos.h;
-        //   break;
-        // }
 
-        // PREVENT ENTERING FROM BOTTOM
-        if (top <= o.yMap + o.h && bottom >= o.yMap + o.h) {
+        if (
+          top <= o.yMap + o.h &&
+          top >= o.yMap &&
+          // check horizontal
+          right - 25 > o.xMap &&
+          left + 25 < o.xMap + o.w
+        ) {
           this.#velY = 0;
           this.#y = o.yMap + o.h;
-          break;
         }
-        // if (
-        //   top <= o.yMap + o.h &&
-        //   bottom >= o.yMap + o.h &&
-        //   left >= o.xMap &&
-        //   right <= o.xMap + o.w
-        // ) {
-        //   this.#velY = 0;
-        //   this.#y = o.yMap + o.h;
-        //   break;
-        // }
 
-        // PREVENT ENTERING FROM LEFT
-        if (left <= o.xMap && right >= o.xMap) {
+        if (
+          right <= o.xMap + o.w &&
+          right >= o.xMap &&
+          // checking vertical
+          bottom - 25 > o.yMap &&
+          top + 25 < o.yMap + o.h
+        ) {
           this.#velX = 0;
           this.#x = o.xMap - currPos.w;
-          break;
         }
 
-        // PREVENT ENTERING FROM RIGHT
-        if (right >= o.xMap + o.w && left <= o.xMap + o.w) {
+        if (
+          left <= o.xMap + o.w &&
+          left >= o.xMap &&
+          // checking vertical
+          bottom - 25 > o.yMap &&
+          top + 25 < o.yMap + o.h
+        ) {
           this.#velX = 0;
           this.#x = o.xMap + o.w;
-          break;
         }
+
+        console.log(Math.floor(top + 15), Math.floor(o.yMap + o.h));
       }
+
+      // OLD VERSION ==============================================
+      // if (colHor && colVert) {
+      //   // PREVENT ENTERING FROM TOP
+      //   if (bottom >= o.yMap && top <= o.yMap) {
+      //     this.#velY = 0;
+      //     this.#y = o.yMap - currPos.h;
+      //     break;
+      //   }
+      //   // if (
+      //   //   bottom >= o.yMap &&
+      //   //   top <= o.yMap &&
+      //   //   left >= o.xMap &&
+      //   //   right <= o.xMap + o.w
+      //   // ) {
+      //   //   this.#velY = 0;
+      //   //   this.#y = o.yMap - currPos.h;
+      //   //   break;
+      //   // }
+
+      //   // PREVENT ENTERING FROM BOTTOM
+      //   if (top <= o.yMap + o.h && bottom >= o.yMap + o.h) {
+      //     this.#velY = 0;
+      //     this.#y = o.yMap + o.h;
+      //     break;
+      //   }
+      //   // if (
+      //   //   top <= o.yMap + o.h &&
+      //   //   bottom >= o.yMap + o.h &&
+      //   //   left >= o.xMap &&
+      //   //   right <= o.xMap + o.w
+      //   // ) {
+      //   //   this.#velY = 0;
+      //   //   this.#y = o.yMap + o.h;
+      //   //   break;
+      //   // }
+
+      //   // PREVENT ENTERING FROM LEFT
+      //   if (left <= o.xMap && right >= o.xMap) {
+      //     this.#velX = 0;
+      //     this.#x = o.xMap - currPos.w;
+      //     break;
+      //   }
+
+      //   // PREVENT ENTERING FROM RIGHT
+      //   if (right >= o.xMap + o.w && left <= o.xMap + o.w) {
+      //     this.#velX = 0;
+      //     this.#x = o.xMap + o.w;
+      //     break;
+      //   }
+      // }
     }
   }
 
