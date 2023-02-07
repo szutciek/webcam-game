@@ -56,13 +56,14 @@ export default class GameController {
   async renderFrame() {
     try {
       const s = performance.now();
-      this.player.calcMovement();
-      if (this.#ws.readyState === WebSocket.OPEN) this.syncPosition();
-      // comment out to have stationary camera
-      this.centerPlayer();
 
       const items = this.returnItemsFrame(this.gameObjects.allObjects);
       const players = this.returnItemsFrame(this.gameObjects.allPlayers);
+
+      this.player.calcMovement(items);
+      if (this.#ws.readyState === WebSocket.OPEN) this.syncPosition();
+      // comment out to have stationary camera
+      this.centerPlayer();
 
       const promises = players.map((player) => canvas.prepareCamera(player));
       const pT = this.translateInView(this.player);
@@ -93,15 +94,9 @@ export default class GameController {
     const change = { ...item };
     change.x = item.x - this.#x;
     change.y = item.y - this.#y;
+    change.w = item.w;
+    change.h = item.h;
     return change;
-
-    // return {
-    //   x: item.x - this.#x,
-    //   y: item.y - this.#y,
-    //   w: item.w,
-    //   h: item.h,
-    //   camera: item.camera,
-    // };
   }
 
   returnItemsFrame = (items) => {
@@ -118,6 +113,8 @@ export default class GameController {
         i.x + i.w > this.#x &&
         i.y + i.h > this.#y
       ) {
+        i.xMap = i.x;
+        i.yMap = i.y;
         list.push(this.translateInView(i));
       }
     });

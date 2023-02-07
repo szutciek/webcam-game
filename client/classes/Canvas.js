@@ -45,7 +45,10 @@ export default class Canvas {
 
   drawPlayer([x, y, w, h], cam) {
     // drawStickman(x, y);
-    drawFace(this.ctx, x, y, cam);
+    this.ctx.fillStyle = "#F2CCB7";
+    this.ctx.fillRect(x, y, w, h);
+
+    drawFace(this.ctx, x, y, w, h, cam);
   }
 
   clear() {

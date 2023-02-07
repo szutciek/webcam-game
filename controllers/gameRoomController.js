@@ -1,6 +1,6 @@
 const rooms = require("../state/rooms");
 const UserError = require("../utils/UserError");
-const { loadMap } = require("./gameMapController");
+const { loadMap, findAvalibleMaps } = require("./gameMapController");
 
 exports.handleRoomJoin = async (message, ws, client) => {
   try {
@@ -9,16 +9,27 @@ exports.handleRoomJoin = async (message, ws, client) => {
     if (!room) {
       room = rooms.addRoom(message.room, client.user?._id, 20);
 
-      const map = await loadMap(room.code);
-      if (map) {
-        const data = JSON.parse(map);
-
-        data.objects.forEach((obj, i) => {
-          setTimeout(() => {
-            room.addObject(obj.coords, obj.texture);
-          }, i * 50);
-        });
+      // add option to choose map and create room in a different way later on
+      let mapCode = undefined;
+      const avalibleMaps = await findAvalibleMaps();
+      if (avalibleMaps.includes(`${room.code}.json`)) {
+        mapCode = room.code;
+      } else {
+        mapCode = "default";
       }
+
+      const map = await loadMap(mapCode);
+      if (!map) throw new UserError("Map couldn't be loaded", 404);
+      const data = JSON.parse(map);
+
+      data.objects.forEach((obj, i) => {
+        setTimeout(() => {
+          room.addObject(obj.coords, { type: "color", value: "aqua" });
+          setTimeout(() => {
+            room.updateObject(obj.coords, obj.texture);
+          }, 30);
+        }, i * 20);
+      });
     }
 
     if (!room.checkSpaceAvalible()) {

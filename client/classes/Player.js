@@ -92,7 +92,55 @@ export default class Player {
     document.removeEventListener("keyup");
   }
 
-  calcMovement = () => {
+  checkCollisions(currPos, obstacles) {
+    if (!currPos || !obstacles)
+      throw new Error("Incomplete data for collision detection");
+
+    const right = currPos.x + currPos.w;
+    const left = currPos.x;
+    const bottom = currPos.y + currPos.h;
+    const top = currPos.y;
+
+    for (const o of obstacles) {
+      const colVert = top <= o.yMap + o.h && bottom >= o.yMap;
+      const colHor = left <= o.xMap + o.w && right >= o.xMap;
+
+      if (colHor && colVert) {
+        // PREVENT ENTERING FROM TOP
+        if (
+          bottom >= o.yMap &&
+          top <= o.yMap &&
+          left >= o.xMap &&
+          right <= o.xMap + o.w
+        ) {
+          this.#velY = 0;
+          this.#y = o.yMap - currPos.h;
+        }
+        // PREVENT ENTERING FROM BOTTOM
+        if (
+          top <= o.yMap + o.h &&
+          bottom >= o.yMap + o.h &&
+          left >= o.xMap &&
+          right <= o.xMap + o.w
+        ) {
+          this.#velY = 0;
+          this.#y = o.yMap + o.h;
+        }
+        // PREVENT ENTERING FROM LEFT
+        if (left <= o.xMap && right >= o.xMap) {
+          this.#velX = 0;
+          this.#x = o.xMap - currPos.w;
+        }
+        // PREVENT ENTERING FROM RIGHT
+        if (right >= o.xMap + o.w && left <= o.xMap + o.w) {
+          this.#velX = 0;
+          this.#x = o.xMap + o.w;
+        }
+      }
+    }
+  }
+
+  calcMovement = (obstacles) => {
     this.#addVelocity();
     this.#subtractVelocity();
 
@@ -103,6 +151,11 @@ export default class Player {
     if (this.#velX > 0) this.#x += f(Math.abs(this.#velX));
     if (this.#velY < 0) this.#y += -f(Math.abs(this.#velY));
     if (this.#velY > 0) this.#y += f(Math.abs(this.#velY));
+
+    this.checkCollisions(
+      { x: this.#x, y: this.#y, w: this.#w, h: this.#h },
+      obstacles
+    );
 
     // this.#x += this.#velX;
     // this.#y += this.#velY;

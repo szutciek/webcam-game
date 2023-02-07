@@ -1,0 +1,9 @@
+{
+  "name": "default",
+  "objects": [
+    {
+      "coords": { "x": 21, "y": 0, "w": 1000, "h": 1000 },
+      "texture": { "type": "color", "value": "blue" }
+    }
+  ]
+}

@@ -134,14 +134,6 @@
       "texture": { "type": "color", "value": "#6A5506" }
     },
     {
-      "coords": { "x": 0, "y": 300, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
-    },
-    {
-      "coords": { "x": 10, "y": 350, "w": 30, "h": 50 },
-      "texture": { "type": "color", "value": "#947914" }
-    },
-    {
       "coords": { "x": 0, "y": 400, "w": 50, "h": 50 },
       "texture": { "type": "color", "value": "#6A5506" }
     },
