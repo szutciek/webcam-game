@@ -157,9 +157,9 @@ export default class Player {
       const colVert = top <= o.yMap + o.h && bottom >= o.yMap;
       const colHor = left <= o.xMap + o.w && right >= o.xMap;
 
-      if (colHor) horizontalCollision = true;
+      if (colHor && o.ignore) horizontalCollision = true;
 
-      if (colHor && colVert) {
+      if (!o.ignore && colHor && colVert) {
         horizontalCollision = true;
 
         if (

@@ -30,9 +30,11 @@ module.exports = class Chunk {
     // checks if the object indeed matches this chunk
     // every object is 100px wide so we need to account for that by adding 100
 
-    // console.log(this.x, coordinates.x);
-    if (this.x <= coordinates.x && this.maxX >= coordinates.x + 100) {
-      if (this.y <= coordinates.y && this.maxY >= coordinates.y + 100) {
+    if (this.x <= coordinates.x && this.maxX >= coordinates.x + coordinates.w) {
+      if (
+        this.y <= coordinates.y &&
+        this.maxY >= coordinates.y + coordinates.h
+      ) {
         return true;
       }
     }
@@ -72,7 +74,11 @@ module.exports = class Chunk {
   }
 
   // 100x100
-  createObject(coordinates, texture = { type: "color", value: "white" }) {
+  createObject(
+    coordinates,
+    texture = { type: "color", value: "white" },
+    ignore
+  ) {
     // if (!this.checkIfMultiple(coordinates.x)) return;
     // if (!this.checkIfMultiple(coordinates.y)) return;
     if (coordinates.x === undefined) return;
@@ -82,7 +88,10 @@ module.exports = class Chunk {
     // handle errors when too wide
     if (this.checkIfInBounds(coordinates) && !this.checkIfExists(coordinates)) {
       const id = crypto.randomUUID();
-      this.gameObjects.set(id, new GameObject(id, coordinates, texture));
+      this.gameObjects.set(
+        id,
+        new GameObject(id, coordinates, texture, ignore)
+      );
       this.lastUpdate = Date.now();
     }
   }

@@ -22,13 +22,17 @@ exports.handleRoomJoin = async (message, ws, client) => {
       if (!map) throw new UserError("Map couldn't be loaded", 404);
       const data = JSON.parse(map);
 
-      data.objects.forEach((obj, i) => {
-        setTimeout(() => {
-          room.addObject(obj.coords, { type: "color", value: "aqua" });
-          setTimeout(() => {
-            room.updateObject(obj.coords, obj.texture);
-          }, 30);
-        }, i * 20);
+      // data.objects.forEach((obj, i) => {
+      //   setTimeout(() => {
+      //     room.addObject(obj.coords, { type: "color", value: "aqua" });
+      //     setTimeout(() => {
+      //       room.updateObject(obj.coords, obj.texture, obj.ignore);
+      //     }, 30);
+      //   }, i * 20);
+      // });
+
+      data.objects.forEach((obj) => {
+        room.addObject(obj.coords, obj.texture, obj.ignore);
       });
     }
 

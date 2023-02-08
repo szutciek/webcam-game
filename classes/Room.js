@@ -34,7 +34,7 @@ module.exports = class Room {
     }
   }
 
-  addObject(coords, texture) {
+  addObject(coords, texture, ignore) {
     if (coords.x === undefined || coords.y === undefined) return;
     const chunk = this.getChunk(coords.x, coords.y);
     if (!chunk)
@@ -42,7 +42,7 @@ module.exports = class Room {
     this.findChunk(
       this.identifyChunk(coords.x),
       this.identifyChunk(coords.y)
-    ).createObject(coords, texture);
+    ).createObject(coords, texture, ignore);
   }
 
   getChunk(xI, yI) {
