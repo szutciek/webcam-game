@@ -110,17 +110,25 @@ export default class ClientController {
   handleMessage(mes) {
     const message = JSON.parse(mes.data);
     if (message.type === "pinf") {
-      const [x, y, w, h] = message.data;
+      const [x, y, w, h] = message.position;
       if (!message.uuid) return;
       this.gameObjects.updatePlayerInfo(message.uuid, { x, y, w, h });
       return;
     }
 
-    if (message.type === "pcam") {
+    if (message.type === "pinfcam") {
+      const [x, y, w, h] = message.position;
       if (!message.uuid) return;
-      // add convert script to this
-      this.gameObjects.updatePlayerCamera(message.uuid, message.data);
+      this.gameObjects.updatePlayerInfo(message.uuid, { x, y, w, h });
+      this.gameObjects.updatePlayerCamera(message.uuid, message.camera);
+      return;
     }
+
+    // if (message.type === "pcam") {
+    //   if (!message.uuid) return;
+    //   // add convert script to this
+    //   this.gameObjects.updatePlayerCamera(message.uuid, message.data);
+    // }
 
     if (message.type === "mobj") {
       this.gameObjects.setObjects(message.data);

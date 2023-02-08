@@ -10,7 +10,7 @@ const {
 } = require("./controllers/gameClientController");
 const {
   handleSyncPosition,
-  handleSyncCam,
+  handleSyncPositionAndCamera,
 } = require("./controllers/gameSyncController.js");
 const { handleRoomJoin } = require("./controllers/gameRoomController");
 
@@ -37,9 +37,13 @@ wss.on("connection", function connection(ws) {
         return handleSyncPosition(message, client, ws);
       }
 
-      if (message.type === "cam") {
-        return handleSyncCam(message, client, ws);
+      if (message.type === "infcam") {
+        return handleSyncPositionAndCamera(message, client, ws);
       }
+
+      // if (message.type === "cam") {
+      //   return handleSyncCam(message, client, ws);
+      // }
 
       if (message.type === "roomjoin") {
         return await handleRoomJoin(message, ws, client);

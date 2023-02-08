@@ -11,6 +11,7 @@ export default class GameController {
   #vh = window.innerHeight;
 
   #interval = undefined;
+  #includeCam = 0;
   #webcamInterval = undefined;
 
   constructor(player, ws, uuid, gameObjects) {
@@ -33,15 +34,15 @@ export default class GameController {
       this.renderFrame();
     }, 1000 / 60);
 
-    this.#webcamInterval = setInterval(async () => {
-      try {
-        if (!this.player) return;
-        this.player.camera = await takePicture();
-        this.syncCamera(this.uuid, this?.player?.camera);
-      } catch (err) {
-        console.log(err);
-      }
-    }, 1000 / 24);
+    // this.#webcamInterval = setInterval(async () => {
+    //   try {
+    //     if (!this.player) return;
+    //     this.player.camera = await takePicture();
+    //     this.syncCamera(this.uuid, this?.player?.camera);
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    // }, 1000 / 24);
   }
   stopGame() {
     clearInterval(this.#interval);
@@ -61,7 +62,18 @@ export default class GameController {
       const players = this.returnItemsFrame(this.gameObjects.allPlayers);
 
       this.player.calcMovement(items);
-      if (this.#ws.readyState === WebSocket.OPEN) this.syncPosition();
+      if (this.#ws.readyState === WebSocket.OPEN) {
+        // camera script
+        if (this.#includeCam % 3 === 0) {
+          if (!this.player) return;
+          this.player.camera = await takePicture();
+          this.syncPositionAndCamera();
+          this.#includeCam = 0;
+        } else {
+          this.syncPosition();
+        }
+        // only position script
+      }
       // comment out to have stationary camera
       this.centerPlayer();
 
@@ -85,6 +97,8 @@ export default class GameController {
       document.getElementById(
         "renderedItems"
       ).innerText = `${items.length} Objects, `;
+
+      this.#includeCam++;
     } catch (err) {
       console.warn(err);
     }
@@ -121,34 +135,37 @@ export default class GameController {
     return list;
   };
 
-  sendSyncPosition(x, y, w, h) {
+  syncPositionAndCamera() {
     this.send(
       JSON.stringify({
-        type: "inf",
+        type: "infcam",
         uuid: this.uuid,
-        data: [x, y, w, h],
+        position: [this.player.x, this.player.y, this.player.w, this.player.h],
+        camera: this.player?.camera,
       })
     );
   }
 
   syncPosition() {
-    this.sendSyncPosition(
-      this.player.x,
-      this.player.y,
-      this.player.w,
-      this.player.h
-    );
-  }
-
-  syncCamera(id, b64) {
     this.send(
       JSON.stringify({
-        type: "cam",
-        uuid: id,
-        data: b64,
+        type: "inf",
+        uuid: this.uuid,
+        position: [this.player.x, this.player.y, this.player.w, this.player.h],
       })
     );
   }
+
+  // too many requests - cam data added every 3rd instead
+  // syncCamera(id, b64) {
+  //   this.send(
+  //     JSON.stringify({
+  //       type: "cam",
+  //       uuid: id,
+  //       data: b64,
+  //     })
+  //   );
+  // }
 
   send(payload) {
     if (this.#ws.readyState === WebSocket.OPEN) this.#ws.send(payload);

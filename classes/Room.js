@@ -123,7 +123,7 @@ module.exports = class Room {
   updatePlayerPosition(uuid, data) {
     const player = this.#players.get(uuid);
     if (!player) return;
-    player.updatePosition(data.data);
+    player.updatePosition(data.position);
     this.sendChunks(player);
   }
 
