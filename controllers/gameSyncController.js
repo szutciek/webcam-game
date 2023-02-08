@@ -15,13 +15,15 @@ exports.handleSyncPosition = (data, client, ws) => {
   }
 
   // perform some position validation
-  client.roomRef.updatePlayerPosition(ws.uuid, data);
+  client.roomRef.updatePlayerPosition(ws.uuid, data.position);
+  client.roomRef.updatePlayerPose(ws.uuid, data.pose);
 
   client.roomRef.broadcast(
     {
       type: "pinf",
       uuid: ws.uuid,
       position: [...data.position],
+      pose: data.pose,
     },
     ws.uuid
   );
@@ -43,13 +45,15 @@ exports.handleSyncPositionAndCamera = (data, client, ws) => {
   }
 
   // perform some position validation
-  client.roomRef.updatePlayerPosition(ws.uuid, data);
+  client.roomRef.updatePlayerPosition(ws.uuid, data.position);
+  client.roomRef.updatePlayerPose(ws.uuid, data.pose);
 
   client.roomRef.broadcast(
     {
       type: "pinfcam",
       uuid: ws.uuid,
       position: [...data.position],
+      pose: data.pose,
       camera: data.camera,
     },
     ws.uuid

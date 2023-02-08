@@ -3,4 +3,5 @@ module.exports = {
   maxClients: 2,
   maxPlayersRoom: 2,
   maxRenderDistance: 2,
+  rootDir: __dirname,
 };

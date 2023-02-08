@@ -120,17 +120,21 @@ module.exports = class Room {
     this.#players.delete(uuid);
   }
 
-  updatePlayerPosition(uuid, data) {
+  updatePlayerPosition(uuid, position) {
     const player = this.#players.get(uuid);
     if (!player) return;
-    player.updatePosition(data.position);
+    player.updatePosition(position);
     this.sendChunks(player);
   }
-
-  updatePlayerCamera(uuid, data) {
+  updatePlayerPose(uuid, pose) {
     const player = this.#players.get(uuid);
     if (!player) return;
-    player.camera = data;
+    player.updatePose(pose);
+  }
+  updatePlayerCamera(uuid, camera) {
+    const player = this.#players.get(uuid);
+    if (!player) return;
+    player.camera = camera;
     this.#players.set(uuid, player);
   }
 

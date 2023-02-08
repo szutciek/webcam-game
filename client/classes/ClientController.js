@@ -112,14 +112,16 @@ export default class ClientController {
     if (message.type === "pinf") {
       const [x, y, w, h] = message.position;
       if (!message.uuid) return;
-      this.gameObjects.updatePlayerInfo(message.uuid, { x, y, w, h });
+      this.gameObjects.updatePlayerPosition(message.uuid, { x, y, w, h });
+      this.gameObjects.updatePlayerPose(message.uuid, message.pose);
       return;
     }
 
     if (message.type === "pinfcam") {
       const [x, y, w, h] = message.position;
       if (!message.uuid) return;
-      this.gameObjects.updatePlayerInfo(message.uuid, { x, y, w, h });
+      this.gameObjects.updatePlayerPosition(message.uuid, { x, y, w, h });
+      this.gameObjects.updatePlayerPose(message.uuid, message.pose);
       this.gameObjects.updatePlayerCamera(message.uuid, message.camera);
       return;
     }

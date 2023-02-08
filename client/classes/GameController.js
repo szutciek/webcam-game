@@ -62,6 +62,17 @@ export default class GameController {
       const players = this.returnItemsFrame(this.gameObjects.allPlayers);
 
       this.player.calcMovement(items);
+      this.player.checkCollisions(
+        {
+          x: this.player.x,
+          y: this.player.y,
+          w: this.player.w,
+          h: this.player.h,
+        },
+        players,
+        true
+      );
+
       if (this.#ws.readyState === WebSocket.OPEN) {
         // camera script
         if (this.#includeCam % 3 === 0) {
@@ -86,7 +97,7 @@ export default class GameController {
       // change to support image textures
       items.forEach((i) => canvas.drawItem(i));
       // players.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], "#555555"));
-      prepared.forEach((i) => canvas.drawPlayer([i.x, i.y, i.w, i.h], i.image));
+      prepared.forEach((i) => canvas.drawPlayer(i, i.image, i.pose));
 
       document.getElementById("renderTime").innerText = `${
         performance.now() - s
@@ -141,6 +152,7 @@ export default class GameController {
         type: "infcam",
         uuid: this.uuid,
         position: [this.player.x, this.player.y, this.player.w, this.player.h],
+        pose: this.player.pose,
         camera: this.player?.camera,
       })
     );
@@ -152,6 +164,7 @@ export default class GameController {
         type: "inf",
         uuid: this.uuid,
         position: [this.player.x, this.player.y, this.player.w, this.player.h],
+        pose: this.player.pose,
       })
     );
   }

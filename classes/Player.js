@@ -5,6 +5,12 @@ module.exports = class Player {
   previousPosition = undefined;
   updatedChunks = new Map();
 
+  pose = {
+    crouching: false,
+    madLeft: false,
+    madRight: false,
+  };
+
   constructor(uuid, position) {
     this.uuid = uuid;
     this.position = position;
@@ -14,6 +20,9 @@ module.exports = class Player {
     this.previousPosition = { ...this.position };
     this.position = { x, y, w, h, time: performance.now() };
     // add inventory and stuff in the future
+  }
+  updatePose(pose) {
+    this.pose = pose;
   }
 
   get x() {

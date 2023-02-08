@@ -143,11 +143,6 @@
     },
 
     {
-      "coords": { "x": 0, "y": 250, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
-    },
-
-    {
       "coords": { "x": -700, "y": -400, "w": 500, "h": 400 },
       "texture": { "type": "color", "value": "#BC4A3C" }
     },

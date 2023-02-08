@@ -41,6 +41,12 @@ export const startStream = () => {
 const capturePicture = async () => {
   canvasStream.width = width;
   canvasStream.height = height;
+
+  context.beginPath();
+  context.arc(50, 50, 50, 0, 2 * Math.PI, true);
+  context.closePath();
+
+  context.clip();
   context.drawImage(video, 0, 0, width, height);
 
   const pic = await new Promise((res) => {

@@ -1,4 +1,4 @@
-import { drawFace } from "/canvasMethods.js";
+import { drawFace, drawBody } from "/canvasMethods.js";
 
 export default class Canvas {
   constructor(id) {
@@ -43,12 +43,22 @@ export default class Canvas {
     this.ctx.drawImage(img, coords[0], coords[1], coords[2], coords[3]);
   }
 
-  drawPlayer([x, y, w, h], cam) {
-    // drawStickman(x, y);
-    this.ctx.fillStyle = "#F2CCB7";
-    this.ctx.fillRect(x, y, w, h);
+  drawPlayer(player, camera, pose) {
+    let { x, y, w, h } = player;
 
-    drawFace(this.ctx, x, y, w, h, cam);
+    // this.ctx.fillStyle = "#F2CCB7";
+    // this.ctx.fillRect(x, y, w, h);
+
+    if (pose.crouching === true) {
+      y += 50;
+      h = 150;
+    }
+
+    // this.ctx.fillStyle = "#ff9999";
+    // this.ctx.fillRect(x, y, w, h);
+
+    drawBody(this.ctx, x, y, w, h, pose);
+    drawFace(this.ctx, x, y, w, h, camera);
   }
 
   clear() {

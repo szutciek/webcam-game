@@ -1,4 +1,4 @@
-const maxX = 15;
+const maxS = 15;
 
 const f = (x) => {
   // 2 is vert stretch, 1 is horizontal translation, using change of base
@@ -20,6 +20,12 @@ export default class Player {
   #inpN = false;
   #inpS = false;
 
+  pose = {
+    crouching: false,
+    madLeft: false,
+    madRight: false,
+  };
+
   constructor(position = [0, 0, 100, 200]) {
     this.#x = position[0];
     this.#y = position[1];
@@ -28,11 +34,20 @@ export default class Player {
   }
 
   #subtractVelocity = () => {
-    if (!this.#inpS && !this.#inpN) {
-      this.#velY /= 1.2;
-    }
-    if (!this.#inpW && !this.#inpE) {
-      this.#velX /= 1.2;
+    if (!this.pose.crouching) {
+      if (!this.#inpS && !this.#inpN) {
+        this.#velY /= 1.2;
+      }
+      if (!this.#inpW && !this.#inpE) {
+        this.#velX /= 1.2;
+      }
+    } else {
+      if (!this.#inpS && !this.#inpN) {
+        this.#velY /= 1.7;
+      }
+      if (!this.#inpW && !this.#inpE) {
+        this.#velX /= 1.7;
+      }
     }
   };
   #addVelocity = () => {
@@ -42,57 +57,92 @@ export default class Player {
     // if (this.#inpS && this.#velY > -maxX) {
     //   this.#velY -= 0.6;
     // }
-    if (this.#inpN && this.#velY > -maxX) {
+
+    let currentMax = maxS;
+    if (this.pose.crouching) currentMax /= 20;
+
+    if (this.#inpN && this.#velY > -currentMax) {
       this.#velY -= 0.6;
     }
-    if (this.#inpS && this.#velY < maxX) {
+    if (this.#inpS && this.#velY < currentMax) {
       this.#velY += 0.6;
     }
 
-    if (this.#inpE && this.#velX < maxX) {
+    if (this.#inpE && this.#velX < currentMax) {
       this.#velX += 0.6;
     }
-    if (this.#inpW && this.#velX > -maxX) {
+    if (this.#inpW && this.#velX > -currentMax) {
       this.#velX -= 0.6;
     }
   };
 
   activateMovement() {
+    document.addEventListener("keypress", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+    });
     document.addEventListener("keydown", (e) => {
-      if (e.key === "w") {
+      e.stopPropagation();
+      e.preventDefault();
+
+      if (e.key === "w" || e.key === "W") {
         this.#inpN = true;
       }
-      if (e.key === "s") {
+      if (e.key === "s" || e.key === "S") {
         this.#inpS = true;
       }
-      if (e.key === "a") {
+      if (e.key === "a" || e.key === "A") {
         this.#inpW = true;
       }
-      if (e.key === "d") {
+      if (e.key === "d" || e.key === "D") {
         this.#inpE = true;
+      }
+
+      // SPECIAL KEYS
+      if (e.key === "Shift") {
+        this.pose.crouching = true;
+
+        // // doesnt work with current collisions
+        // if (this.#h !== 150) this.#y += 50;
+        // this.#h = 150;
       }
     });
     document.addEventListener("keyup", (e) => {
-      if (e.key === "w") {
+      e.stopPropagation();
+      e.preventDefault();
+
+      if (e.key === "w" || e.key === "W") {
         this.#inpN = false;
       }
-      if (e.key === "s") {
+      if (e.key === "s" || e.key === "S") {
         this.#inpS = false;
       }
-      if (e.key === "a") {
+      if (e.key === "a" || e.key === "A") {
         this.#inpW = false;
       }
-      if (e.key === "d") {
+      if (e.key === "d" || e.key === "D") {
         this.#inpE = false;
+      }
+
+      // SPECIAL KEYS
+      if (e.key === "Shift") {
+        this.pose.crouching = false;
+
+        // // doesnt work with current collisions
+        // if (this.#h !== 200 && this.nothing50Above()) {
+        //   this.#y -= 50;
+        // }
+        // this.#h = 200;
       }
     });
   }
   deactivateMovement() {
     document.removeEventListener("keydown");
     document.removeEventListener("keyup");
+    document.removeEventListener("keypress");
   }
 
-  checkCollisions(currPos, obstacles) {
+  checkCollisions(currPos, obstacles, react = false) {
     if (!currPos || !obstacles)
       throw new Error("Incomplete data for collision detection");
 
@@ -101,15 +151,20 @@ export default class Player {
     const bottom = currPos.y + currPos.h;
     const top = currPos.y;
 
+    let horizontalCollision = false;
+
     for (const o of obstacles) {
       const colVert = top <= o.yMap + o.h && bottom >= o.yMap;
       const colHor = left <= o.xMap + o.w && right >= o.xMap;
 
+      if (colHor) horizontalCollision = true;
+
       if (colHor && colVert) {
+        horizontalCollision = true;
+
         if (
           bottom <= o.yMap + o.h &&
           bottom >= o.yMap &&
-          // check horizontal
           right - 25 > o.xMap &&
           left + 25 < o.xMap + o.w
         ) {
@@ -120,7 +175,6 @@ export default class Player {
         if (
           top <= o.yMap + o.h &&
           top >= o.yMap &&
-          // check horizontal
           right - 25 > o.xMap &&
           left + 25 < o.xMap + o.w
         ) {
@@ -131,25 +185,32 @@ export default class Player {
         if (
           right <= o.xMap + o.w &&
           right >= o.xMap &&
-          // checking vertical
           bottom - 25 > o.yMap &&
           top + 25 < o.yMap + o.h
         ) {
           this.#velX = 0;
           this.#x = o.xMap - currPos.w;
+          // react to the right
+          react && (this.pose.madRight = true);
         }
 
         if (
           left <= o.xMap + o.w &&
           left >= o.xMap &&
-          // checking vertical
           bottom - 25 > o.yMap &&
           top + 25 < o.yMap + o.h
         ) {
           this.#velX = 0;
           this.#x = o.xMap + o.w;
+          // react to the left
+          react && (this.pose.madLeft = true);
         }
       }
+    }
+
+    if (!horizontalCollision) {
+      this.pose.madLeft = false;
+      this.pose.madRight = false;
     }
   }
 
