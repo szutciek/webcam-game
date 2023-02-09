@@ -40,7 +40,14 @@ exports.handleRoomJoin = async (message, ws, client) => {
       throw new UserError(`Room ${message.room} is currently full`);
     }
 
-    room.joinRoom(message.uuid);
+    const startPos = {
+      x: Math.floor(Math.random() * 500) - 250,
+      y: Math.floor(Math.random() * 500) - 250,
+      w: 100,
+      h: 200,
+    };
+
+    room.joinRoom(message.uuid, startPos);
     client.changeRoom(message.room);
 
     ws.send(
@@ -48,12 +55,7 @@ exports.handleRoomJoin = async (message, ws, client) => {
         type: "roomjoinOk",
         room: message.room,
         data: {
-          position: [
-            Math.floor(Math.random() * 500) - 250,
-            Math.floor(Math.random() * 500) - 250,
-            100,
-            200,
-          ],
+          position: [startPos.x, startPos.y, startPos.w, startPos.h],
         },
       })
     );

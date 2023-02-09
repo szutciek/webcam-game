@@ -41,6 +41,13 @@ module.exports = class Room {
   }
 
   gameTick() {
+    // do all kinds of calculations
+    this.#players.forEach((player) => {
+      player.calculateVelocity();
+      player.calculateMovement();
+    });
+
+    // collect all data
     let list = [];
     if (this.#includeCam % 3 === 0) {
       list = this.getAllPlayersQuickData(true);
@@ -51,6 +58,7 @@ module.exports = class Room {
     }
     this.#includeCam++;
 
+    // broadcast the data to clients
     this.broadcast({
       type: "pinfo",
       data: list,
@@ -153,16 +161,22 @@ module.exports = class Room {
     return true;
   }
 
-  joinRoom(uuid) {
-    this.#players.set(uuid, new Player(uuid, { x: 0, y: 0, w: 100, h: 200 }));
+  joinRoom(uuid, startPos) {
+    this.#players.set(uuid, new Player(uuid, startPos));
   }
 
   leaveRoom(uuid) {
     this.#players.delete(uuid);
   }
 
-  updatePlayerCalcPosition(uuid, data) {
-    console.log(data.x, data.y);
+  updatePlayerInput(uuid, data) {
+    const player = this.#players.get(uuid);
+    if (!player) return;
+
+    // changing the inputs for velocity calculations
+    player.updateInputs(data);
+
+    // respond with chunks (convenient)
     this.sendChunks(this.#players.get(uuid));
   }
 

@@ -51,13 +51,6 @@ export default class Player {
     }
   };
   addVelocity = () => {
-    // if (this.#inpN && this.#velY < maxX) {
-    //   this.#velY += 0.6;
-    // }
-    // if (this.#inpS && this.#velY > -maxX) {
-    //   this.#velY -= 0.6;
-    // }
-
     let currentMax = maxS;
     if (this.pose.crouching) currentMax /= 20;
 
@@ -226,10 +219,18 @@ export default class Player {
     // we doing velocity in px/frame
     // actually kinda stupid cause velocity isnt velocity but anyways
 
-    if (this.#velX < 0) this.#x += -f(Math.abs(this.#velX));
-    if (this.#velX > 0) this.#x += f(Math.abs(this.#velX));
-    if (this.#velY < 0) this.#y += -f(Math.abs(this.#velY));
-    if (this.#velY > 0) this.#y += f(Math.abs(this.#velY));
+    // if (this.#velX < 0) this.#x += -f(Math.abs(this.#velX));
+    // if (this.#velX > 0) this.#x += f(Math.abs(this.#velX));
+    // if (this.#velY < 0) this.#y += -f(Math.abs(this.#velY));
+    // if (this.#velY > 0) this.#y += f(Math.abs(this.#velY));
+
+    if (this.#velX < 0) this.#x += this.#velX;
+    if (this.#velX > 0) this.#x += this.#velX;
+    if (this.#velY < 0) this.#y += this.#velY;
+    if (this.#velY > 0) this.#y += this.#velY;
+
+    this.#x += Math.sign(this.#velX) * f(Math.abs(this.#velX));
+    this.#y += Math.sign(this.#velY) * f(Math.abs(this.#velY));
 
     // this.checkCollisions(
     //   { x: this.#x, y: this.#y, w: this.#w, h: this.#h },
@@ -243,10 +244,6 @@ export default class Player {
       this.#x
     )}, ${Math.floor(this.#y)}`;
   };
-
-  syncMovement() {
-    currentSync.syncPosition(this.#x, this.#y);
-  }
 
   get x() {
     return this.#x;
@@ -265,5 +262,13 @@ export default class Player {
   }
   get velY() {
     return this.#velY;
+  }
+  get inputs() {
+    return {
+      n: this.#inpN,
+      e: this.#inpE,
+      s: this.#inpS,
+      w: this.#inpW,
+    };
   }
 }

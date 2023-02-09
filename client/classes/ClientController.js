@@ -110,9 +110,10 @@ export default class ClientController {
   handleMessage(mes) {
     const message = JSON.parse(mes.data);
     if (message.type === "pinfo") {
+      console.log(performance.now());
       message.data.forEach((player) => {
         if (player.id !== this.user.uuid) {
-          this.gameObjects.updatePlayer(player);
+          this.gameObjects.updatePlayer(player.id, player);
         } else {
           this?.player.serverOverride(player);
         }
