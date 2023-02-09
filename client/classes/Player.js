@@ -33,7 +33,7 @@ export default class Player {
     this.#h = position[3];
   }
 
-  #subtractVelocity = () => {
+  subtractVelocity = () => {
     if (!this.pose.crouching) {
       if (!this.#inpS && !this.#inpN) {
         this.#velY /= 1.2;
@@ -50,7 +50,7 @@ export default class Player {
       }
     }
   };
-  #addVelocity = () => {
+  addVelocity = () => {
     // if (this.#inpN && this.#velY < maxX) {
     //   this.#velY += 0.6;
     // }
@@ -142,6 +142,14 @@ export default class Player {
     document.removeEventListener("keypress");
   }
 
+  serverOverride(data) {
+    this.#x = data.position[0];
+    this.#y = data.position[1];
+    this.#w = data.position[2];
+    this.#h = data.position[3];
+    this.pose = data.pose;
+  }
+
   checkCollisions(currPos, obstacles, react = false) {
     if (!currPos || !obstacles)
       throw new Error("Incomplete data for collision detection");
@@ -214,10 +222,7 @@ export default class Player {
     }
   }
 
-  calcMovement = (obstacles) => {
-    this.#addVelocity();
-    this.#subtractVelocity();
-
+  performMovement = () => {
     // we doing velocity in px/frame
     // actually kinda stupid cause velocity isnt velocity but anyways
 
@@ -226,10 +231,10 @@ export default class Player {
     if (this.#velY < 0) this.#y += -f(Math.abs(this.#velY));
     if (this.#velY > 0) this.#y += f(Math.abs(this.#velY));
 
-    this.checkCollisions(
-      { x: this.#x, y: this.#y, w: this.#w, h: this.#h },
-      obstacles
-    );
+    // this.checkCollisions(
+    //   { x: this.#x, y: this.#y, w: this.#w, h: this.#h },
+    //   obstacles
+    // );
 
     // this.#x += this.#velX;
     // this.#y += this.#velY;
@@ -254,5 +259,11 @@ export default class Player {
   }
   get h() {
     return this.#h;
+  }
+  get velX() {
+    return this.#velX;
+  }
+  get velY() {
+    return this.#velY;
   }
 }

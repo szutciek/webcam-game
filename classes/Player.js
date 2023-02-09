@@ -5,6 +5,7 @@ module.exports = class Player {
   previousPosition = undefined;
   updatedChunks = new Map();
 
+  camera = "";
   pose = {
     crouching: false,
     madLeft: false,
@@ -36,5 +37,20 @@ module.exports = class Player {
   }
   get h() {
     return this.position.h;
+  }
+
+  quickData(camera) {
+    const data = {
+      id: this.uuid,
+      position: [
+        Math.floor(this.position.x),
+        Math.floor(this.position.y),
+        this.position.w,
+        this.position.h,
+      ],
+      pose: this.pose,
+    };
+    if (camera) data.camera = this.camera;
+    return data;
   }
 };

@@ -15,19 +15,26 @@ exports.handleSyncPosition = (data, client, ws) => {
   }
 
   // perform some position validation
-  client.roomRef.updatePlayerPosition(ws.uuid, data.position);
+  client.roomRef.updatePlayerCalcPosition(ws.uuid, {
+    x: data.position[0],
+    y: data.position[1],
+    w: data.position[2],
+    h: data.position[3],
+    velX: data.velX,
+    velY: data.velY,
+  });
   client.roomRef.updatePlayerPose(ws.uuid, data.pose);
 
   // we send one huge request
-  client.roomRef.broadcast(
-    {
-      type: "pinf",
-      uuid: ws.uuid,
-      position: [...data.position],
-      pose: data.pose,
-    },
-    ws.uuid
-  );
+  // client.roomRef.broadcast(
+  //   {
+  //     type: "pinf",
+  //     uuid: ws.uuid,
+  //     position: [...data.position],
+  //     pose: data.pose,
+  //   },
+  //   ws.uuid
+  // );
 };
 
 exports.handleSyncPositionAndCamera = (data, client, ws) => {
@@ -46,20 +53,28 @@ exports.handleSyncPositionAndCamera = (data, client, ws) => {
   }
 
   // perform some position validation
-  client.roomRef.updatePlayerPosition(ws.uuid, data.position);
+  client.roomRef.updatePlayerCalcPosition(ws.uuid, {
+    x: data.position[0],
+    y: data.position[1],
+    w: data.position[2],
+    h: data.position[3],
+    velX: data.velX,
+    velY: data.velY,
+  });
   client.roomRef.updatePlayerPose(ws.uuid, data.pose);
+  client.roomRef.updatePlayerCamera(ws.uuid, data.camera);
 
   // we send one huge request
-  client.roomRef.broadcast(
-    {
-      type: "pinfcam",
-      uuid: ws.uuid,
-      position: [...data.position],
-      pose: data.pose,
-      camera: data.camera,
-    },
-    ws.uuid
-  );
+  // client.roomRef.broadcast(
+  //   {
+  //     type: "pinfcam",
+  //     uuid: ws.uuid,
+  //     position: [...data.position],
+  //     pose: data.pose,
+  //     camera: data.camera,
+  //   },
+  //   ws.uuid
+  // );
 };
 
 // exports.handleSyncCam = (data, client, ws) => {

@@ -5,6 +5,9 @@ const { maxPlayersRoom, maxRenderDistance } = require("../config");
 const Chunk = require("./Chunk");
 
 module.exports = class Room {
+  #clock = undefined;
+  #includeCam = 0;
+
   #players = new Map();
 
   // 1600px x 1600px
@@ -22,6 +25,44 @@ module.exports = class Room {
     this.renderDistance = renderDistance;
 
     this.createStartChunks(2);
+
+    this.startGameClock();
+  }
+
+  stopGameClock() {
+    clearInterval(this.#clock);
+  }
+
+  startGameClock() {
+    this.#clock = setInterval(() => {
+      if (this.#players.size === 0) this.stopGameClock();
+      this.gameTick();
+    }, 1000 / 60);
+  }
+
+  gameTick() {
+    let list = [];
+    if (this.#includeCam % 3 === 0) {
+      list = this.getAllPlayersQuickData(true);
+
+      this.#includeCam = 0;
+    } else {
+      list = this.getAllPlayersQuickData(false);
+    }
+    this.#includeCam++;
+
+    this.broadcast({
+      type: "pinfo",
+      data: list,
+    });
+  }
+
+  getAllPlayersQuickData(camera) {
+    const data = [];
+    this.#players.forEach((p) => {
+      data.push(p.quickData(camera));
+    });
+    return data;
   }
 
   createStartChunks(num) {
@@ -120,12 +161,17 @@ module.exports = class Room {
     this.#players.delete(uuid);
   }
 
-  updatePlayerPosition(uuid, position) {
-    const player = this.#players.get(uuid);
-    if (!player) return;
-    player.updatePosition(position);
-    this.sendChunks(player);
+  updatePlayerCalcPosition(uuid, data) {
+    console.log(data.x, data.y);
+    this.sendChunks(this.#players.get(uuid));
   }
+
+  // updatePlayerPosition(uuid, position) {
+  //   const player = this.#players.get(uuid);
+  //   if (!player) return;
+  //   player.updatePosition(position);
+  //   this.sendChunks(player);
+  // }
   updatePlayerPose(uuid, pose) {
     const player = this.#players.get(uuid);
     if (!player) return;

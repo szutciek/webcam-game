@@ -58,21 +58,6 @@ export default class GameController {
     try {
       const s = performance.now();
 
-      const items = this.returnItemsFrame(this.gameObjects.allObjects);
-      const players = this.returnItemsFrame(this.gameObjects.allPlayers);
-
-      this.player.calcMovement(items);
-      this.player.checkCollisions(
-        {
-          x: this.player.x,
-          y: this.player.y,
-          w: this.player.w,
-          h: this.player.h,
-        },
-        players,
-        true
-      );
-
       if (this.#ws.readyState === WebSocket.OPEN) {
         // camera script
         if (this.#includeCam % 3 === 0) {
@@ -83,8 +68,28 @@ export default class GameController {
         } else {
           this.syncPosition();
         }
-        // only position script
       }
+
+      console.log(this.player.x, this.player.y);
+
+      const items = this.returnItemsFrame(this.gameObjects.allObjects);
+      const players = this.returnItemsFrame(this.gameObjects.allPlayers);
+
+      this.player.addVelocity();
+      this.player.subtractVelocity();
+
+      this.player.performMovement();
+
+      const playerBox = {
+        x: this.player.x,
+        y: this.player.y,
+        w: this.player.w,
+        h: this.player.h,
+      };
+
+      this.player.checkCollisions(playerBox, items, false);
+      this.player.checkCollisions(playerBox, players, true);
+
       // comment out to have stationary camera
       this.centerPlayer();
 
@@ -152,6 +157,8 @@ export default class GameController {
         type: "infcam",
         uuid: this.uuid,
         position: [this.player.x, this.player.y, this.player.w, this.player.h],
+        velX: this.player.velX,
+        velY: this.player.velY,
         pose: this.player.pose,
         camera: this.player?.camera,
       })
@@ -164,6 +171,8 @@ export default class GameController {
         type: "inf",
         uuid: this.uuid,
         position: [this.player.x, this.player.y, this.player.w, this.player.h],
+        velX: this.player.velX,
+        velY: this.player.velY,
         pose: this.player.pose,
       })
     );

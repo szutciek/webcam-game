@@ -109,22 +109,34 @@ export default class ClientController {
 
   handleMessage(mes) {
     const message = JSON.parse(mes.data);
-    if (message.type === "pinf") {
-      const [x, y, w, h] = message.position;
-      if (!message.uuid) return;
-      this.gameObjects.updatePlayerPosition(message.uuid, { x, y, w, h });
-      this.gameObjects.updatePlayerPose(message.uuid, message.pose);
+    if (message.type === "pinfo") {
+      message.data.forEach((player) => {
+        if (player.id !== this.user.uuid) {
+          this.gameObjects.updatePlayer(player);
+        } else {
+          this?.player.serverOverride(player);
+        }
+      });
+
       return;
     }
 
-    if (message.type === "pinfcam") {
-      const [x, y, w, h] = message.position;
-      if (!message.uuid) return;
-      this.gameObjects.updatePlayerPosition(message.uuid, { x, y, w, h });
-      this.gameObjects.updatePlayerPose(message.uuid, message.pose);
-      this.gameObjects.updatePlayerCamera(message.uuid, message.camera);
-      return;
-    }
+    // if (message.type === "pinf") {
+    //   const [x, y, w, h] = message.position;
+    //   if (!message.uuid) return;
+    //   this.gameObjects.updatePlayerPosition(message.uuid, { x, y, w, h });
+    //   this.gameObjects.updatePlayerPose(message.uuid, message.pose);
+    //   return;
+    // }
+
+    // if (message.type === "pinfcam") {
+    //   const [x, y, w, h] = message.position;
+    //   if (!message.uuid) return;
+    //   this.gameObjects.updatePlayerPosition(message.uuid, { x, y, w, h });
+    //   this.gameObjects.updatePlayerPose(message.uuid, message.pose);
+    //   this.gameObjects.updatePlayerCamera(message.uuid, message.camera);
+    //   return;
+    // }
 
     // if (message.type === "pcam") {
     //   if (!message.uuid) return;
