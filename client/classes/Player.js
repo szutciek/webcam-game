@@ -78,12 +78,12 @@ export default class Player {
 
   activateMovement() {
     document.addEventListener("keypress", (e) => {
-      e.stopPropagation();
-      e.preventDefault();
+      // e.stopPropagation();
+      // e.preventDefault();
     });
     document.addEventListener("keydown", (e) => {
-      e.stopPropagation();
-      e.preventDefault();
+      // e.stopPropagation();
+      // e.preventDefault();
 
       if (e.key === "w" || e.key === "W") {
         this.#inpN = true;

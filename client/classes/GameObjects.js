@@ -1,6 +1,15 @@
 export default class GameObjects {
   #elements = new Map();
   #players = new Map();
+  #interactive = new Map();
+
+  constructor() {
+    this.#interactive.set(crypto.randomUUID(), {
+      position: { x: -100, y: 400, w: 40, h: 40 },
+      texture: { type: "color", value: "red" },
+      mesh: { type: "circle" },
+    });
+  }
 
   updatePlayerPosition(id, data) {
     const player = this.#players.get(id) || {};

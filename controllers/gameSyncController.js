@@ -18,6 +18,7 @@ exports.handleSyncPosition = (data, client, ws) => {
   client.roomRef.updatePlayerPosition(ws.uuid, data.position);
   client.roomRef.updatePlayerPose(ws.uuid, data.pose);
 
+  // we send one huge request
   client.roomRef.broadcast(
     {
       type: "pinf",
@@ -48,6 +49,7 @@ exports.handleSyncPositionAndCamera = (data, client, ws) => {
   client.roomRef.updatePlayerPosition(ws.uuid, data.position);
   client.roomRef.updatePlayerPose(ws.uuid, data.pose);
 
+  // we send one huge request
   client.roomRef.broadcast(
     {
       type: "pinfcam",
