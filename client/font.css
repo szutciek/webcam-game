@@ -1,0 +1,36 @@
+@font-face {
+  font-family: "Poppins";
+  font-weight: 900;
+  src: url(https://assets.kanapka.eu/fonts/Poppins/Poppins-ExtraBold.ttf);
+  font-display: fallback;
+}
+@font-face {
+  font-family: "Poppins";
+  font-weight: 800;
+  src: url(https://assets.kanapka.eu/fonts/Poppins/Poppins-Bold.ttf);
+  font-display: fallback;
+}
+@font-face {
+  font-family: "Poppins";
+  font-weight: 700;
+  src: url(https://assets.kanapka.eu/fonts/Poppins/Poppins-SemiBold.ttf);
+  font-display: fallback;
+}
+@font-face {
+  font-family: "Poppins";
+  font-weight: 500;
+  src: url(https://assets.kanapka.eu/fonts/Poppins/Poppins-Medium.ttf);
+  font-display: fallback;
+}
+@font-face {
+  font-family: "Poppins";
+  font-weight: 400;
+  src: url(https://assets.kanapka.eu/fonts/Poppins/Poppins-Regular.ttf);
+  font-display: fallback;
+}
+@font-face {
+  font-family: "Poppins";
+  font-weight: 300;
+  src: url(https://assets.kanapka.eu/fonts/Poppins/Poppins-Light.ttf);
+  font-display: fallback;
+}

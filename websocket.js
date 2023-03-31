@@ -30,7 +30,7 @@ wss.on("connection", function connection(ws) {
 
       if (!message.uuid) throw new UserError("UUID required to sync");
       if (!ws.uuid) throw new UserError("UUID required to sync");
-      if (ws.uuid !== message.uuid) throw new UserError("UUID is not the same");
+      if (ws.uuid !== message.uuid) throw new UserError("UUID is not correct");
       if (!validateUUID(message.uuid)) throw new UserError("UUID is not valid");
       const client = clients.find(message.uuid);
       if (!client) throw new UserError("Unknown UUID");

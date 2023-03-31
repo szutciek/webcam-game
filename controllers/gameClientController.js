@@ -1,45 +1,20 @@
 const jwt = require("jsonwebtoken");
-const { jwtSecret } = require("../config");
 const { validateId } = require("../utils/validators");
 const UserError = require("../utils/UserError.js");
 const clients = require("../state/clients");
 const rooms = require("../state/rooms");
 const Client = require("../classes/Client");
-
-const signToken = (id) => {
-  return jwt.sign(
-    {
-      exp: Math.floor(Date.now() / 1000) + 60 * 60,
-      id,
-    },
-    jwtSecret
-  );
-};
-
-const decodeToken = (token) => {
-  const payload = jwt.verify(token, jwtSecret);
-
-  if (!validateId(payload.id)) console.log("Id includes invalid characters");
-
-  return payload;
-};
-
-const findUser = async (id) => {
-  return {
-    name: "Developer",
-    _id: crypto.randomUUID(),
-  };
-};
+const Authentication = require("../classes/Authentication.js");
+const { choose } = require("../utils/functions.js");
 
 exports.handleAuthClient = async (data, ws) => {
   try {
     if (!data.token) throw new UserError("Error while decoding token", 400);
 
-    // const id = decodeToken(data.token);
-    // if (!id) throw new UserError("Error while decoding token", 400);
-    const id = "kpdsadk";
+    const { _id } = Authentication.decodeToken(data.token);
+    if (!_id) throw new UserError("Error while decoding token", 400);
 
-    const user = await findUser(id);
+    const user = await Authentication.findUserId(_id);
     if (!user) throw new UserError("Error while finding user", 400);
 
     const uuid = crypto.randomUUID();
@@ -53,11 +28,12 @@ exports.handleAuthClient = async (data, ws) => {
         type: "authclientOk",
         data: {
           uuid,
-          name: user.name,
+          ...choose(user, ["username", "email", "profile"]),
         },
       })
     );
   } catch (err) {
+    console.log(err);
     throw err;
   }
 };

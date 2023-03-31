@@ -7,6 +7,7 @@ const Chunk = require("./Chunk");
 module.exports = class Room {
   #clock = undefined;
   #includeCam = 0;
+  #running = false;
 
   #players = new Map();
 
@@ -25,22 +26,28 @@ module.exports = class Room {
     this.renderDistance = renderDistance;
 
     this.createStartChunks(2);
-
-    this.startGameClock();
   }
 
   stopGameClock() {
+    this.#running = false;
     clearInterval(this.#clock);
   }
 
   startGameClock() {
+    this.#running = true;
     this.#clock = setInterval(() => {
       if (this.#players.size === 0) this.stopGameClock();
       this.gameTick();
     }, 1000 / 60);
+    console.log(`Starting game in room ${this.code}.`);
   }
 
   gameTick() {
+    if (this.#players.size === 0) {
+      console.log(`Room ${this.code} is empty. Pausing game.`);
+      this.stopGameClock();
+    }
+
     // do all kinds of calculations
     this.#players.forEach((player) => {
       player.calculateVelocity();
@@ -162,6 +169,8 @@ module.exports = class Room {
   }
 
   joinRoom(uuid, startPos) {
+    if (!this.#running) this.startGameClock();
+
     this.#players.set(uuid, new Player(uuid, startPos));
   }
 

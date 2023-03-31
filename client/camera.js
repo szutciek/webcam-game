@@ -3,7 +3,7 @@ const canvasStream = document.createElement("canvas");
 const context = canvasStream.getContext("2d");
 
 const [width, height] = [100, 100];
-let stream = undefined;
+export let stream = undefined;
 
 export const requestCameraPermission = () => {
   return new Promise(async (res, rej) => {

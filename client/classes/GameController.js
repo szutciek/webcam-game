@@ -73,7 +73,8 @@ export default class GameController {
         }
       }
 
-      console.log(this.player.velY);
+      // commented temp
+      // console.log(this.player.velY);
 
       // ==========================================================================
       // PREPARING ELEMENTS IN VIEWPORT ===========================================
@@ -119,8 +120,9 @@ export default class GameController {
       items.forEach((i) => canvas.drawItem(i));
       // players.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], "#555555"));
       prepared.forEach((i) => canvas.drawPlayer(i, i.image, i.pose));
-      console.log(performance.now());
-      console.log("---------");
+      // commented temp
+      // console.log(performance.now());
+      // console.log("---------");
 
       this.#includeCam++;
 

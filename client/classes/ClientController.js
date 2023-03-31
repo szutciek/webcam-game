@@ -74,6 +74,14 @@ export default class ClientController {
     );
   }
 
+  updateUser(data) {
+    Object.entries(data).forEach((e) => {
+      this.user[e[0]] = e[1];
+    });
+    window.localStorage.setItem("user", JSON.stringify(this.user));
+    // update stuff
+  }
+
   startListen() {
     this.#ws.addEventListener("message", (message) => {
       this.handleMessage(message);
@@ -110,7 +118,7 @@ export default class ClientController {
   handleMessage(mes) {
     const message = JSON.parse(mes.data);
     if (message.type === "pinfo") {
-      console.log(performance.now());
+      // console.log(performance.now());
       message.data.forEach((player) => {
         if (player.id !== this.user.uuid) {
           this.gameObjects.updatePlayer(player.id, player);
@@ -148,13 +156,13 @@ export default class ClientController {
     if (message.type === "mobj") {
       this.gameObjects.setObjects(message.data);
     }
-
     if (message.type === "error") {
       console.warn(message);
       return;
     }
     if (message.type === "authclientOk") {
       this.user.uuid = message.data.uuid;
+      this.updateUser(message.data);
       console.log(`User assigned UUID ${this.user.uuid}`);
       return;
     }
@@ -167,6 +175,10 @@ export default class ClientController {
         message?.data?.position[3],
       ]);
       this.startRender();
+      return;
+    }
+    if (message.type === "userdata") {
+      this.updateUser(message.data);
       return;
     }
   }
