@@ -15,6 +15,7 @@ module.exports = class Room {
   chunks = new Map();
 
   lastTimeStamp = 0.015;
+  syncStartTime = undefined;
 
   constructor(
     code,
@@ -36,12 +37,14 @@ module.exports = class Room {
   }
 
   startGameClock() {
+    this.syncStartTime = performance.timeOrigin;
     this.#running = true;
     this.#clock = setInterval(() => {
       if (this.#players.size === 0) this.stopGameClock();
       this.gameTick();
     }, 1000 / 60);
     console.log(`Starting game in room ${this.code}.`);
+    this.#players.forEach((p) => this.sendRoomInfo(p.uuid));
   }
 
   gameTick() {
@@ -178,10 +181,19 @@ module.exports = class Room {
     if (!this.#running) this.startGameClock();
 
     this.#players.set(uuid, new Player(uuid, startPos, username));
+
+    this.sendRoomInfo(uuid);
   }
 
   leaveRoom(uuid) {
     this.#players.delete(uuid);
+  }
+
+  sendRoomInfo(uuid) {
+    clients.find(uuid).sendTo({
+      type: "roominfo",
+      syncStartTime: this.syncStartTime,
+    });
   }
 
   // updatePlayerInput(uuid, data) {
@@ -202,14 +214,14 @@ module.exports = class Room {
   //   this.sendChunks(player);
   // }
 
-  updatePlayerPrediction(uuid, position) {
+  updatePlayerPrediction(uuid, position, timeStamp) {
     const player = this.#players.get(uuid);
     if (!player) return;
-    player.updatePrediction(position);
+    player.updatePrediction(position, timeStamp);
     this.sendChunks(player);
   }
 
-  updatePlayerVelocity(uuid, velocities) {
+  updatePlayerVelocity(uuid, velocities, timeStamp) {
     const player = this.#players.get(uuid);
     if (!player) return;
     player.updateVelocity(velocities);
@@ -245,6 +257,7 @@ module.exports = class Room {
         const chunk = this.findChunk(x, y);
         if (!chunk) continue;
         if (chunk.gameObjects.size === 0) continue;
+        console.log(player);
         if (player.updatedChunks.get(`${x}:${y}`) >= chunk.lastUpdate) continue;
         player.updatedChunks.set(`${x}:${y}`, Date.now());
         list.push(...chunk.gameObjects.values());

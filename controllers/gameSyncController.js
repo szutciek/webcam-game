@@ -45,12 +45,21 @@ exports.handleSyncMovement = (data, client, ws) => {
     if (
       typeof data.position !== "object" ||
       typeof data.velocities !== "object" ||
-      typeof data.pose !== "object"
+      typeof data.pose !== "object" ||
+      typeof data.relativeTimeStamp !== "number"
     )
       throw new UserError("Bad request", 400);
 
-    client.roomRef.updatePlayerVelocity(ws.uuid, data.velocities);
-    client.roomRef.updatePlayerPrediction(ws.uuid, data.position);
+    client.roomRef.updatePlayerVelocity(
+      ws.uuid,
+      data.velocities,
+      data.relativeTimeStamp
+    );
+    client.roomRef.updatePlayerPrediction(
+      ws.uuid,
+      data.position,
+      data.relativeTimeStamp
+    );
     client.roomRef.updatePlayerPose(ws.uuid, data.pose);
   } catch (err) {
     throw err;

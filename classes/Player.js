@@ -38,11 +38,12 @@ module.exports = class Player {
 
   updatePose(pose) {
     this.pose = pose;
-    console.log(this.pose.crouching);
   }
 
-  updatePrediction(position) {
+  // think about the stuff again
+  updatePrediction(position, timeStamp) {
     this.prediction = position;
+    this.timeStamp = timeStamp;
   }
 
   updateVelocity(velocities) {
@@ -67,18 +68,15 @@ module.exports = class Player {
     }
   }
 
-  // updateInputs(inputs) {
-  //   this.inputs = inputs;
-  // }
-
   calculateMovement(secondsPassed) {
-    // console.log(this.prediction);
-
     if (this.velX < 0) this.position.x += this.velX;
     if (this.velX > 0) this.position.x += this.velX;
     if (this.velY < 0) this.position.y += this.velY;
     if (this.velY > 0) this.position.y += this.velY;
 
+    console.log(this.timeStamp);
+
+    // adjusting for the time it takes to transmit
     this.position.x +=
       Math.sign(this.velX) * f(Math.abs(this.velX * secondsPassed));
     this.position.y +=

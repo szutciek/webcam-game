@@ -12,6 +12,7 @@ export default class ClientController {
   gameController = undefined;
   gameObjects = undefined;
   player = undefined;
+  serverTimeOrigin = undefined;
 
   constructor(user) {
     if (!user) throw new Error("User required to run client");
@@ -100,7 +101,8 @@ export default class ClientController {
       this.player,
       this.#ws,
       this.user.uuid,
-      this.gameObjects
+      this.gameObjects,
+      this.serverTimeOrigin
     );
     this.gameController.startGame();
   }
@@ -108,6 +110,14 @@ export default class ClientController {
   stopRender() {
     this.gameController = undefined;
     this.player = undefined;
+  }
+
+  setServerTimeOrigin(time) {
+    if (!this.gameController) {
+      this.serverTimeOrigin = time;
+    } else {
+      this.gameController.setServerTimeOrigin(time);
+    }
   }
 
   sendJSON(payload) {
@@ -127,29 +137,6 @@ export default class ClientController {
 
       return;
     }
-
-    // if (message.type === "pinf") {
-    //   const [x, y, w, h] = message.position;
-    //   if (!message.uuid) return;
-    //   this.gameObjects.updatePlayerPosition(message.uuid, { x, y, w, h });
-    //   this.gameObjects.updatePlayerPose(message.uuid, message.pose);
-    //   return;
-    // }
-
-    // if (message.type === "pinfcam") {
-    //   const [x, y, w, h] = message.position;
-    //   if (!message.uuid) return;
-    //   this.gameObjects.updatePlayerPosition(message.uuid, { x, y, w, h });
-    //   this.gameObjects.updatePlayerPose(message.uuid, message.pose);
-    //   this.gameObjects.updatePlayerCamera(message.uuid, message.camera);
-    //   return;
-    // }
-
-    // if (message.type === "pcam") {
-    //   if (!message.uuid) return;
-    //   // add convert script to this
-    //   this.gameObjects.updatePlayerCamera(message.uuid, message.data);
-    // }
 
     if (message.type === "mobj") {
       this.gameObjects.setObjects(message.data);
@@ -181,6 +168,9 @@ export default class ClientController {
     if (message.type === "userdata") {
       this.updateUser(message.data);
       return;
+    }
+    if (message.type === "roominfo") {
+      this.setServerTimeOrigin(message.syncStartTime);
     }
 
     if (message.type === "pong") {

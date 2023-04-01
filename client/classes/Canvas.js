@@ -9,12 +9,12 @@ export default class Canvas {
   }
 
   addCustomFonts() {
-    this.font = new FontFace(
+    const font = new FontFace(
       "Poppins",
       "https://assets.kanapka.eu/fonts/Poppins/Poppins-Bold.ttf"
     );
-    this.font.load();
-    document.fonts.add(this.font);
+    font.load();
+    document.fonts.add(font);
   }
 
   drawItem(item) {

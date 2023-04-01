@@ -14,13 +14,15 @@ export default class GameController {
   #includeCam = 0;
 
   lastTimeStamp = 0.015;
+  serverTimeOrigin = 0;
 
-  constructor(player, ws, uuid, gameObjects) {
+  constructor(player, ws, uuid, gameObjects, serverTimeOrigin) {
     if (!player) throw new Error("Can't create game - player undefined");
     this.player = player;
     this.#ws = ws;
     this.uuid = uuid;
     this.gameObjects = gameObjects;
+    this.serverTimeOrigin = serverTimeOrigin;
   }
 
   startGame() {
@@ -48,6 +50,11 @@ export default class GameController {
   async renderFrame() {
     try {
       const secondsPassed = (performance.now() - this.lastTimeStamp) / 1000;
+      const milisecondsServerStart =
+        Math.round(
+          (performance.timeOrigin + performance.now() - this.serverTimeOrigin) *
+            1000
+        ) / 1000;
 
       // ==========================================================================
       // PREPARING ELEMENTS IN VIEWPORT ===========================================
@@ -87,11 +94,9 @@ export default class GameController {
           this.player.camera = await takePicture();
           this.syncCamera();
           this.#includeCam = 0;
-          // ping casually
           this.ping();
-        } else {
-          this.syncMovement();
         }
+        this.syncMovement(milisecondsServerStart);
       }
 
       // ==========================================================================
@@ -161,6 +166,10 @@ export default class GameController {
     return list;
   };
 
+  setServerTimeOrigin(time) {
+    this.serverTimeOrigin = time;
+  }
+
   syncCamera() {
     this.send(
       JSON.stringify({
@@ -170,13 +179,14 @@ export default class GameController {
     );
   }
 
-  syncMovement() {
+  syncMovement(timeStamp) {
     this.send(
       JSON.stringify({
         type: "mov",
         velocities: this.player.velocities,
         position: this.player.position,
         pose: this.player.pose,
+        relativeTimeStamp: timeStamp,
       })
     );
   }
