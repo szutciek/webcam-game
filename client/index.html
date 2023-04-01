@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Games</title>
+    <title>Webcam Game - Kanapka Studios</title>
     <link rel="stylesheet" href="/style.css" />
     <link rel="stylesheet" href="/font.css" />
     <script src="/script.js" defer type="module"></script>
@@ -13,11 +13,19 @@
     <div class="fixed">
       <div class="top">
         <div class="dev">
-          <p id="position"></p>
-          <p id="renderTime"></p>
+          <p id="ping"></p>
           <p>
             <span id="renderedItems"></span><span id="renderedPlayers"></span>
           </p>
+          <p id="renderTime"></p>
+          <p id="position"></p>
+        </div>
+
+        <div class="openMenu">
+          <img
+            src="https://assets.kanapka.eu/icons/grid-outline.svg"
+            alt="Menu icon"
+          />
         </div>
       </div>
       <div class="bottom">
@@ -31,12 +39,12 @@
         <div class="profile">
           <div class="loadingIcon"></div>
           <img />
-          <video />
+          <video></video>
         </div>
         <h1></h1>
       </div>
       <div class="status">
-        <p>Loading game</p>
+        <p id="loadStatusDisplay">Loading game</p>
       </div>
     </div>
 

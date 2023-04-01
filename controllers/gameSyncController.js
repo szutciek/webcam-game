@@ -38,10 +38,23 @@ const UserError = require("../utils/UserError.js");
 // };
 
 exports.handleSyncMovement = (data, client, ws) => {
-  if (!client.roomRef || !client.room) throw new UserError("Join a room first");
+  try {
+    if (!client.roomRef || !client.room)
+      throw new UserError("Join a room first");
 
-  client.roomRef.updatePlayerInput(ws.uuid, data.inputs);
-  client.roomRef.updatePlayerPose(ws.uuid, data.pose);
+    if (
+      typeof data.position !== "object" ||
+      typeof data.velocities !== "object" ||
+      typeof data.pose !== "object"
+    )
+      throw new UserError("Bad request", 400);
+
+    client.roomRef.updatePlayerVelocity(ws.uuid, data.velocities);
+    client.roomRef.updatePlayerPrediction(ws.uuid, data.position);
+    client.roomRef.updatePlayerPose(ws.uuid, data.pose);
+  } catch (err) {
+    throw err;
+  }
 };
 
 // exports.handleSyncPositionAndCamera = (data, client, ws) => {

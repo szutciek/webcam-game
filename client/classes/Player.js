@@ -1,8 +1,13 @@
 const maxS = 15;
+const diff = 1;
 
 const f = (x) => {
   // 2 is vert stretch, 1 is horizontal translation, using change of base
   return (15 * Math.log(x + 1)) / Math.log(8);
+};
+
+const lerp = (s, e, t) => {
+  return (1 - t) * s + t * e;
 };
 
 export default class Player {
@@ -26,27 +31,31 @@ export default class Player {
     madRight: false,
   };
 
-  constructor(position = [0, 0, 100, 200]) {
+  lastTimeStamp = undefined;
+
+  constructor(position = [0, 0, 100, 200], username = "Anonymous") {
     this.#x = position[0];
     this.#y = position[1];
     this.#w = position[2];
     this.#h = position[3];
+
+    this.username = username;
   }
 
   subtractVelocity = () => {
     if (!this.pose.crouching) {
       if (!this.#inpS && !this.#inpN) {
-        this.#velY /= 1.2;
+        this.#velY = lerp(this.#velY, 0, 0.1);
       }
       if (!this.#inpW && !this.#inpE) {
-        this.#velX /= 1.2;
+        this.#velX = lerp(this.#velX, 0, 0.1);
       }
     } else {
       if (!this.#inpS && !this.#inpN) {
-        this.#velY /= 1.7;
+        this.#velY = lerp(this.#velY, 0, 0.3);
       }
       if (!this.#inpW && !this.#inpE) {
-        this.#velX /= 1.7;
+        this.#velX = lerp(this.#velX, 0, 0.3);
       }
     }
   };
@@ -55,17 +64,30 @@ export default class Player {
     if (this.pose.crouching) currentMax /= 20;
 
     if (this.#inpN && this.#velY > -currentMax) {
-      this.#velY -= 0.6;
+      this.#velY -= diff;
     }
     if (this.#inpS && this.#velY < currentMax) {
-      this.#velY += 0.6;
+      this.#velY += diff;
     }
-
     if (this.#inpE && this.#velX < currentMax) {
-      this.#velX += 0.6;
+      this.#velX += diff;
     }
     if (this.#inpW && this.#velX > -currentMax) {
-      this.#velX -= 0.6;
+      this.#velX -= diff;
+    }
+
+    if (Math.abs(this.#velX) > currentMax) {
+      this.#velX = Math.sign(this.#velX) * currentMax;
+    }
+    if (Math.abs(this.#velY) > currentMax) {
+      this.#velY = Math.sign(this.#velY) * currentMax;
+    }
+
+    if (Math.abs(this.#velX) < 0.1) {
+      this.#velX = 0;
+    }
+    if (Math.abs(this.#velY) < 0.1) {
+      this.#velY = 0;
     }
   };
 
@@ -136,11 +158,12 @@ export default class Player {
   }
 
   serverOverride(data) {
+    // temp
+    // return;
     this.#x = data.position[0];
     this.#y = data.position[1];
     this.#w = data.position[2];
     this.#h = data.position[3];
-    this.pose = data.pose;
   }
 
   checkCollisions(currPos, obstacles, react = false) {
@@ -215,34 +238,18 @@ export default class Player {
     }
   }
 
-  performMovement = () => {
-    // we doing velocity in px/frame
-    // actually kinda stupid cause velocity isnt velocity but anyways
-
-    // if (this.#velX < 0) this.#x += -f(Math.abs(this.#velX));
-    // if (this.#velX > 0) this.#x += f(Math.abs(this.#velX));
-    // if (this.#velY < 0) this.#y += -f(Math.abs(this.#velY));
-    // if (this.#velY > 0) this.#y += f(Math.abs(this.#velY));
-
+  performMovement = (secondsPassed) => {
     if (this.#velX < 0) this.#x += this.#velX;
     if (this.#velX > 0) this.#x += this.#velX;
     if (this.#velY < 0) this.#y += this.#velY;
     if (this.#velY > 0) this.#y += this.#velY;
 
-    this.#x += Math.sign(this.#velX) * f(Math.abs(this.#velX));
-    this.#y += Math.sign(this.#velY) * f(Math.abs(this.#velY));
+    this.#x += Math.sign(this.#velX) * f(Math.abs(this.#velX * secondsPassed));
+    this.#y += Math.sign(this.#velY) * f(Math.abs(this.#velY * secondsPassed));
 
-    // this.checkCollisions(
-    //   { x: this.#x, y: this.#y, w: this.#w, h: this.#h },
-    //   obstacles
-    // );
-
-    // this.#x += this.#velX;
-    // this.#y += this.#velY;
-
-    document.getElementById("position").innerText = `${Math.floor(
+    document.getElementById("position").innerText = `(${Math.floor(
       this.#x
-    )}, ${Math.floor(this.#y)}`;
+    )}, ${Math.floor(this.#y)})`;
   };
 
   get x() {
@@ -262,6 +269,20 @@ export default class Player {
   }
   get velY() {
     return this.#velY;
+  }
+  get position() {
+    return {
+      x: this.#x,
+      y: this.#y,
+      w: this.#w,
+      h: this.#h,
+    };
+  }
+  get velocities() {
+    return {
+      x: this.#velX,
+      y: this.#velY,
+    };
   }
   get inputs() {
     return {

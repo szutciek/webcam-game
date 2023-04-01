@@ -26,11 +26,13 @@ const userSchema = new mongoose.Schema({
   },
   profile: {
     type: String,
-    required: [true, "Profile is required"],
-    validate: [
-      validators.validateManyCharacters,
-      "Profile includes invalid characters",
-    ],
+    default: "https://assets.kanapka.eu/images/user.png",
+    validate: [validators.validateURL, "Profile includes invalid characters"],
+  },
+  panelColor: {
+    type: String,
+    required: true,
+    default: "#f9f9f9",
   },
   password: {
     type: String,

@@ -1,0 +1,72 @@
+.fancyInput {
+  margin-bottom: 20px;
+}
+.fancyInput:last-of-type {
+  margin-bottom: 0;
+}
+.inputArea {
+  position: relative;
+}
+.fancyInput .inputArea p {
+  position: absolute;
+  top: 50%;
+  left: 0.3rem;
+  /* to hide chrome autofill */
+  width: calc(100% - 0.6rem);
+  background-color: white;
+  border-radius: 2px;
+
+  user-select: none;
+  pointer-events: none;
+  line-height: 1rem;
+  padding: 0.2rem;
+
+  font-size: 1rem;
+  font-weight: 400;
+  color: #a4a4a4;
+
+  transform: translateY(-50%);
+  transition: 0.2s font-size, 0.2s top;
+}
+.fancyInput .inputArea input {
+  background-color: transparent;
+  border: none;
+  outline: none;
+
+  /* height breaks? */
+  height: 3rem;
+  width: 100%;
+  padding: 0.6rem 0.5rem;
+  background-color: white;
+
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2d2d2d;
+
+  border: 1px solid #b9b9b9;
+  border-radius: 2px;
+  transition: 0.2s;
+}
+.fancyInput .errorArea {
+  display: grid;
+  justify-content: left;
+  align-items: center;
+  grid-template-columns: 1rem auto;
+  gap: 0.3rem;
+
+  padding: 0.15rem 0.3rem;
+  transition: 0.2s;
+  background-color: #ef5f5f;
+  border-radius: 0 0 2px 2px;
+  user-select: none;
+  pointer-events: none;
+}
+.fancyInput .errorArea svg {
+  width: 1rem;
+  height: 1rem;
+}
+.fancyInput .errorArea h6 {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #ffffff;
+}

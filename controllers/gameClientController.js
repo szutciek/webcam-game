@@ -17,6 +17,9 @@ exports.handleAuthClient = async (data, ws) => {
     const user = await Authentication.findUserId(_id);
     if (!user) throw new UserError("Error while finding user", 400);
 
+    if (clients.alreadyOnline(user._id))
+      throw new UserError("User is already online", 403);
+
     const uuid = crypto.randomUUID();
 
     const client = new Client(uuid, user, ws);
@@ -28,18 +31,17 @@ exports.handleAuthClient = async (data, ws) => {
         type: "authclientOk",
         data: {
           uuid,
-          ...choose(user, ["username", "email", "profile"]),
+          ...choose(user, ["username", "email", "profile", "panelColor"]),
         },
       })
     );
   } catch (err) {
-    console.log(err);
     throw err;
   }
 };
 
 exports.handleClientLeave = (uuid, client) => {
-  client.leaveRoom();
+  client?.leaveRoom();
   clients.removeClient(uuid);
   console.log(`Client disconnected. Now online: ${clients.size}`);
 };

@@ -13,11 +13,12 @@ export default class GameObjects {
 
   updatePlayer(id, data) {
     const player = this.#players.get(id) || {};
-    player.x = data.x;
-    player.y = data.y;
-    player.w = data.w;
-    player.h = data.h;
+    player.x = data.position[0];
+    player.y = data.position[1];
+    player.w = data.position[2];
+    player.h = data.position[3];
     player.pose = data.pose;
+    if (data.username) player.username = data.username;
     if (data.camera) player.camera = data.camera;
     this.#players.set(id, player);
   }

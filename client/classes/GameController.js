@@ -12,7 +12,8 @@ export default class GameController {
 
   #interval = undefined;
   #includeCam = 0;
-  #webcamInterval = undefined;
+
+  lastTimeStamp = 0.015;
 
   constructor(player, ws, uuid, gameObjects) {
     if (!player) throw new Error("Can't create game - player undefined");
@@ -33,16 +34,6 @@ export default class GameController {
     this.#interval = setInterval(() => {
       this.renderFrame();
     }, 1000 / 60);
-
-    // this.#webcamInterval = setInterval(async () => {
-    //   try {
-    //     if (!this.player) return;
-    //     this.player.camera = await takePicture();
-    //     this.syncCamera(this.uuid, this?.player?.camera);
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
-    // }, 1000 / 24);
   }
   stopGame() {
     clearInterval(this.#interval);
@@ -56,25 +47,7 @@ export default class GameController {
 
   async renderFrame() {
     try {
-      const s = performance.now();
-
-      // ==========================================================================
-      // SENDING POSITION TO SERVER (for own calculations) ========================
-      // ==========================================================================
-
-      if (this.#ws.readyState === WebSocket.OPEN) {
-        if (this.#includeCam % 3 === 0) {
-          if (!this.player) return;
-          this.player.camera = await takePicture();
-          this.syncCamera();
-          this.#includeCam = 0;
-        } else {
-          this.syncMovement();
-        }
-      }
-
-      // commented temp
-      // console.log(this.player.velY);
+      const secondsPassed = (performance.now() - this.lastTimeStamp) / 1000;
 
       // ==========================================================================
       // PREPARING ELEMENTS IN VIEWPORT ===========================================
@@ -89,7 +62,7 @@ export default class GameController {
 
       this.player.addVelocity();
       this.player.subtractVelocity();
-      this.player.performMovement();
+      this.player.performMovement(secondsPassed);
 
       // ==========================================================================
       // COLLISIONS ===============================================================
@@ -105,40 +78,53 @@ export default class GameController {
       this.player.checkCollisions(playerBox, players, true);
 
       // ==========================================================================
+      // SENDING POSITION TO SERVER (for validation) ==============================
+      // ==========================================================================
+
+      if (this.#ws.readyState === WebSocket.OPEN) {
+        if (this.#includeCam % 3 === 0) {
+          if (!this.player) return;
+          this.player.camera = await takePicture();
+          this.syncCamera();
+          this.#includeCam = 0;
+          // ping casually
+          this.ping();
+        } else {
+          this.syncMovement();
+        }
+      }
+
+      // ==========================================================================
       // RENDERING PROCESS ========================================================
       // ==========================================================================
 
       this.centerPlayer();
-
       const promises = players.map((player) => canvas.prepareCamera(player));
       const pT = this.translateInView(this.player);
       promises.push(canvas.prepareCamera(pT));
       const prepared = await Promise.all(promises);
 
       canvas.clear();
-      // change to support image textures
       items.forEach((i) => canvas.drawItem(i));
-      // players.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], "#555555"));
       prepared.forEach((i) => canvas.drawPlayer(i, i.image, i.pose));
-      // commented temp
-      // console.log(performance.now());
-      // console.log("---------");
-
-      this.#includeCam++;
 
       // ==========================================================================
       // DISPLAYING STATS =========================================================
       // ==========================================================================
 
-      document.getElementById("renderTime").innerText = `${
-        performance.now() - s
-      }`;
       document.getElementById(
         "renderedPlayers"
       ).innerText = `${prepared.length} Players`;
       document.getElementById(
         "renderedItems"
       ).innerText = `${items.length} Objects, `;
+
+      // ==========================================================================
+      // FINISHING TOUCHES ========================================================
+      // ==========================================================================
+
+      this.#includeCam++;
+      this.lastTimeStamp = performance.now();
     } catch (err) {
       console.warn(err);
     }
@@ -179,7 +165,6 @@ export default class GameController {
     this.send(
       JSON.stringify({
         type: "cam",
-        uuid: this.uuid,
         camera: this.player?.camera,
       })
     );
@@ -189,8 +174,8 @@ export default class GameController {
     this.send(
       JSON.stringify({
         type: "mov",
-        uuid: this.uuid,
-        inputs: this.player.inputs,
+        velocities: this.player.velocities,
+        position: this.player.position,
         pose: this.player.pose,
       })
     );
@@ -249,5 +234,14 @@ export default class GameController {
     window.addEventListener("resize", () => {
       this.windowResize();
     });
+  }
+
+  ping() {
+    this.#ws.send(
+      JSON.stringify({
+        type: "ping",
+        time: performance.now(),
+      })
+    );
   }
 }

@@ -47,7 +47,7 @@ exports.handleRoomJoin = async (message, ws, client) => {
       h: 200,
     };
 
-    room.joinRoom(message.uuid, startPos);
+    room.joinRoom(message.uuid, startPos, client.user.username);
     client.changeRoom(message.room);
 
     ws.send(

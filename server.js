@@ -25,6 +25,9 @@ app.get("/", (_, res) => res.send(index));
 app.get("/signin", (_, res) =>
   res.sendFile(__dirname + "/client/pages/signin.html")
 );
+app.get("/signup", (_, res) =>
+  res.sendFile(__dirname + "/client/pages/signup.html")
+);
 
 app.use(express.json());
 app.use("/api", apiRouter);

@@ -13,14 +13,15 @@ class UIController {
       }, 300);
       this.screen.style.opacity = 0;
       this.screen.style.pointerEvents = "none";
-    }, 2 * 1000 - visible);
+    }, 0 * 1000 - visible);
   };
 
-  showLoadingScreen = (username, profile) => {
+  showLoadingScreen = (username, profile, color = "#ffffff") => {
     const usernameField = this.screen.querySelector("h1");
     usernameField.innerText = username;
     const profileField = this.screen.querySelector("img");
     profileField.src = profile;
+    this.screen.style.backgroundColor = color;
   };
 
   showCameraLoadingScreen = (stream) => {
@@ -28,6 +29,10 @@ class UIController {
     camera.srcObject = stream;
     camera.play();
     this.timeShown = new Date().getTime();
+  };
+
+  changeLoadStatus = (status) => {
+    this.screen.querySelector("#loadStatusDisplay").innerText = status;
   };
 }
 

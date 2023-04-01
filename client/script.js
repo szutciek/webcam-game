@@ -9,13 +9,19 @@ const setup = async () => {
     const user = JSON.parse(window.localStorage.getItem("user"));
     if (!user) window.location = "/signin?message=Please log in to play";
 
-    UIController.showLoadingScreen(user.username, user.profile);
+    UIController.showLoadingScreen(
+      user.username,
+      user?.profile,
+      user?.panelColor
+    );
 
+    UIController.changeLoadStatus("Starting camera stream");
     await requestCameraPermission();
     await startStream();
 
     UIController.showCameraLoadingScreen(stream);
 
+    UIController.changeLoadStatus("Connecting to server");
     const clientController = new ClientController({
       token,
       username: user.username,
@@ -24,7 +30,9 @@ const setup = async () => {
     // handle room selection with ui
     let room = new URLSearchParams(window.location.search).get("room");
 
+    UIController.changeLoadStatus(`Joining room ${room || "default"}`);
     if (!clientController.changeRoom(room || "default")) return;
+    UIController.changeLoadStatus("Starting game");
     clientController.startGame();
     UIController.hideLoadingScreen();
   } catch (err) {

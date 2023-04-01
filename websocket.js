@@ -28,12 +28,15 @@ wss.on("connection", function connection(ws) {
         return await handleAuthClient(message, ws);
       }
 
-      if (!message.uuid) throw new UserError("UUID required to sync");
       if (!ws.uuid) throw new UserError("UUID required to sync");
-      if (ws.uuid !== message.uuid) throw new UserError("UUID is not correct");
-      if (!validateUUID(message.uuid)) throw new UserError("UUID is not valid");
-      const client = clients.find(message.uuid);
+      message.uuid = ws.uuid;
+
+      const client = clients.find(ws.uuid);
       if (!client) throw new UserError("Unknown UUID");
+
+      if (message.type === "ping") {
+        ws.send(JSON.stringify({ type: "pong", time: message.time }));
+      }
 
       // if (message.type === "inf") {
       //   return handleSyncPosition(message, client, ws);
@@ -61,8 +64,8 @@ wss.on("connection", function connection(ws) {
     } catch (err) {
       if (err.name === "JsonWebTokenError")
         err = new UserError("Error while decoding token", 400);
-
-      console.log(err);
+      if (err.name === "TokenExpiredError")
+        err = new UserError("Token expired. Log in again", 401);
 
       handleSendError(err, ws);
     }

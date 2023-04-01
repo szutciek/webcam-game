@@ -1,9 +1,20 @@
-import { drawFace, drawBody } from "/canvasMethods.js";
+import { drawFace, drawBody, drawTag } from "/canvasMethods.js";
 
 export default class Canvas {
   constructor(id) {
     this.el = document.getElementById(id);
     this.ctx = this.el.getContext("2d");
+
+    this.addCustomFonts();
+  }
+
+  addCustomFonts() {
+    this.font = new FontFace(
+      "Poppins",
+      "https://assets.kanapka.eu/fonts/Poppins/Poppins-Bold.ttf"
+    );
+    this.font.load();
+    document.fonts.add(this.font);
   }
 
   drawItem(item) {
@@ -57,6 +68,9 @@ export default class Canvas {
     // this.ctx.fillStyle = "#ff9999";
     // this.ctx.fillRect(x, y, w, h);
 
+    if (player.username !== "Anonymous") {
+      drawTag(this.ctx, x, y, w, h, player.username);
+    }
     drawBody(this.ctx, x, y, w, h, pose);
     drawFace(this.ctx, x, y, w, h, camera);
   }

@@ -110,22 +110,74 @@ body {
 
 .container {
   margin: 10px;
-  max-width: 300px;
+  max-width: 640px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  padding: 2rem 0;
+}
+
+.progress ul {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  list-style: none;
+  text-align: center;
+}
+.progress li {
+  padding: 0.6rem 0.2rem;
+
+  font-size: 1rem;
+  font-weight: 500;
+  color: #5b5b5b;
+  transition: 0.2s;
+}
+.progress .active {
+  color: #97acdf;
+}
+.progress .bar {
+  height: 0.25rem;
+  width: 100%;
+  background-color: #d8d8d8;
+  border-radius: 2rem;
+}
+.progress .bar #indicator {
+  height: 100%;
+  width: calc(100% / 3);
+  background-color: #97acdf;
+  border-radius: 2rem;
+  transition: 0.2s;
+}
+
+.slider {
+  width: 100%;
+  height: fit-content;
+  overflow-x: hidden;
+}
+#sliding {
+  display: grid;
+  grid-template-columns: repeat(3, 100%);
+  height: fit-content;
+  transition: 0.2s;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 420px;
 }
 
 .title {
-  margin-bottom: 2rem;
-}
-.title .top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 .title h1 {
   font-size: 2rem;
   font-weight: 600;
   color: #1a1a1a;
+  margin-bottom: 0.2rem;
 }
 .title .top img {
   width: 36px;
@@ -137,77 +189,6 @@ body {
   font-size: 0.9rem;
   font-weight: 400;
   color: #535353;
-}
-
-.fancyInput {
-  margin-bottom: 20px;
-}
-.fancyInput:last-of-type {
-  margin-bottom: 0;
-}
-.inputArea {
-  position: relative;
-}
-.fancyInput .inputArea p {
-  position: absolute;
-  top: 50%;
-  left: 0.3rem;
-  /* to hide chrome autofill */
-  width: calc(100% - 0.6rem);
-  background-color: white;
-  border-radius: 2px;
-
-  user-select: none;
-  pointer-events: none;
-  line-height: 1rem;
-  padding: 0.2rem;
-
-  font-size: 1rem;
-  font-weight: 400;
-  color: #a4a4a4;
-
-  transform: translateY(-50%);
-  transition: 0.2s font-size, 0.2s top;
-}
-.fancyInput .inputArea input {
-  background-color: transparent;
-  border: none;
-  outline: none;
-
-  width: 100%;
-  padding: 0.6rem 0.5rem;
-  background-color: white;
-
-  font-size: 1rem;
-  font-weight: 500;
-  color: #2d2d2d;
-
-  border: 1px solid #b9b9b9;
-  border-radius: 2px;
-  transition: 0.2s;
-}
-.fancyInput .errorArea {
-  display: grid;
-  justify-content: left;
-  align-items: center;
-  grid-template-columns: 1rem auto;
-  gap: 0.3rem;
-
-  padding: 0.15rem 0.3rem;
-  transition: 0.2s;
-  background-color: #ef5f5f;
-  border-radius: 0 0 2px 2px;
-  user-select: none;
-  pointer-events: none;
-}
-.fancyInput .errorArea svg {
-  width: 1rem;
-  height: 1rem;
-}
-.fancyInput .errorArea h6 {
-  font-size: 0.8rem;
-  font-weight: 400;
-  color: #ffffff;
 }
 
 .password {
@@ -228,7 +209,9 @@ body {
   display: flex;
   justify-content: center;
 }
-.submit button {
+.submit,
+.next,
+.secondary {
   width: 100%;
   padding: 0.75rem;
 
@@ -238,24 +221,35 @@ body {
   font-size: 1rem;
   line-height: 1.5rem;
   font-weight: 500;
-  color: white;
-
-  background-color: #97acdf;
   cursor: pointer;
 }
-.submit button:hover {
+.submit,
+.next {
+  background-color: #97acdf;
+  color: white;
+}
+.submit:hover,
+.next:hover {
   background-color: #889dcd;
+}
+.secondary {
+  color: rgb(33, 33, 33);
+  background-color: transparent;
+  margin-bottom: 0.5rem;
+}
+.secondary:hover {
+  background-color: #f7f7f7;
 }
 
 .other {
   position: relative;
-  margin: 2rem 0 0 0;
   border-top: 1px solid #b9b9b9;
-  padding: 2rem 0;
+  padding: 2rem 0 0 0;
+  margin: 1rem 0 0 0;
   text-align: center;
 }
 .other::after {
-  content: "Need an account?";
+  content: "Have an account?";
   position: absolute;
   top: -10px;
   left: 50%;
@@ -279,6 +273,43 @@ body {
 }
 .other a:hover {
   background-color: #e0e0e0;
+}
+
+.preview {
+  width: 100%;
+  height: 100%;
+  background-color: #fcfcfc;
+  border: 1px solid #e9e9e9;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.preview video {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #eeeeee;
+}
+.preview #usernamePreview {
+  height: 1.5rem;
+  font-size: 1.5rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem 0;
+
+  color: #161616;
+}
+.preview #emailPreview {
+  height: 0.9rem;
+  font-size: 0.9rem;
+  line-height: 0.9rem;
+  font-weight: 400;
+
+  color: #454545;
 }
 
 .loader {

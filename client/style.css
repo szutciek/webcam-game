@@ -16,10 +16,46 @@ body {
   position: fixed;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100vh;
+}
+.fixed .dev {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+}
+.fixed .dev #position {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.fixed .dev #renderTime {
+  font-size: 0.7rem;
+}
+.fixed .dev #renderedItems,
+.fixed .dev #renderedPlayers {
+  font-size: 1rem;
 }
 
-.hud {
-  position: fixed;
+.fixed .openMenu {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  width: 3rem;
+  height: 3rem;
+  padding: 10px;
+  background-color: #d9f0fe;
+  box-shadow: -4px 4px 16px #0000004a;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.fixed .openMenu:hover {
+  background-color: #caebff;
+  padding: 6px;
+}
+.fixed .openMenu img {
+  width: 100%;
+  height: 100%;
 }
 
 #loadingScreen {

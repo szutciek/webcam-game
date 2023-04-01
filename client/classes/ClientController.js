@@ -50,7 +50,6 @@ export default class ClientController {
       this.#ws.send(
         JSON.stringify({
           type: "authclient",
-          // change into jwt eventually
           token: this.user.token,
         })
       );
@@ -118,7 +117,6 @@ export default class ClientController {
   handleMessage(mes) {
     const message = JSON.parse(mes.data);
     if (message.type === "pinfo") {
-      // console.log(performance.now());
       message.data.forEach((player) => {
         if (player.id !== this.user.uuid) {
           this.gameObjects.updatePlayer(player.id, player);
@@ -157,6 +155,9 @@ export default class ClientController {
       this.gameObjects.setObjects(message.data);
     }
     if (message.type === "error") {
+      if ([401, 403].includes(message.code)) {
+        window.location = `/signin?message=${message.message}`;
+      }
       console.warn(message);
       return;
     }
@@ -180,6 +181,13 @@ export default class ClientController {
     if (message.type === "userdata") {
       this.updateUser(message.data);
       return;
+    }
+
+    if (message.type === "pong") {
+      const ping = (performance.now() - message.time) / 2;
+      document.getElementById("ping").innerText = `Ping: ${String(
+        Math.round(ping * 100) / 100
+      ).padEnd(5, "0")}ms`;
     }
   }
 

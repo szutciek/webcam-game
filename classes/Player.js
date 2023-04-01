@@ -16,21 +16,17 @@ module.exports = class Player {
   velY = 0;
 
   camera = "";
-  inputs = {
-    n: false,
-    e: false,
-    s: false,
-    w: false,
-  };
+
   pose = {
     crouching: false,
     madLeft: false,
     madRight: false,
   };
 
-  constructor(uuid, position = { x: 0, y: 0, w: 100, h: 200 }) {
+  constructor(uuid, position = { x: 0, y: 0, w: 100, h: 200 }, username) {
     this.uuid = uuid;
     this.position = position;
+    this.username = username;
   }
 
   // client not gonna override anymore
@@ -42,50 +38,51 @@ module.exports = class Player {
 
   updatePose(pose) {
     this.pose = pose;
+    console.log(this.pose.crouching);
   }
 
-  updateInputs(inputs) {
-    this.inputs = inputs;
+  updatePrediction(position) {
+    this.prediction = position;
   }
 
-  calculateVelocity() {
-    let currentMax = maxS;
-    if (this.pose.crouching) currentMax /= 20;
-
-    if (this.inputs.n && this.velY > -currentMax) {
-      this.velY -= 0.6;
-    }
-    if (this.inputs.s && this.velY < currentMax) {
-      this.velY += 0.6;
-    }
-
-    if (this.inputs.e && this.velX < currentMax) {
-      this.velX += 0.6;
-    }
-    if (this.inputs.w && this.velX > -currentMax) {
-      this.velX -= 0.6;
+  updateVelocity(velocities) {
+    if (
+      typeof velocities.x === "number" &&
+      velocities.x <= 15 &&
+      velocities.x >= -15
+    ) {
+      this.velX = velocities.x;
+    } else if (Math.abs(velocities.x) > 15) {
+      this.velX = 0;
     }
 
-    if (!this.pose.crouching) {
-      if (!this.inputs.s && !this.inputs.n) {
-        this.velY /= 1.2;
-      }
-      if (!this.inputs.w && !this.inputs.e) {
-        this.velX /= 1.2;
-      }
-    } else {
-      if (!this.inputs.s && !this.inputs.n) {
-        this.velY /= 1.7;
-      }
-      if (!this.inputs.w && !this.inputs.e) {
-        this.velX /= 1.7;
-      }
+    if (
+      typeof velocities.y === "number" &&
+      velocities.y <= 15 &&
+      velocities.y >= -15
+    ) {
+      this.velY = velocities.y;
+    } else if (Math.abs(velocities.y) > 15) {
+      this.velY = 0;
     }
   }
 
-  calculateMovement() {
-    this.position.x += Math.sign(this.velX) * f(Math.abs(this.velX));
-    this.position.y += Math.sign(this.velY) * f(Math.abs(this.velY));
+  // updateInputs(inputs) {
+  //   this.inputs = inputs;
+  // }
+
+  calculateMovement(secondsPassed) {
+    // console.log(this.prediction);
+
+    if (this.velX < 0) this.position.x += this.velX;
+    if (this.velX > 0) this.position.x += this.velX;
+    if (this.velY < 0) this.position.y += this.velY;
+    if (this.velY > 0) this.position.y += this.velY;
+
+    this.position.x +=
+      Math.sign(this.velX) * f(Math.abs(this.velX * secondsPassed));
+    this.position.y +=
+      Math.sign(this.velY) * f(Math.abs(this.velY * secondsPassed));
   }
 
   get x() {
@@ -110,6 +107,7 @@ module.exports = class Player {
         this.position.w,
         this.position.h,
       ],
+      username: this.username,
       pose: this.pose,
     };
     if (camera) data.camera = this.camera;

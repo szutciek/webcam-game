@@ -14,6 +14,8 @@ module.exports = class Room {
   // 1600px x 1600px
   chunks = new Map();
 
+  lastTimeStamp = 0.015;
+
   constructor(
     code,
     creatorId,
@@ -43,6 +45,8 @@ module.exports = class Room {
   }
 
   gameTick() {
+    const secondsPassed = (performance.now() - this.lastTimeStamp) / 1000;
+
     if (this.#players.size === 0) {
       console.log(`Room ${this.code} is empty. Pausing game.`);
       this.stopGameClock();
@@ -50,8 +54,8 @@ module.exports = class Room {
 
     // do all kinds of calculations
     this.#players.forEach((player) => {
-      player.calculateVelocity();
-      player.calculateMovement();
+      player.calculateMovement(secondsPassed);
+      // console.log(player.x, player.y);
     });
 
     // collect all data
@@ -70,6 +74,8 @@ module.exports = class Room {
       type: "pinfo",
       data: list,
     });
+
+    this.lastTimeStamp = performance.now();
   }
 
   getAllPlayersQuickData(camera) {
@@ -168,26 +174,26 @@ module.exports = class Room {
     return true;
   }
 
-  joinRoom(uuid, startPos) {
+  joinRoom(uuid, startPos, username = "Anonymous") {
     if (!this.#running) this.startGameClock();
 
-    this.#players.set(uuid, new Player(uuid, startPos));
+    this.#players.set(uuid, new Player(uuid, startPos, username));
   }
 
   leaveRoom(uuid) {
     this.#players.delete(uuid);
   }
 
-  updatePlayerInput(uuid, data) {
-    const player = this.#players.get(uuid);
-    if (!player) return;
+  // updatePlayerInput(uuid, data) {
+  //   const player = this.#players.get(uuid);
+  //   if (!player) return;
 
-    // changing the inputs for velocity calculations
-    player.updateInputs(data);
+  //   // changing the inputs for velocity calculations
+  //   player.updateInputs(data);
 
-    // respond with chunks (convenient)
-    this.sendChunks(this.#players.get(uuid));
-  }
+  //   // respond with chunks (convenient)
+  //   this.sendChunks(this.#players.get(uuid));
+  // }
 
   // updatePlayerPosition(uuid, position) {
   //   const player = this.#players.get(uuid);
@@ -195,11 +201,26 @@ module.exports = class Room {
   //   player.updatePosition(position);
   //   this.sendChunks(player);
   // }
+
+  updatePlayerPrediction(uuid, position) {
+    const player = this.#players.get(uuid);
+    if (!player) return;
+    player.updatePrediction(position);
+    this.sendChunks(player);
+  }
+
+  updatePlayerVelocity(uuid, velocities) {
+    const player = this.#players.get(uuid);
+    if (!player) return;
+    player.updateVelocity(velocities);
+  }
+
   updatePlayerPose(uuid, pose) {
     const player = this.#players.get(uuid);
     if (!player) return;
     player.updatePose(pose);
   }
+
   updatePlayerCamera(uuid, camera) {
     const player = this.#players.get(uuid);
     if (!player) return;
