@@ -11,7 +11,7 @@ export default class GameController {
   #vh = window.innerHeight;
 
   #interval = undefined;
-  #includeCam = 0;
+  #iteration = 0;
 
   lastTimeStamp = 0.015;
   serverTimeOrigin = 0;
@@ -51,9 +51,12 @@ export default class GameController {
   async renderFrame() {
     try {
       this.currentTick++;
-      const secondsPassed = (performance.now() - this.lastTimeStamp) / 1000;
-      const milisecondsServerStart =
-        Math.round((performance.now() - this.serverTimeOrigin) * 1000) / 1000;
+      const now = performance.now();
+      const secondsPassed = (now - this.lastTimeStamp) / 1000;
+      const notRounded = this.serverTimeOrigin - performance.timeOrigin + now;
+      const milisecondsServerStart = Math.round(notRounded * 1000) / 1000;
+
+      // console.log(milisecondsServerStart);
 
       // ==========================================================================
       // PREPARING ELEMENTS IN VIEWPORT ===========================================
@@ -88,11 +91,12 @@ export default class GameController {
       // ==========================================================================
 
       if (this.#ws.readyState === WebSocket.OPEN) {
-        if (this.#includeCam % 3 === 0) {
+        if (this.#iteration % 3 === 0) {
           if (!this.player) return;
-          this.player.camera = await takePicture();
+          this.player.camera = takePicture();
           this.syncCamera();
-          this.#includeCam = 0;
+        }
+        if (this.#iteration % 30 === 0) {
           this.ping();
         }
         this.syncMovement(milisecondsServerStart);
@@ -127,7 +131,8 @@ export default class GameController {
       // FINISHING TOUCHES ========================================================
       // ==========================================================================
 
-      this.#includeCam++;
+      this.#iteration++;
+      if (this.#iteration === 120) this.#iteration === 0;
       this.lastTimeStamp = performance.now();
     } catch (err) {
       console.warn(err);
@@ -190,44 +195,6 @@ export default class GameController {
       })
     );
   }
-
-  // syncPositionAndCamera() {
-  //   this.send(
-  //     JSON.stringify({
-  //       type: "infcam",
-  //       uuid: this.uuid,
-  //       position: [this.player.x, this.player.y, this.player.w, this.player.h],
-  //       velX: this.player.velX,
-  //       velY: this.player.velY,
-  //       pose: this.player.pose,
-  //       camera: this.player?.camera,
-  //     })
-  //   );
-  // }
-
-  // syncPosition() {
-  //   this.send(
-  //     JSON.stringify({
-  //       type: "inf",
-  //       uuid: this.uuid,
-  //       position: [this.player.x, this.player.y, this.player.w, this.player.h],
-  //       velX: this.player.velX,
-  //       velY: this.player.velY,
-  //       pose: this.player.pose,
-  //     })
-  //   );
-  // }
-
-  // too many requests - cam data added every 3rd instead
-  // syncCamera(id, b64) {
-  //   this.send(
-  //     JSON.stringify({
-  //       type: "cam",
-  //       uuid: id,
-  //       data: b64,
-  //     })
-  //   );
-  // }
 
   send(payload) {
     if (this.#ws.readyState === WebSocket.OPEN) this.#ws.send(payload);

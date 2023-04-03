@@ -1,4 +1,3 @@
-const clients = require("../state/clients.js");
 const UserError = require("../utils/UserError.js");
 
 exports.handleSyncMovement = (data, client, ws) => {
@@ -16,16 +15,33 @@ exports.handleSyncMovement = (data, client, ws) => {
 
     client.roomRef.updatePlayerState(ws.uuid, data);
   } catch (err) {
-    console.log(err);
     throw err;
   }
 };
 
 exports.handleSyncCam = (data, client, ws) => {
-  if (!client.roomRef || !client.room) throw new UserError("Join a room first");
+  try {
+    if (!client.roomRef || !client.room)
+      throw new UserError("Join a room first");
 
-  if (typeof data.camera !== "string")
-    throw new UserError("Camera data should be a string");
+    if (typeof data.camera !== "string")
+      throw new UserError("Camera data should be a string");
 
-  client.roomRef.updatePlayerCamera(ws.uuid, data.camera);
+    client.roomRef.updatePlayerCamera(ws.uuid, data.camera);
+  } catch (err) {
+    throw err;
+  }
+};
+
+exports.handleChatMessage = (data, client) => {
+  try {
+    client.roomRef.broadcast({
+      type: "chatmsg",
+      uuid: client.uuid,
+      username: client.user.username,
+      message: data.message,
+    });
+  } catch (err) {
+    throw err;
+  }
 };

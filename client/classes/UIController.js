@@ -1,3 +1,4 @@
+import "/classes/UIListener.js";
 import Message from "/classes/UIMessage.js";
 
 class UIController {
@@ -9,6 +10,7 @@ class UIController {
 
     this.pingElement = document.getElementById("ping");
     this.userElement = document.getElementById("user");
+    this.roomPlayersElement = document.getElementById("players");
   }
 
   hideLoadingScreen = () => {
@@ -22,6 +24,10 @@ class UIController {
       this.screen.style.pointerEvents = "none";
     }, 0 * 1000 - visible);
   };
+
+  updateRoomInfo(info) {
+    this.roomPlayersElement.innerText = `${info.code}: ${info.players.length} online, ${info.map}`;
+  }
 
   showLoadingScreen(username, profile, color = "#ffffff") {
     const usernameField = this.screen.querySelector("h1");

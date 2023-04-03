@@ -11,7 +11,10 @@ export default class Canvas {
   addCustomFonts() {
     const font = new FontFace(
       "Poppins",
-      "https://assets.kanapka.eu/fonts/Poppins/Poppins-Bold.ttf"
+      "url(https://assets.kanapka.eu/fonts/Poppins/Poppins-Bold.ttf)",
+      {
+        weight: 800,
+      }
     );
     font.load();
     document.fonts.add(font);

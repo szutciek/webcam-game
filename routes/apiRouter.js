@@ -136,18 +136,18 @@ router.post("/signup", async (req, res, next) => {
         g[0] * 16 + rgbMap(g[1]),
         b[0] * 16 + rgbMap(b[1]),
       ];
-      if (rSum < 50 || gSum < 50 || bSum < 50) {
+      if (rSum < 50 && gSum < 50 && bSum < 50) {
         ok = false;
         errors.push({
           field: "panelColor",
           message: "Panel Color is too dark (min 50)",
         });
       }
-      if (rSum > 250 || gSum > 250 || bSum > 250) {
+      if (rSum > 245 && gSum > 245 && bSum > 245) {
         ok = false;
         errors.push({
           field: "panelColor",
-          message: "Panel Color is too light (max 250)",
+          message: "Panel Color is too light (max 245)",
         });
       }
     }

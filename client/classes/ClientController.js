@@ -20,12 +20,26 @@ export default class ClientController {
     this.user = user;
   }
 
-  changeRoom(room) {
-    if (!room) return;
+  changeRoom(room, map) {
+    if (!room) room = "default";
     console.log(`Changing room to ${room}`);
     this.room = room;
+    // only for new rooms
+    this.roomMap = map;
     // tell server about change
     return true;
+  }
+
+  joinRoom() {
+    if (!this.user.uuid || !this.room) return;
+    this.#ws.send(
+      JSON.stringify({
+        type: "roomjoin",
+        uuid: this.user.uuid,
+        room: this.room,
+        map: this?.roomMap,
+      })
+    );
   }
 
   connectServer() {
@@ -64,17 +78,6 @@ export default class ClientController {
     }
   }
 
-  joinRoom() {
-    if (!this.user.uuid || !this.room) return;
-    this.#ws.send(
-      JSON.stringify({
-        type: "roomjoin",
-        uuid: this.user.uuid,
-        room: this.room,
-      })
-    );
-  }
-
   updateUser(data) {
     Object.entries(data).forEach((e) => {
       this.user[e[0]] = e[1];
@@ -94,6 +97,13 @@ export default class ClientController {
       this.handleMessage(message);
     });
     console.log("No longer listening to server...");
+  }
+
+  updateRoomInfo(info) {
+    if (info.syncStartTime) {
+      this.setServerTimeOrigin(info.syncStartTime);
+    }
+    UIController.updateRoomInfo(info);
   }
 
   startRender() {
@@ -121,6 +131,13 @@ export default class ClientController {
     }
   }
 
+  sendChat(message) {
+    this.sendJSON({
+      type: "chatmsg",
+      message,
+    });
+  }
+
   sendJSON(payload) {
     this.#ws.send(JSON.stringify(payload));
   }
@@ -133,9 +150,9 @@ export default class ClientController {
           this.gameObjects.updatePlayer(player.id, player);
         }
       });
-
       return;
     }
+
     if (message.type === "movovd") {
       if (typeof message.position !== "object") return;
       this.player.serverOverride(message.position);
@@ -151,11 +168,19 @@ export default class ClientController {
       );
     }
     if (message.type === "event") {
-      console.log(message);
       UIController.showMessage(
         message.event,
         message.icon,
         message.classification
+      );
+    }
+    if (message.type === "chatmsg") {
+      UIController.showMessage(
+        `${this.user.uuid === message.uuid ? "You" : message.username}: ${
+          message.message
+        }`,
+        "chat",
+        "normal"
       );
     }
     if (message.type === "mobj") {
@@ -165,7 +190,6 @@ export default class ClientController {
       if ([401, 403].includes(message.code)) {
         window.location = `/signin?message=${message.message}`;
       }
-      console.warn(message);
       return;
     }
     if (message.type === "authclientOk") {
@@ -196,7 +220,7 @@ export default class ClientController {
       return;
     }
     if (message.type === "roominfo") {
-      this.setServerTimeOrigin(message.syncStartTime);
+      this.updateRoomInfo(message);
     }
     if (message.type === "latwarn") {
       console.warn(`High latency: ${message.latency}`);

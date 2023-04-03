@@ -6,7 +6,7 @@ class Rooms {
 
   constructor() {}
 
-  addRoom(code, creatorId, maxPlayers) {
+  addRoom(code, map, creatorId, maxPlayers) {
     // prevent overriding a room
     if (this.#rooms.has(code))
       throw new UserError("This code is already in use!");
@@ -15,7 +15,7 @@ class Rooms {
       throw new UserError("Couldn't create room (no _id)");
     }
 
-    const newRoom = new Room(code, creatorId, maxPlayers);
+    const newRoom = new Room(code, map, creatorId, maxPlayers);
     this.#rooms.set(code, newRoom);
     return newRoom;
   }

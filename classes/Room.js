@@ -13,21 +13,23 @@ module.exports = class Room {
 
   // 1600px x 1600px
   chunks = new Map();
+  spawnPoints = [];
 
   lastTimeStamp = 0.015;
   syncStartTime = undefined;
 
   constructor(
     code,
+    map,
     creatorId,
     maxPlayers = maxPlayersRoom,
     renderDistance = maxRenderDistance
   ) {
     this.code = code;
+    this.map = map;
     this.creatorId = creatorId;
     this.maxPlayers = maxPlayers;
     this.renderDistance = renderDistance;
-
     this.createStartChunks(2);
   }
 
@@ -60,7 +62,7 @@ module.exports = class Room {
     this.#players.forEach((player) => {
       const correction = player.correctMovement(secondsPassed, currentTime);
       if (correction !== undefined)
-        clients.find(player.uuid).sendTo({
+        clients.find(player.uuid)?.sendTo({
           type: "movovd",
           position: correction,
         });
@@ -84,6 +86,34 @@ module.exports = class Room {
     });
 
     this.lastTimeStamp = performance.now();
+  }
+
+  setSpawnPoints(points) {
+    this.spawnPoints = points;
+  }
+
+  determineStartPos() {
+    const points = [];
+
+    this.spawnPoints.forEach((s) => {
+      let collides = false;
+
+      this.#players.forEach((p) => {
+        const playerCollides = p.checkCollision({
+          ...s,
+          w: 100,
+          h: 200,
+        });
+        if (playerCollides) collides = true;
+      });
+
+      if (!collides) points.push(s);
+    });
+
+    const index = Math.floor(Math.random() * this.spawnPoints.length);
+    if (points.length === 0) return this.spawnPoints[index];
+    const secondIndex = Math.floor(Math.random() * points.length);
+    return points[secondIndex];
   }
 
   getAllPlayersQuickData(camera) {
@@ -188,6 +218,8 @@ module.exports = class Room {
     this.#players.set(uuid, new Player(uuid, startPos, username));
 
     this.sendRoomInfo(uuid);
+
+    this.broadcastRoomInfo();
     this.broadcast({
       type: "event",
       event: `${username} joined the room`,
@@ -199,6 +231,8 @@ module.exports = class Room {
   leaveRoom(uuid) {
     const player = this.#players.get(uuid);
     this.#players.delete(uuid);
+
+    this.broadcastRoomInfo();
     this.broadcast({
       type: "event",
       event: `${player?.username} left the room`,
@@ -207,11 +241,30 @@ module.exports = class Room {
     });
   }
 
-  sendRoomInfo(uuid) {
-    clients.find(uuid).sendTo({
-      type: "roominfo",
-      syncStartTime: this.syncStartTime,
+  getRoomInfo() {
+    const pList = [];
+    this.#players.forEach((p) => {
+      pList.push({
+        uuid: p.uuid,
+        username: p.username,
+      });
     });
+    return {
+      type: "roominfo",
+      code: this.code,
+      map: this.map,
+      players: pList,
+    };
+  }
+
+  sendRoomInfo(uuid) {
+    clients
+      .find(uuid)
+      .sendTo({ ...this.getRoomInfo(), syncStartTime: this.syncStartTime });
+  }
+
+  broadcastRoomInfo() {
+    this.broadcast(this.getRoomInfo());
   }
 
   getPlayer(uuid) {
@@ -271,10 +324,10 @@ module.exports = class Room {
     return this.#players.has(uuid);
   }
 
-  broadcast(message, uuid) {
+  broadcast(message, uuid = false) {
     for (const [id, client] of clients.allClients()) {
       if (client.room === this.code) {
-        if (id !== uuid) {
+        if (!uuid || id !== uuid) {
           client.sendTo(message);
         }
       }

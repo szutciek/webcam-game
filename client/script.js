@@ -2,6 +2,8 @@ import ClientController from "/classes/ClientController.js";
 import UIController from "/classes/UIController.js";
 import { requestCameraPermission, startStream, stream } from "/camera.js";
 
+let clientController;
+
 const setup = async () => {
   try {
     const token = window.localStorage.getItem("token");
@@ -22,7 +24,7 @@ const setup = async () => {
     UIController.showCameraLoadingScreen(stream);
 
     UIController.changeLoadStatus("Connecting to server");
-    const clientController = new ClientController({
+    clientController = new ClientController({
       token,
       username: user.username,
     });
@@ -30,10 +32,12 @@ const setup = async () => {
     UIController.showUser(user.username, user.panelColor);
 
     // handle room selection with ui
-    let room = new URLSearchParams(window.location.search).get("room");
+    const search = new URLSearchParams(window.location.search);
+    const room = search.get("room");
+    const map = search.get("map");
 
     UIController.changeLoadStatus(`Joining room ${room || "default"}`);
-    if (!clientController.changeRoom(room || "default")) return;
+    if (!clientController.changeRoom(room, map)) return;
     UIController.changeLoadStatus("Starting game");
     clientController.startGame();
     UIController.hideLoadingScreen();
@@ -43,3 +47,5 @@ const setup = async () => {
 };
 
 setup();
+
+export { clientController };

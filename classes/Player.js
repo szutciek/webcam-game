@@ -2,6 +2,7 @@ const UserError = require("../utils/UserError");
 const clients = require("../state/clients");
 
 const maxS = 15;
+const errorMargin = 5;
 
 const f = (x) => {
   // 2 is vert stretch, 1 is horizontal translation, using change of base
@@ -9,45 +10,30 @@ const f = (x) => {
 };
 
 module.exports = class Player {
-  previousPosition = undefined;
   updatedChunks = new Map();
 
-  // CALCULATED ON SERVER
-  velX = 0;
-  velY = 0;
   position = {
     x: 0,
     y: 0,
     w: 100,
     h: 200,
   };
-
-  // FROM CLIENT
   velocities = {
     x: 0,
     y: 0,
   };
-  prediction = {
-    x: 0,
-    y: 0,
-    w: 100,
-    h: 200,
-  };
-
-  clientTicks = [];
-
-  camera = "";
-
   pose = {
     crouching: false,
     madLeft: false,
     madRight: false,
   };
+  camera = "";
+
+  clientTicks = [];
 
   constructor(uuid, position = { x: 0, y: 0, w: 100, h: 200 }, username) {
     this.uuid = uuid;
     this.position = position;
-    this.prevPos = position;
     this.username = username;
   }
 
@@ -56,7 +42,6 @@ module.exports = class Player {
   }
 
   addClientTick(tick) {
-    // console.log("UPDATE");
     this.clientTicks.length = 10;
     this.clientTicks.unshift({
       velocities: tick.velocities,
@@ -72,50 +57,24 @@ module.exports = class Player {
     this.clientTick = tick;
   }
 
-  // think about the stuff again
-  updatePrediction(position) {
-    this.prediction = position;
-  }
-
-  updateVelocity(velocities) {
-    if (
-      typeof velocities.x === "number" &&
-      velocities.x <= 15 &&
-      velocities.x >= -15
-    ) {
-      this.velX = velocities.x;
-    } else if (Math.abs(velocities.x) > 15) {
-      this.velX = 0;
-    }
-    if (
-      typeof velocities.y === "number" &&
-      velocities.y <= 15 &&
-      velocities.y >= -15
-    ) {
-      this.velY = velocities.y;
-    } else if (Math.abs(velocities.y) > 15) {
-      this.velY = 0;
-    }
-  }
-
   validateVelocity(velocities) {
     const validated = {};
     if (
       typeof velocities.x === "number" &&
-      velocities.x <= 15 &&
-      velocities.x >= -15
+      velocities.x <= maxS &&
+      velocities.x >= -maxS
     ) {
       validated.x = velocities.x;
-    } else if (Math.abs(velocities.x) > 15) {
+    } else if (Math.abs(velocities.x) > maxS) {
       validated.x = 0;
     }
     if (
       typeof velocities.y === "number" &&
-      velocities.y <= 15 &&
-      velocities.y >= -15
+      velocities.y <= maxS &&
+      velocities.y >= -maxS
     ) {
       validated.y = velocities.y;
-    } else if (Math.abs(velocities.y) > 15) {
+    } else if (Math.abs(velocities.y) > maxS) {
       validated.y = 0;
     }
     return validated;
@@ -124,57 +83,6 @@ module.exports = class Player {
   validatePose(pose) {
     return pose;
   }
-
-  // correctMovement(secondsPassed, currentTime) {
-  //   if (!this.ticked) return false;
-  //   // this value is the difference between tick on client and server
-  //   const tickDelay = (currentTime - this.clientTimeStamp) / 1000;
-  //   if (typeof tickDelay !== "number") tickDelay = 1;
-
-  //   const timePassed = (currentTime - this.lastPosUpd) / 1000;
-
-  //   if (tickDelay > 100) {
-  //     console.log(tickDelay);
-  //   }
-
-  //   const posX =
-  //     this.position.x +
-  //     Math.sign(this.velX) * f(Math.abs(this.velX * timePassed));
-  //   const posY =
-  //     this.position.y +
-  //     Math.sign(this.velY) * f(Math.abs(this.velY * timePassed));
-
-  //   const possibleXmin = this.position.x - f(Math.abs(this.velX * timePassed));
-  //   const possibleXmax = this.position.x + f(Math.abs(this.velX * timePassed));
-
-  //   // console.log(
-  //   //   Math.round(possibleXmin) <= Math.round(this.prediction.x) &&
-  //   //     Math.round(possibleXmax) >= Math.round(this.prediction.x)
-  //   // );
-  //   console.log("TICK");
-
-  //   const diffX =
-  //     Math.abs(Math.round(posX)) - Math.abs(Math.round(this.prediction?.x));
-  //   const diffY =
-  //     Math.abs(Math.round(posY)) - Math.abs(Math.round(this.prediction?.y));
-
-  //   this.lastPosUpd = currentTime;
-  //   this.ticked = true;
-  //   if (diffX < 30 && diffY < 30) {
-  //     this.position.x = this.prediction.x;
-  //     this.position.y = this.prediction.y;
-  //     return false;
-  //   } else {
-  //     return {
-  //       x: this.position.x,
-  //       y: this.position.y,
-  //       w: this.position.w,
-  //       h: this.position.h,
-  //     };
-  //   }
-
-  //   // if valid update prev pos and dont send override to client
-  // }
 
   correctMovement(secondsPassed, currentTime) {
     if (this.clientTicks.length === 0) return false;
@@ -227,13 +135,12 @@ module.exports = class Player {
     const maxDispX = f(Math.abs((this.vX * clientTimeBetween) / 1000));
     const maxDispY = f(Math.abs((this.vY * clientTimeBetween) / 1000));
 
-    // const dispX = Math.abs(newestPos.x - this.position.x);
-    // const dispY = Math.abs(newestPos.y - this.position.y);
-
     const validX =
-      Math.abs(newestPos.x) <= Math.abs(this.position.x) + maxDispX + 30;
+      Math.abs(newestPos.x) <=
+      Math.abs(this.position.x) + maxDispX + errorMargin;
     const validY =
-      Math.abs(newestPos.y) <= Math.abs(this.position.y) + maxDispY + 30;
+      Math.abs(newestPos.y) <=
+      Math.abs(this.position.y) + maxDispY + errorMargin;
 
     if (!validX || !validY) valid = false;
 
@@ -254,6 +161,24 @@ module.exports = class Player {
         h: this.position.h,
       };
     }
+  }
+
+  checkCollision(hitbox) {
+    const cX = hitbox.x;
+    const cY = hitbox.y;
+    const cH = hitbox.h;
+    const cW = hitbox.w;
+
+    const pX = this.position.x;
+    const pY = this.position.y;
+    const pH = this.position.h;
+    const pW = this.position.w;
+
+    // const colVert = top <= o.yMap + o.h && bottom >= o.yMap;
+    const colVert = cY <= pY + pH && cY + cH >= pY;
+    const colHor = cX <= pX + pW && cX + cW >= pX;
+
+    return colHor && colVert;
   }
 
   get x() {

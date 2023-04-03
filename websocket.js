@@ -1,22 +1,17 @@
-const { randomUUID } = require("crypto");
-const { WebSocketServer: WSS, WebSocket: ws } = require("ws");
+const { WebSocketServer: WSS } = require("ws");
 const UserError = require("./utils/UserError.js");
 const handleSendError = require("./utils/handleSendError.js");
-const { validateUUID } = require("./utils/validators");
 const clients = require("./state/clients");
 const {
   handleAuthClient,
   handleClientLeave,
 } = require("./controllers/gameClientController");
 const {
-  handleSyncPosition,
-  handleSyncPositionAndCamera,
   handleSyncMovement,
   handleSyncCam,
+  handleChatMessage,
 } = require("./controllers/gameSyncController.js");
 const { handleRoomJoin } = require("./controllers/gameRoomController");
-
-const objects = require("./gameObjects");
 
 const wss = new WSS({ port: 5501 });
 
@@ -38,20 +33,16 @@ wss.on("connection", function connection(ws) {
         ws.send(JSON.stringify({ type: "pong", time: message.time }));
       }
 
-      // if (message.type === "inf") {
-      //   return handleSyncPosition(message, client, ws);
-      // }
-
-      // if (message.type === "infcam") {
-      //   return handleSyncPositionAndCamera(message, client, ws);
-      // }
-
       if (message.type === "mov") {
         return handleSyncMovement(message, client, ws);
       }
 
       if (message.type === "cam") {
         return handleSyncCam(message, client, ws);
+      }
+
+      if (message.type === "chatmsg") {
+        return handleChatMessage(message, client);
       }
 
       if (message.type === "roomjoin") {
@@ -72,6 +63,10 @@ wss.on("connection", function connection(ws) {
   });
 
   ws.on("close", () => {
+    handleClientLeave(ws.uuid, clients.find(ws.uuid));
+  });
+
+  ws.on("error", () => {
     handleClientLeave(ws.uuid, clients.find(ws.uuid));
   });
 });

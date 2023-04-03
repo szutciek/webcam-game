@@ -7,18 +7,26 @@ exports.handleRoomJoin = async (message, ws, client) => {
     let room = rooms.find(message.room);
 
     if (!room) {
-      room = rooms.addRoom(message.room, client.user?._id, 20);
-
-      // add option to choose map and create room in a different way later on
-      let mapCode = undefined;
       const avalibleMaps = await findAvalibleMaps();
-      if (avalibleMaps.includes(`${room.code}.json`)) {
-        mapCode = room.code;
+
+      let mapName;
+      if (
+        avalibleMaps.includes(`${message.map}.json`) &&
+        message.room !== "default"
+      ) {
+        mapName = message.map;
       } else {
-        mapCode = "default";
+        mapName = "default";
       }
 
-      const map = await loadMap(mapCode);
+      room = rooms.addRoom(
+        message.room || "default",
+        mapName,
+        client.user._id,
+        20
+      );
+
+      const map = await loadMap(room.map);
       if (!map) throw new UserError("Map couldn't be loaded", 404);
       const data = JSON.parse(map);
 
@@ -31,6 +39,8 @@ exports.handleRoomJoin = async (message, ws, client) => {
       //   }, i * 20);
       // });
 
+      room.setSpawnPoints(data.spawnPoints);
+
       data.objects.forEach((obj) => {
         room.addObject(obj.coords, obj.texture, obj.ignore);
       });
@@ -40,12 +50,9 @@ exports.handleRoomJoin = async (message, ws, client) => {
       throw new UserError(`Room ${message.room} is currently full`);
     }
 
-    const startPos = {
-      x: Math.floor(Math.random() * 500) - 250,
-      y: Math.floor(Math.random() * 500) - 250,
-      w: 100,
-      h: 200,
-    };
+    const startPos = room.determineStartPos();
+    startPos.w = 100;
+    startPos.h = 200;
 
     room.joinRoom(message.uuid, startPos, client.user.username);
     client.changeRoom(message.room);
@@ -60,18 +67,23 @@ exports.handleRoomJoin = async (message, ws, client) => {
       })
     );
   } catch (err) {
+    console.log(err);
     throw err;
   }
 };
 
 exports.handleRoomLeave = (message, ws, client) => {
-  // leaves in room and client
-  client.leaveRoom(message.room);
+  try {
+    // leaves in room and client
+    client.leaveRoom(message.room);
 
-  ws?.send(
-    JSON.stringify({
-      type: "roomleaveOk",
-      room: message.room,
-    })
-  );
+    ws?.send(
+      JSON.stringify({
+        type: "roomleaveOk",
+        room: message.room,
+      })
+    );
+  } catch (err) {
+    throw err;
+  }
 };
