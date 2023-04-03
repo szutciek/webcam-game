@@ -27,6 +27,8 @@ const setup = async () => {
       username: user.username,
     });
 
+    UIController.showUser(user.username, user.panelColor);
+
     // handle room selection with ui
     let room = new URLSearchParams(window.location.search).get("room");
 

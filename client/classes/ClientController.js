@@ -2,6 +2,7 @@ import { wsURL } from "/config.js";
 import Player from "/classes/Player.js";
 import GameObjects from "/classes/GameObjects.js";
 import GameController from "/classes/GameController.js";
+import UIController from "/classes/UIController.js";
 
 export default class ClientController {
   #ws = undefined;
@@ -130,14 +131,33 @@ export default class ClientController {
       message.data.forEach((player) => {
         if (player.id !== this.user.uuid) {
           this.gameObjects.updatePlayer(player.id, player);
-        } else {
-          this?.player.serverOverride(player);
         }
       });
 
       return;
     }
-
+    if (message.type === "movovd") {
+      if (typeof message.position !== "object") return;
+      this.player.serverOverride(message.position);
+      console.warn(
+        `Illegal movement, correction: [${message.position.x}, ${message.position.y}]`
+      );
+      UIController.showMessage(
+        `Illegal movement, correction: [${
+          Math.round(message.position.x * 10) / 10
+        }, ${Math.round(message.position.y * 10) / 10}]`,
+        "alert",
+        "warning"
+      );
+    }
+    if (message.type === "event") {
+      console.log(message);
+      UIController.showMessage(
+        message.event,
+        message.icon,
+        message.classification
+      );
+    }
     if (message.type === "mobj") {
       this.gameObjects.setObjects(message.data);
     }
@@ -152,10 +172,16 @@ export default class ClientController {
       this.user.uuid = message.data.uuid;
       this.updateUser(message.data);
       console.log(`User assigned UUID ${this.user.uuid}`);
+
       return;
     }
     if (message.type === "roomjoinOk") {
       console.log(`Successfully joined room ${this.room}`);
+      UIController.showMessage(
+        `Successfully joined room ${this.room}`,
+        "info",
+        "normal"
+      );
       this.player = new Player([
         message?.data?.position[0],
         message?.data?.position[1],
@@ -172,12 +198,18 @@ export default class ClientController {
     if (message.type === "roominfo") {
       this.setServerTimeOrigin(message.syncStartTime);
     }
+    if (message.type === "latwarn") {
+      console.warn(`High latency: ${message.latency}`);
+      UIController.showMessage(
+        `High latency: ${Math.round(message.latency * 10) / 10}ms`,
+        "info",
+        "warning"
+      );
+    }
 
     if (message.type === "pong") {
       const ping = (performance.now() - message.time) / 2;
-      document.getElementById("ping").innerText = `Ping: ${String(
-        Math.round(ping * 100) / 100
-      ).padEnd(5, "0")}ms`;
+      UIController.showPing(ping);
     }
   }
 

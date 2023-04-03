@@ -15,6 +15,7 @@ export default class GameController {
 
   lastTimeStamp = 0.015;
   serverTimeOrigin = 0;
+  currentTick = 0;
 
   constructor(player, ws, uuid, gameObjects, serverTimeOrigin) {
     if (!player) throw new Error("Can't create game - player undefined");
@@ -49,12 +50,10 @@ export default class GameController {
 
   async renderFrame() {
     try {
+      this.currentTick++;
       const secondsPassed = (performance.now() - this.lastTimeStamp) / 1000;
       const milisecondsServerStart =
-        Math.round(
-          (performance.timeOrigin + performance.now() - this.serverTimeOrigin) *
-            1000
-        ) / 1000;
+        Math.round((performance.now() - this.serverTimeOrigin) * 1000) / 1000;
 
       // ==========================================================================
       // PREPARING ELEMENTS IN VIEWPORT ===========================================
@@ -187,6 +186,7 @@ export default class GameController {
         position: this.player.position,
         pose: this.player.pose,
         relativeTimeStamp: timeStamp,
+        tick: this.currentTick,
       })
     );
   }

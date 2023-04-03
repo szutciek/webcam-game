@@ -3,7 +3,7 @@ const diff = 1;
 
 const f = (x) => {
   // 2 is vert stretch, 1 is horizontal translation, using change of base
-  return (15 * Math.log(x + 1)) / Math.log(8);
+  return (10 * (15 * Math.log(x + 1))) / Math.log(8);
 };
 
 const lerp = (s, e, t) => {
@@ -157,11 +157,11 @@ export default class Player {
     document.removeEventListener("keypress");
   }
 
-  serverOverride(data) {
-    this.#x = lerp(this.#x, data.position[0], 0.2);
-    this.#y = lerp(this.#y, data.position[1], 0.2);
-    this.#w = data.position[2];
-    this.#h = data.position[3];
+  serverOverride({ x, y, w, h }) {
+    this.#x = lerp(this.#x, x, 0.3);
+    this.#y = lerp(this.#y, y, 0.3);
+    this.#w = w;
+    this.#h = h;
   }
 
   checkCollisions(currPos, obstacles, react = false) {
@@ -237,17 +237,12 @@ export default class Player {
   }
 
   performMovement = (secondsPassed) => {
-    if (this.#velX < 0) this.#x += this.#velX;
-    if (this.#velX > 0) this.#x += this.#velX;
-    if (this.#velY < 0) this.#y += this.#velY;
-    if (this.#velY > 0) this.#y += this.#velY;
-
     this.#x += Math.sign(this.#velX) * f(Math.abs(this.#velX * secondsPassed));
     this.#y += Math.sign(this.#velY) * f(Math.abs(this.#velY * secondsPassed));
 
-    document.getElementById("position").innerText = `(${Math.floor(
+    document.getElementById("position").innerText = `${Math.floor(
       this.#x
-    )}, ${Math.floor(this.#y)})`;
+    )}, ${Math.floor(this.#y)}`;
   };
 
   get x() {

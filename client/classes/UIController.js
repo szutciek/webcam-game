@@ -1,8 +1,15 @@
+import Message from "/classes/UIMessage.js";
+
 class UIController {
-  screen = document.getElementById("loadingScreen");
+  messages = [];
   timeShown = undefined;
 
-  constructor() {}
+  constructor() {
+    this.screen = document.getElementById("loadingScreen");
+
+    this.pingElement = document.getElementById("ping");
+    this.userElement = document.getElementById("user");
+  }
 
   hideLoadingScreen = () => {
     const visible = new Date().getTime() - this.timeShown;
@@ -16,13 +23,13 @@ class UIController {
     }, 0 * 1000 - visible);
   };
 
-  showLoadingScreen = (username, profile, color = "#ffffff") => {
+  showLoadingScreen(username, profile, color = "#ffffff") {
     const usernameField = this.screen.querySelector("h1");
     usernameField.innerText = username;
     const profileField = this.screen.querySelector("img");
     profileField.src = profile;
     this.screen.style.backgroundColor = color;
-  };
+  }
 
   showCameraLoadingScreen = (stream) => {
     const camera = this.screen.querySelector("video");
@@ -34,6 +41,44 @@ class UIController {
   changeLoadStatus = (status) => {
     this.screen.querySelector("#loadStatusDisplay").innerText = status;
   };
+
+  createMessage(content, icon, type) {
+    return new Message(content, icon, type);
+  }
+
+  displayMessage(message) {
+    this.messages.unshift(message);
+    if (this.messages.length === 5) {
+      const last = this.messages.pop();
+      last.hide();
+    }
+    message.display();
+  }
+
+  showMessage(content, icon, type) {
+    const message = this.createMessage(content, icon, type);
+    this.displayMessage(message);
+  }
+
+  showUser(username, color) {
+    this.userElement.innerText = username;
+    this.userElement.closest(".box").style.backgroundColor = `${color}`;
+  }
+
+  showPing(ping) {
+    const rounded = Math.round(ping * 10) / 10;
+    this.pingElement.innerText = `${rounded} ms`;
+    if (rounded > 50) {
+      // this.pingElement.closest("div").style.border = "1px solid #ff000052";
+      this.pingElement.closest("div").style.backgroundColor = "#ff000032";
+    } else if (rounded > 30) {
+      // this.pingElement.closest("div").style.border = "1px solid #ffbf0052";
+      this.pingElement.closest("div").style.backgroundColor = "#ffbf0032";
+    } else {
+      // this.pingElement.closest("div").style.border = "1px solid #00ff2652";
+      this.pingElement.closest("div").style.backgroundColor = "#00ff2622";
+    }
+  }
 }
 
 export default new UIController();

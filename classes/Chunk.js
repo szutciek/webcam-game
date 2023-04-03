@@ -1,7 +1,9 @@
-const GameObject = require("./GameObject.js");
+const StaticObject = require("./StaticObject.js");
+const DynamicObject = require("./StaticObject.js");
 
 module.exports = class Chunk {
-  gameObjects = new Map();
+  staticObjects = new Map();
+  dynamicObjects = new Map();
 
   constructor(x, y) {
     this.x = x;
@@ -42,8 +44,12 @@ module.exports = class Chunk {
     return false;
   }
 
+  get gameObjects() {
+    return new Map([...this.dynamicObjects, ...this.staticObjects]);
+  }
+
   findObjectId(id) {
-    return this.gameObjects.get(id) || undefined;
+    return this.gameObjects.get(id);
   }
 
   findObject(x, y) {
@@ -77,7 +83,7 @@ module.exports = class Chunk {
   createObject(
     coordinates,
     texture = { type: "color", value: "white" },
-    ignore
+    staticObject
   ) {
     // if (!this.checkIfMultiple(coordinates.x)) return;
     // if (!this.checkIfMultiple(coordinates.y)) return;
@@ -88,10 +94,14 @@ module.exports = class Chunk {
     // handle errors when too wide
     if (this.checkIfInBounds(coordinates) && !this.checkIfExists(coordinates)) {
       const id = crypto.randomUUID();
-      this.gameObjects.set(
-        id,
-        new GameObject(id, coordinates, texture, ignore)
-      );
+      if (staticObject === true) {
+        this.staticObjects.set(id, new StaticObject(id, coordinates, texture));
+      } else {
+        this.dynamicObjects.set(
+          id,
+          new DynamicObject(id, coordinates, texture)
+        );
+      }
       this.lastUpdate = Date.now();
     }
   }

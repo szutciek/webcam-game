@@ -49,6 +49,7 @@ module.exports = class Room {
 
   gameTick() {
     const secondsPassed = (performance.now() - this.lastTimeStamp) / 1000;
+    const currentTime = Math.round(performance.now() * 1000) / 1000;
 
     if (this.#players.size === 0) {
       console.log(`Room ${this.code} is empty. Pausing game.`);
@@ -57,8 +58,12 @@ module.exports = class Room {
 
     // do all kinds of calculations
     this.#players.forEach((player) => {
-      player.calculateMovement(secondsPassed);
-      // console.log(player.x, player.y);
+      const correction = player.correctMovement(secondsPassed, currentTime);
+      if (correction !== undefined)
+        clients.find(player.uuid).sendTo({
+          type: "movovd",
+          position: correction,
+        });
     });
 
     // collect all data
@@ -183,10 +188,23 @@ module.exports = class Room {
     this.#players.set(uuid, new Player(uuid, startPos, username));
 
     this.sendRoomInfo(uuid);
+    this.broadcast({
+      type: "event",
+      event: `${username} joined the room`,
+      icon: "userJoin",
+      classification: "normal",
+    });
   }
 
   leaveRoom(uuid) {
+    const player = this.#players.get(uuid);
     this.#players.delete(uuid);
+    this.broadcast({
+      type: "event",
+      event: `${player?.username} left the room`,
+      icon: "userLeave",
+      classification: "warning",
+    });
   }
 
   sendRoomInfo(uuid) {
@@ -196,45 +214,19 @@ module.exports = class Room {
     });
   }
 
-  // updatePlayerInput(uuid, data) {
-  //   const player = this.#players.get(uuid);
-  //   if (!player) return;
+  getPlayer(uuid) {
+    return this.#players.get(uuid);
+  }
 
-  //   // changing the inputs for velocity calculations
-  //   player.updateInputs(data);
-
-  //   // respond with chunks (convenient)
-  //   this.sendChunks(this.#players.get(uuid));
-  // }
-
-  // updatePlayerPosition(uuid, position) {
-  //   const player = this.#players.get(uuid);
-  //   if (!player) return;
-  //   player.updatePosition(position);
-  //   this.sendChunks(player);
-  // }
-
-  updatePlayerPrediction(uuid, position, timeStamp) {
-    const player = this.#players.get(uuid);
+  updatePlayerState(uuid, data) {
+    const player = this.getPlayer(uuid);
     if (!player) return;
-    player.updatePrediction(position, timeStamp);
+    player.addClientTick(data);
     this.sendChunks(player);
   }
 
-  updatePlayerVelocity(uuid, velocities, timeStamp) {
-    const player = this.#players.get(uuid);
-    if (!player) return;
-    player.updateVelocity(velocities);
-  }
-
-  updatePlayerPose(uuid, pose) {
-    const player = this.#players.get(uuid);
-    if (!player) return;
-    player.updatePose(pose);
-  }
-
   updatePlayerCamera(uuid, camera) {
-    const player = this.#players.get(uuid);
+    const player = this.getPlayer(uuid);
     if (!player) return;
     player.camera = camera;
     this.#players.set(uuid, player);
@@ -257,7 +249,7 @@ module.exports = class Room {
         const chunk = this.findChunk(x, y);
         if (!chunk) continue;
         if (chunk.gameObjects.size === 0) continue;
-        console.log(player);
+        // console.log(player);
         if (player.updatedChunks.get(`${x}:${y}`) >= chunk.lastUpdate) continue;
         player.updatedChunks.set(`${x}:${y}`, Date.now());
         list.push(...chunk.gameObjects.values());

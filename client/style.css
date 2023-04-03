@@ -12,6 +12,11 @@ body {
   overflow: hidden;
 }
 
+.flexVert {
+  display: flex;
+  align-items: center;
+}
+
 .fixed {
   position: fixed;
   top: 0;
@@ -19,9 +24,123 @@ body {
   width: 100%;
   height: 100vh;
 }
-.fixed .dev {
+.fixed .technical {
   position: absolute;
   top: 2rem;
+  left: 2rem;
+  pointer-events: none;
+  user-select: none;
+}
+.fixed .status {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: left;
+}
+.fixed .event {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.4rem 0.8rem 0.4rem 0.4rem;
+  border-radius: 4px;
+  margin-bottom: 0.4rem;
+  height: 2.3rem;
+  width: max-content;
+  background-color: #00000028;
+  max-width: 500px;
+  overflow: hidden;
+}
+.fixed .event {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+.fixed .event p {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.fixed .normal {
+  color: white;
+  font-weight: 400;
+}
+.fixed .warning {
+  color: #d80000;
+  font-weight: 600;
+}
+.fixed .event svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 4px;
+  border-radius: 4px;
+  stroke: #ffffff;
+}
+.fixed .normal svg {
+  background-color: #00000057;
+}
+.fixed .warning svg {
+  background-color: #ff0000;
+}
+.fixed .log .expired {
+  animation: logDismiss 0.5s ease-in-out forwards;
+}
+
+.fixed .technical .status {
+  background-color: #fff;
+  border-radius: 2rem;
+}
+.fixed .technical .box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.2rem 0.8rem 0.2rem 2.7rem;
+  margin-left: -2rem;
+}
+.fixed .technical .user {
+  gap: 1rem;
+  padding: 0.4rem 1.4rem 0.4rem 0.8rem;
+  margin-left: 0;
+  border-radius: 2rem;
+  z-index: 1;
+}
+.fixed .technical .ping {
+  text-align: right;
+  background-color: #e8e8e8;
+  border-radius: 2rem;
+}
+.fixed .technical .position {
+  text-align: right;
+}
+.fixed .technical .box p {
+  font-size: 1rem;
+}
+.fixed .technical .user p {
+  color: #101010;
+  font-weight: 500;
+}
+.fixed .technical .ping p {
+  color: #000;
+  min-width: 70px;
+  font-weight: 300;
+}
+.fixed .technical .box svg {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.fixed .technical .ping svg {
+  stroke: #000;
+}
+.fixed .technical .position p {
+  color: #000;
+  min-width: 100px;
+  font-weight: 300;
+}
+
+.fixed .dev {
+  position: absolute;
+  bottom: 2rem;
   left: 2rem;
 }
 .fixed .dev #position {
@@ -115,6 +234,26 @@ body {
   height: calc(100% + 1rem);
   animation: spin 1s linear infinite;
 }
+
+@keyframes logDismiss {
+  0% {
+    opacity: 1;
+    transform: translateX(0) scale(1) rotateZ(0);
+  }
+  50% {
+    opacity: 0;
+    height: 2.3rem;
+    margin-bottom: 0.4rem;
+    padding: 0.4rem 0.8rem 0.4rem 0.4rem;
+  }
+  100% {
+    transform: translateX(-100%) scale(0.7) rotateY(-90deg);
+    height: 0;
+    margin-bottom: 0;
+    padding: 0;
+  }
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);
