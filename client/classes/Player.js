@@ -167,7 +167,7 @@ export default class Player {
   }
 
   rectIntersect(x1, y1, w1, h1, x2, y2, w2, h2) {
-    if (x2 > w1 + x1 || x1 > w2 + x2 || y2 > h1 + y1 || y1 > h2 + y2) {
+    if (x2 >= w1 + x1 || x1 >= w2 + x2 || y2 >= h1 + y1 || y1 >= h2 + y2) {
       return false;
     }
     return true;
@@ -187,7 +187,7 @@ export default class Player {
     return false;
   }
 
-  checkCollisions(currPos, obstacles, react = false) {
+  checkCollisions(currPos, obstacles, react = true) {
     if (!currPos || !obstacles)
       throw new Error("Incomplete data for collision detection");
 
@@ -223,12 +223,12 @@ export default class Player {
       if (colHor !== false) {
         const sign = Math.sign(-this.#velX);
         this.#velX = 0;
-        let pos = Math.round(currPos.x);
+        let pos = currPos.x;
 
         for (let i = 0; i < 100; i++) {
           pos += sign;
           if (!this.sideIntersect(pos, currPos.w, oHit.x, oHit.w)) {
-            this.#x = pos + sign;
+            this.#x = pos;
             break;
           }
         }
@@ -241,18 +241,30 @@ export default class Player {
         for (let i = 0; i < 100; i++) {
           pos += sign;
           if (!this.sideIntersect(pos, currPos.h, oHit.y, oHit.h)) {
-            this.#y = pos + sign;
+            this.#y = pos;
             break;
           }
+        }
+      }
+
+      console.log(react);
+      if (react === true) {
+        if (this.#x + this.#w + 30 > oHit.x) {
+          horizontalCollision = true;
+          this.pose.madLeft = true;
+        }
+        if (this.#x - 25 < oHit.x + oHit.w) {
+          console.log("yr");
+          horizontalCollision = true;
+          this.pose.madRight = true;
         }
       }
     }
 
     this.prevPos = currPos;
 
-    // if collision change pose
-
     if (!horizontalCollision) {
+      // console.log("back");
       this.pose.madLeft = false;
       this.pose.madRight = false;
     }

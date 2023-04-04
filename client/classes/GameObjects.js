@@ -9,6 +9,10 @@ export default class GameObjects {
       texture: { type: "color", value: "red" },
       mesh: { type: "circle" },
     });
+
+    setInterval(() => {
+      this.checkIfPlayersAlive();
+    }, 5 * 1000);
   }
 
   updatePlayer(id, data) {
@@ -20,6 +24,7 @@ export default class GameObjects {
     player.pose = data.pose;
     if (data.username) player.username = data.username;
     if (data.camera) player.camera = data.camera;
+    player.lastUpdate = new Date().getTime();
     this.#players.set(id, player);
   }
 
@@ -51,6 +56,18 @@ export default class GameObjects {
   //   p.camera = b64;
   //   this.#players.set(key, p);
   // }
+
+  checkIfPlayersAlive() {
+    const alive = new Map();
+    const now = new Date().getTime();
+    this.#players.forEach((value, key) => {
+      if (value.lastUpdate - now - 5 > 0) {
+        value.lastUpdate = now;
+        alive.set(key, value);
+      }
+    });
+    this.#players = alive;
+  }
 
   setObjects(data) {
     data.forEach((i) => {
