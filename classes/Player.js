@@ -84,6 +84,27 @@ module.exports = class Player {
     return pose;
   }
 
+  rectIntersect(x1, y1, w1, h1, x2, y2, w2, h2) {
+    if (x2 > w1 + x1 || x1 > w2 + x2 || y2 > h1 + y1 || y1 > h2 + y2) {
+      return false;
+    }
+    return true;
+  }
+
+  sideIntersect(a, aL, b, bL) {
+    // console.log(a, aL, b, bL);
+    if (a < b + bL && a > b) {
+      return Math.sign(a - (b + bL));
+    }
+    if (a + aL > b && a + aL < b + bL) {
+      return Math.sign(a + aL - b);
+    }
+    if (a > b && a + aL < b + bL) {
+      return Math.sign(a - b);
+    }
+    return false;
+  }
+
   correctMovement(secondsPassed, currentTime) {
     if (this.clientTicks.length === 0) return false;
 
@@ -96,7 +117,9 @@ module.exports = class Player {
     const newestClientTime = this.clientTicks[0].relativeTimeStamp;
 
     // if client ahead of server
-    if (newestClientTime >= currentTime) valid = false;
+    if (newestClientTime >= currentTime) {
+      valid = false;
+    }
 
     // validate pose
     const pose = this.validatePose(newestPose);
@@ -123,7 +146,9 @@ module.exports = class Player {
     const clientTimeBetween = newestClientTime - lastTickClientTime;
 
     // if there is no delay than something is wrong
-    if (clientTimeBetween < 0) valid = false;
+    if (clientTimeBetween < 0) {
+      valid = false;
+    }
 
     if (clientTimeBetween > 100) {
       clients.find(this.uuid).sendTo({

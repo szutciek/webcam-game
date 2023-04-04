@@ -14,6 +14,8 @@ export default class Player {
   #x = 0;
   #y = 0;
 
+  prevPos = undefined;
+
   #w = 100;
   #h = 200;
 
@@ -158,77 +160,97 @@ export default class Player {
   }
 
   serverOverride({ x, y, w, h }) {
-    this.#x = lerp(this.#x, x, 0.3);
-    this.#y = lerp(this.#y, y, 0.3);
+    this.#x = lerp(this.#x, x, 0.2);
+    this.#y = lerp(this.#y, y, 0.2);
     this.#w = w;
     this.#h = h;
+  }
+
+  rectIntersect(x1, y1, w1, h1, x2, y2, w2, h2) {
+    if (x2 > w1 + x1 || x1 > w2 + x2 || y2 > h1 + y1 || y1 > h2 + y2) {
+      return false;
+    }
+    return true;
+  }
+
+  sideIntersect(a, aL, b, bL) {
+    // console.log(a, aL, b, bL);
+    if (a < b + bL && a > b) {
+      return Math.sign(a - (b + bL));
+    }
+    if (a + aL > b && a + aL < b + bL) {
+      return Math.sign(a + aL - b);
+    }
+    if (a > b && a + aL < b + bL) {
+      return Math.sign(a - b);
+    }
+    return false;
   }
 
   checkCollisions(currPos, obstacles, react = false) {
     if (!currPos || !obstacles)
       throw new Error("Incomplete data for collision detection");
 
-    const right = currPos.x + currPos.w;
-    const left = currPos.x;
-    const bottom = currPos.y + currPos.h;
-    const top = currPos.y;
-
     let horizontalCollision = false;
 
-    for (const o of obstacles) {
-      const colVert = top <= o.yMap + o.h && bottom >= o.yMap;
-      const colHor = left <= o.xMap + o.w && right >= o.xMap;
+    const max = obstacles.length;
+    for (let i = 0; i < max; i++) {
+      if (
+        this.rectIntersect(
+          currPos.x,
+          currPos.y,
+          currPos.w,
+          currPos.h,
+          obstacles[i].xMap,
+          obstacles[i].yMap,
+          obstacles[i].w,
+          obstacles[i].h
+        ) === false
+      ) {
+        continue;
+      }
 
-      if (colHor && o.ignore) horizontalCollision = true;
+      const oHit = {
+        x: obstacles[i].xMap,
+        y: obstacles[i].yMap,
+        w: obstacles[i].w,
+        h: obstacles[i].h,
+      };
 
-      if (!o.ignore && colHor && colVert) {
-        horizontalCollision = true;
+      const colHor = this.sideIntersect(currPos.x, currPos.w, oHit.x, oHit.w);
+      const colVert = this.sideIntersect(currPos.y, currPos.h, oHit.y, oHit.h);
 
-        if (
-          bottom <= o.yMap + o.h &&
-          bottom >= o.yMap &&
-          right - 25 > o.xMap &&
-          left + 25 < o.xMap + o.w
-        ) {
-          this.#velY = 0;
-          this.#y = o.yMap - currPos.h;
+      if (colHor !== false) {
+        const sign = Math.sign(-this.#velX);
+        this.#velX = 0;
+        let pos = Math.round(currPos.x);
+
+        for (let i = 0; i < 100; i++) {
+          pos += sign;
+          if (!this.sideIntersect(pos, currPos.w, oHit.x, oHit.w)) {
+            this.#x = pos + sign;
+            break;
+          }
         }
+      }
+      if (colVert !== false) {
+        const sign = Math.sign(-this.#velY);
+        this.#velY = 0;
+        let pos = Math.round(currPos.y);
 
-        if (
-          top <= o.yMap + o.h &&
-          top >= o.yMap &&
-          right - 25 > o.xMap &&
-          left + 25 < o.xMap + o.w
-        ) {
-          this.#velY = 0;
-          this.#y = o.yMap + o.h;
-        }
-
-        if (
-          right <= o.xMap + o.w &&
-          right >= o.xMap &&
-          bottom - 25 > o.yMap &&
-          top + 25 < o.yMap + o.h
-        ) {
-          this.#velX = 0;
-          this.#x = o.xMap - currPos.w;
-          // react to the right
-          react && (this.pose.madRight = true);
-        }
-
-        if (
-          left <= o.xMap + o.w &&
-          left >= o.xMap &&
-          bottom - 25 > o.yMap &&
-          top + 25 < o.yMap + o.h
-        ) {
-          this.#velX = 0;
-          this.#x = o.xMap + o.w;
-          // react to the left
-          react && (this.pose.madLeft = true);
+        for (let i = 0; i < 100; i++) {
+          pos += sign;
+          if (!this.sideIntersect(pos, currPos.h, oHit.y, oHit.h)) {
+            this.#y = pos + sign;
+            break;
+          }
         }
       }
     }
+
+    this.prevPos = currPos;
+
+    // if collision change pose
 
     if (!horizontalCollision) {
       this.pose.madLeft = false;
