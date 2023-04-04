@@ -99,6 +99,7 @@ body {
 }
 .fixed .normal svg {
   background-color: #00000057;
+  fill: white;
 }
 .fixed .warning svg {
   background-color: #ff0000;
