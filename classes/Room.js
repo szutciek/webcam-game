@@ -60,6 +60,7 @@ module.exports = class Room {
 
     // do all kinds of calculations
     this.#players.forEach((player) => {
+      // calculate if the player hit a dynamic
       const correction = player.correctMovement(secondsPassed, currentTime);
       if (correction !== undefined)
         clients.find(player.uuid)?.sendTo({
@@ -78,6 +79,11 @@ module.exports = class Room {
       list = this.getAllPlayersQuickData(false);
     }
     this.#includeCam++;
+
+    // sending chunks to all players
+    this.#players.forEach((p) => {
+      this.sendChunks(p);
+    });
 
     // broadcast the data to clients
     this.broadcast({
@@ -134,7 +140,7 @@ module.exports = class Room {
     }
   }
 
-  addObject(coords, texture, ignore) {
+  addObject(coords, texture, options) {
     if (coords.x === undefined || coords.y === undefined) return;
     const chunk = this.getChunk(coords.x, coords.y);
     if (!chunk)
@@ -142,7 +148,7 @@ module.exports = class Room {
     this.findChunk(
       this.identifyChunk(coords.x),
       this.identifyChunk(coords.y)
-    ).createObject(coords, texture, ignore);
+    ).createObject(coords, texture, options);
   }
 
   getChunk(xI, yI) {
@@ -275,7 +281,8 @@ module.exports = class Room {
     const player = this.getPlayer(uuid);
     if (!player) return;
     player.addClientTick(data);
-    this.sendChunks(player);
+    // maybe sending data immediately after tick is better
+    // this.sendChunks(player);
   }
 
   updatePlayerCamera(uuid, camera) {
@@ -302,7 +309,6 @@ module.exports = class Room {
         const chunk = this.findChunk(x, y);
         if (!chunk) continue;
         if (chunk.gameObjects.size === 0) continue;
-        // console.log(player);
         if (player.updatedChunks.get(`${x}:${y}`) >= chunk.lastUpdate) continue;
         player.updatedChunks.set(`${x}:${y}`, Date.now());
         list.push(...chunk.gameObjects.values());
@@ -311,7 +317,6 @@ module.exports = class Room {
 
     if (list.length === 0) return;
 
-    // message containing multiple objects - mobj
     const message = {
       type: "mobj",
       data: list,

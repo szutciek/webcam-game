@@ -14,330 +14,518 @@
   "objects": [
     {
       "coords": { "x": 0, "y": 0, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 50, "y": 10, "w": 50, "h": 30 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 100, "y": 0, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 150, "y": 10, "w": 50, "h": 30 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 200, "y": 0, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 250, "y": 10, "w": 50, "h": 30 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 300, "y": 0, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 350, "y": 10, "w": 50, "h": 30 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 400, "y": 0, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 450, "y": 10, "w": 50, "h": 30 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 500, "y": 0, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 510, "y": 50, "w": 30, "h": 50 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 500, "y": 100, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 510, "y": 150, "w": 30, "h": 50 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 500, "y": 200, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 510, "y": 250, "w": 30, "h": 50 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 500, "y": 300, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 510, "y": 350, "w": 30, "h": 50 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 500, "y": 400, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 510, "y": 450, "w": 30, "h": 50 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 500, "y": 500, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 0, "y": 500, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 50, "y": 510, "w": 50, "h": 30 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 100, "y": 500, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 150, "y": 510, "w": 50, "h": 30 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 200, "y": 500, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 250, "y": 510, "w": 50, "h": 30 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 300, "y": 500, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 350, "y": 510, "w": 50, "h": 30 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 400, "y": 500, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 450, "y": 510, "w": 50, "h": 30 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 10, "y": 50, "w": 30, "h": 50 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 0, "y": 100, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 0, "y": 400, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": 10, "y": 450, "w": 30, "h": 50 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
 
     {
       "coords": { "x": -1000, "y": -820, "w": 900, "h": 800 },
       "texture": { "type": "color", "value": "#969696" },
-      "ignore": true
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
     },
 
     {
       "coords": { "x": -1000, "y": -20, "w": 50, "h": 20 },
       "texture": { "type": "color", "value": "#d45757" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -950, "y": -20, "w": 50, "h": 20 },
       "texture": { "type": "color", "value": "#d93030" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -900, "y": -20, "w": 50, "h": 20 },
       "texture": { "type": "color", "value": "#d45757" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -850, "y": -20, "w": 50, "h": 20 },
       "texture": { "type": "color", "value": "#d93030" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -800, "y": -20, "w": 50, "h": 20 },
       "texture": { "type": "color", "value": "#d45757" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -750, "y": -20, "w": 50, "h": 20 },
       "texture": { "type": "color", "value": "#d93030" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -700, "y": -20, "w": 50, "h": 20 },
       "texture": { "type": "color", "value": "#d45757" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -650, "y": -20, "w": 50, "h": 20 },
       "texture": { "type": "color", "value": "#d93030" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -600, "y": -20, "w": 50, "h": 20 },
       "texture": { "type": "color", "value": "#d45757" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -550, "y": -20, "w": 50, "h": 20 },
       "texture": { "type": "color", "value": "#d93030" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -500, "y": -20, "w": 50, "h": 20 },
       "texture": { "type": "color", "value": "#d45757" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -450, "y": -20, "w": 50, "h": 20 },
       "texture": { "type": "color", "value": "#d93030" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -400, "y": -20, "w": 50, "h": 20 },
       "texture": { "type": "color", "value": "#d45757" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
 
     {
       "coords": { "x": -100, "y": -50, "w": 20, "h": 50 },
       "texture": { "type": "color", "value": "#d45757" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -100, "y": -100, "w": 20, "h": 50 },
       "texture": { "type": "color", "value": "#d93030" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -100, "y": -150, "w": 20, "h": 50 },
       "texture": { "type": "color", "value": "#d45757" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -100, "y": -200, "w": 20, "h": 50 },
       "texture": { "type": "color", "value": "#d93030" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -100, "y": -250, "w": 20, "h": 50 },
       "texture": { "type": "color", "value": "#d45757" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -100, "y": -300, "w": 20, "h": 50 },
       "texture": { "type": "color", "value": "#d93030" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -100, "y": -350, "w": 20, "h": 50 },
       "texture": { "type": "color", "value": "#d45757" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -100, "y": -400, "w": 20, "h": 50 },
       "texture": { "type": "color", "value": "#d93030" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -100, "y": -450, "w": 20, "h": 50 },
       "texture": { "type": "color", "value": "#d45757" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -100, "y": -500, "w": 20, "h": 50 },
       "texture": { "type": "color", "value": "#d93030" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -100, "y": -550, "w": 20, "h": 50 },
       "texture": { "type": "color", "value": "#d45757" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -100, "y": -600, "w": 20, "h": 50 },
       "texture": { "type": "color", "value": "#d93030" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -100, "y": -650, "w": 20, "h": 50 },
       "texture": { "type": "color", "value": "#d45757" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -100, "y": -700, "w": 20, "h": 50 },
       "texture": { "type": "color", "value": "#d93030" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -100, "y": -750, "w": 20, "h": 50 },
       "texture": { "type": "color", "value": "#d45757" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -100, "y": -800, "w": 20, "h": 50 },
       "texture": { "type": "color", "value": "#d93030" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -100, "y": -850, "w": 20, "h": 50 },
       "texture": { "type": "color", "value": "#d45757" },
-      "ignore": false
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
 
     {
       "coords": { "x": -500, "y": 0, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -490, "y": 50, "w": 30, "h": 50 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -500, "y": 100, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -490, "y": 150, "w": 30, "h": 50 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -500, "y": 200, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -490, "y": 250, "w": 30, "h": 50 },
-      "texture": { "type": "color", "value": "#947914" }
+      "texture": { "type": "color", "value": "#947914" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     },
     {
       "coords": { "x": -500, "y": 300, "w": 50, "h": 50 },
-      "texture": { "type": "color", "value": "#6A5506" }
+      "texture": { "type": "color", "value": "#6A5506" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
     }
   ]
 }

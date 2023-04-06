@@ -1,5 +1,5 @@
-const StaticObject = require("./StaticObject.js");
-const DynamicObject = require("./StaticObject.js");
+const Rectangle = require("./GameObjects/Rectangle.js");
+const Circle = require("./GameObjects/Circle.js");
 
 module.exports = class Chunk {
   staticObjects = new Map();
@@ -32,10 +32,14 @@ module.exports = class Chunk {
     // checks if the object indeed matches this chunk
     // every object is 100px wide so we need to account for that by adding 100
 
-    if (this.x <= coordinates.x && this.maxX >= coordinates.x + coordinates.w) {
+    // num so that it is possible to place but also wont appear suddenly
+    if (
+      this.x <= coordinates.x &&
+      this.maxX + 200 >= coordinates.x + coordinates.w
+    ) {
       if (
         this.y <= coordinates.y &&
-        this.maxY >= coordinates.y + coordinates.h
+        this.maxY + 200 >= coordinates.y + coordinates.h
       ) {
         return true;
       }
@@ -46,6 +50,10 @@ module.exports = class Chunk {
 
   get gameObjects() {
     return new Map([...this.dynamicObjects, ...this.staticObjects]);
+  }
+
+  calculateDynamicObjectMovement() {
+    console.log("Calculating movement of dynamic objects");
   }
 
   findObjectId(id) {
@@ -79,11 +87,26 @@ module.exports = class Chunk {
     return true;
   }
 
+  objectFromClass(id, coordinates, texture, options) {
+    if (!options.shape) {
+      throw new Error("Shape not defined");
+    }
+
+    switch (options.shape) {
+      case "rect":
+        return new Rectangle(id, coordinates, texture, options);
+      case "circ":
+        return new Circle(id, coordinates, texture, options);
+    }
+
+    throw new Error("Coundn't create game object");
+  }
+
   // 100x100
   createObject(
     coordinates,
     texture = { type: "color", value: "white" },
-    staticObject
+    options = { colliding: true, dynamic: false, shape: "rect" }
   ) {
     // if (!this.checkIfMultiple(coordinates.x)) return;
     // if (!this.checkIfMultiple(coordinates.y)) return;
@@ -94,14 +117,18 @@ module.exports = class Chunk {
     // handle errors when too wide
     if (this.checkIfInBounds(coordinates) && !this.checkIfExists(coordinates)) {
       const id = crypto.randomUUID();
-      if (staticObject === true) {
-        this.staticObjects.set(id, new StaticObject(id, coordinates, texture));
-      } else {
+      if (options.dynamic === true) {
         this.dynamicObjects.set(
           id,
-          new DynamicObject(id, coordinates, texture)
+          this.objectFromClass(id, coordinates, texture, options)
+        );
+      } else {
+        this.staticObjects.set(
+          id,
+          this.objectFromClass(id, coordinates, texture, options)
         );
       }
+
       this.lastUpdate = Date.now();
     }
   }

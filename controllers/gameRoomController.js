@@ -42,7 +42,11 @@ exports.handleRoomJoin = async (message, ws, client) => {
       room.setSpawnPoints(data.spawnPoints);
 
       data.objects.forEach((obj) => {
-        room.addObject(obj.coords, obj.texture, obj.ignore);
+        room.addObject(obj.coords, obj.texture, {
+          colliding: obj.colliding,
+          dynamic: obj.dynamic,
+          shape: obj.shape,
+        });
       });
     }
 

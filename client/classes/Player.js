@@ -94,14 +94,7 @@ export default class Player {
   };
 
   activateMovement() {
-    document.addEventListener("keypress", (e) => {
-      // e.stopPropagation();
-      // e.preventDefault();
-    });
     document.addEventListener("keydown", (e) => {
-      // e.stopPropagation();
-      // e.preventDefault();
-
       if (e.key === "w" || e.key === "W") {
         this.#inpN = true;
       }
@@ -115,7 +108,6 @@ export default class Player {
         this.#inpE = true;
       }
 
-      // SPECIAL KEYS
       if (e.key === "Shift") {
         this.pose.crouching = true;
 
@@ -141,7 +133,6 @@ export default class Player {
         this.#inpE = false;
       }
 
-      // SPECIAL KEYS
       if (e.key === "Shift") {
         this.pose.crouching = false;
 

@@ -1,15 +1,11 @@
+import Rectangle from "/classes/GameObjects/Rectangle.js";
+import Circle from "/classes/GameObjects/Circle.js";
+
 export default class GameObjects {
   #elements = new Map();
   #players = new Map();
-  #interactive = new Map();
 
   constructor() {
-    this.#interactive.set(crypto.randomUUID(), {
-      position: { x: -100, y: 400, w: 40, h: 40 },
-      texture: { type: "color", value: "red" },
-      mesh: { type: "circle" },
-    });
-
     setInterval(() => {
       this.checkIfPlayersAlive();
     }, 5 * 1000);
@@ -28,35 +24,6 @@ export default class GameObjects {
     this.#players.set(id, player);
   }
 
-  // updatePlayerPosition(id, data) {
-  //   const player = this.#players.get(id) || {};
-  //   // add more fields for inventory etc.
-  //   player.x = data.x;
-  //   player.y = data.y;
-  //   player.w = data.w;
-  //   player.h = data.h;
-  //   player.lastMessage = Date.now();
-  //   this.#players.set(id, player);
-
-  //   for (const [id, player] of this.#players) {
-  //     if (player.lastMessage < Date.now() - 5 * 1000) {
-  //       console.log(`Player ${id} wasn't active in 5s and got removed`);
-  //       this.#players.delete(id);
-  //     }
-  //   }
-  // }
-  // updatePlayerPose(id, data) {
-  //   const player = this.#players.get(id) || {};
-  //   player.pose = data;
-  //   this.#players.set(id, player);
-  // }
-  // updatePlayerCamera(key, b64) {
-  //   const p = this.#players.get(key);
-  //   if (!p) return;
-  //   p.camera = b64;
-  //   this.#players.set(key, p);
-  // }
-
   checkIfPlayersAlive() {
     const alive = new Map();
     const now = new Date().getTime();
@@ -69,9 +36,27 @@ export default class GameObjects {
     this.#players = alive;
   }
 
-  setObjects(data) {
+  updateObjects(data) {
     data.forEach((i) => {
-      this.#elements.set(i.id, i);
+      if (i.shape === "rect") {
+        this.#elements.set(
+          i.id,
+          new Rectangle(i.id, { x: i.x, y: i.y, w: i.w, h: i.h }, i.texture, {
+            shape: "rect",
+            colliding: i.colliding,
+            dynamic: i.dynamic,
+          })
+        );
+      } else if (i.shape === "circ") {
+        this.#elements.set(
+          i.id,
+          new Circle(i.id, { x: i.x, y: i.y, r: i.r }, i.texture, {
+            shape: "circ",
+            colliding: i.colliding,
+            dynamic: i.dynamic,
+          })
+        );
+      }
     });
   }
 

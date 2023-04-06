@@ -184,11 +184,13 @@ export default class ClientController {
       );
     }
     if (message.type === "mobj") {
-      this.gameObjects.setObjects(message.data);
+      this.gameObjects.updateObjects(message.data);
     }
     if (message.type === "error") {
       if ([401, 403].includes(message.code)) {
         window.location = `/signin?message=${message.message}`;
+      } else {
+        UIController.showMessage(message.message, "alert", "warning");
       }
       return;
     }
