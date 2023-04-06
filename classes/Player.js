@@ -86,11 +86,25 @@ module.exports = class Player {
     return pose;
   }
 
+  sideIntersect(a, aL, b, bL) {
+    if (a < b + bL && a > b) return true;
+    if (a + aL > b && a + aL < b + bL) return true;
+    if (a > b && a + aL < b + bL) return true;
+    return false;
+  }
+
   rectIntersect(x1, y1, w1, h1, x2, y2, w2, h2) {
     if (x2 > w1 + x1 || x1 > w2 + x2 || y2 > h1 + y1 || y1 > h2 + y2) {
       return false;
     }
     return true;
+  }
+
+  checkIfColliding(target) {
+    return [
+      this.sideIntersect(this.position.x, this.position.w, target.x, target.w),
+      this.sideIntersect(this.position.y, this.position.h, target.y, target.h),
+    ];
   }
 
   correctMovement(secondsPassed, currentTime, objects = []) {
@@ -115,8 +129,8 @@ module.exports = class Player {
 
     // validate velocities so never exceed 15
     const { x: vX, y: vY } = this.validateVelocity(newestVel);
-    this.vX = vX;
-    this.vY = vY;
+    this.velocities.x = vX;
+    this.velocities.y = vY;
 
     const lastClientTick = this.clientTicks.find(
       (t) => t?.tick === this.lastTickClient
@@ -145,8 +159,21 @@ module.exports = class Player {
       });
     }
 
-    const maxDispX = f(Math.abs((this.vX * clientTimeBetween) / 1000));
-    const maxDispY = f(Math.abs((this.vY * clientTimeBetween) / 1000));
+    let colliding = false;
+    // loop over and check for collisions
+    objects.forEach((object) => {
+      const isColliding = this.collisionDetectionSAT(object);
+      if (isColliding) colliding = true;
+    });
+
+    if (colliding === true) valid = false;
+
+    const maxDispX = f(
+      Math.abs((this.velocities.x * clientTimeBetween) / 1000)
+    );
+    const maxDispY = f(
+      Math.abs((this.velocities.y * clientTimeBetween) / 1000)
+    );
 
     const validX =
       Math.abs(newestPos.x) <=
@@ -155,30 +182,24 @@ module.exports = class Player {
       Math.abs(newestPos.y) <=
       Math.abs(this.position.y) + maxDispY + errorMargin;
 
-    if (!validX || !validY) valid = false;
+    if (!validX || !validY) {
+      valid = false;
+    }
 
     this.lastTickClientTime = newestClientTime;
     this.lastTickClient = newestTick;
 
-    // loop over and check for collisions
-    objects.forEach((object) => {
-      // checks and overrides
-      if (this.collisionDetectionSAT(object)) {
-        valid = false;
-      }
-    });
-
     if (valid) {
-      this.position.x = newestPos.x;
-      this.position.y = newestPos.y;
+      this.position.x = Math.round(newestPos.x * 10) / 10;
+      this.position.y = Math.round(newestPos.y * 10) / 10;
       this.position.w = newestPos.w;
       this.position.h = newestPos.h;
 
       return false;
     } else {
       return {
-        x: this.position.x,
-        y: this.position.y,
+        x: Math.round(this.position.x * 10) / 10,
+        y: Math.round(this.position.y * 10) / 10,
         w: this.position.w,
         h: this.position.h,
       };
@@ -204,7 +225,7 @@ module.exports = class Player {
   collisionDetectionSAT(target) {
     try {
       if (target.shape === "rect" || target.shape === "player") {
-        if (!target.colliding && target.shape !== "player") return;
+        if (!target.colliding && target.shape !== "player") return false;
 
         if (
           !this.rectIntersect(
@@ -218,7 +239,7 @@ module.exports = class Player {
             target.h
           )
         )
-          return;
+          return false;
 
         const halfWidthPlayerX = this.position.w / 2;
         const halfWidthTargetX = target.w / 2;
@@ -227,7 +248,7 @@ module.exports = class Player {
         const centerTargetX = target.x + halfWidthTargetX;
 
         const diffX = centerTargetX - centerPlayerX;
-        let gapX = diffX - halfWidthPlayerX - halfWidthTargetX;
+        const gapX = diffX - halfWidthPlayerX - halfWidthTargetX;
 
         const halfWidthPlayerY = this.position.h / 2;
         const halfWidthTargetY = target.h / 2;
@@ -236,7 +257,7 @@ module.exports = class Player {
         const centerTargetY = target.y + halfWidthTargetY;
 
         const diffY = centerTargetY - centerPlayerY;
-        let gapY = diffY - halfWidthPlayerY - halfWidthTargetY;
+        const gapY = diffY - halfWidthPlayerY - halfWidthTargetY;
 
         const determineDisplacement = (
           gap,
@@ -255,10 +276,10 @@ module.exports = class Player {
         const yDisp = determineDisplacement(gapY, this.position.h, target.h);
 
         if (Math.abs(yDisp) < Math.abs(xDisp)) {
-          this.velocities.velY = 0;
+          this.velocities.y = 0;
           this.position.y += yDisp;
         } else {
-          this.velocities.velX = 0;
+          this.velocities.x = 0;
           this.position.x += xDisp;
         }
 

@@ -159,13 +159,13 @@ export default class ClientController {
       console.warn(
         `Illegal movement, correction: [${message.position.x}, ${message.position.y}]`
       );
-      // UIController.showMessage(
-      //   `Illegal movement, correction: [${
-      //     Math.round(message.position.x * 10) / 10
-      //   }, ${Math.round(message.position.y * 10) / 10}]`,
-      //   "alert",
-      //   "warning"
-      // );
+      UIController.showMessage(
+        `Illegal movement, correction: [${
+          Math.round(message.position.x * 10) / 10
+        }, ${Math.round(message.position.y * 10) / 10}]`,
+        "alert",
+        "warning"
+      );
     }
     if (message.type === "event") {
       UIController.showMessage(

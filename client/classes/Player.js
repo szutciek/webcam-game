@@ -151,8 +151,8 @@ export default class Player {
   }
 
   serverOverride({ x, y, w, h }) {
-    this.#x = lerp(this.#x, x, 0.15);
-    this.#y = lerp(this.#y, y, 0.15);
+    this.#x = lerp(this.#x, x, 0.3);
+    this.#y = lerp(this.#y, y, 0.3);
     this.#w = w;
     this.#h = h;
   }
@@ -189,7 +189,7 @@ export default class Player {
       const centerTargetX = target.xMap + halfWidthTargetX;
 
       const diffX = centerTargetX - centerPlayerX;
-      let gapX = diffX - halfWidthPlayerX - halfWidthTargetX;
+      const gapX = diffX - halfWidthPlayerX - halfWidthTargetX;
 
       const halfWidthPlayerY = this.#h / 2;
       const halfWidthTargetY = target.h / 2;
@@ -198,7 +198,7 @@ export default class Player {
       const centerTargetY = target.yMap + halfWidthTargetY;
 
       const diffY = centerTargetY - centerPlayerY;
-      let gapY = diffY - halfWidthPlayerY - halfWidthTargetY;
+      const gapY = diffY - halfWidthPlayerY - halfWidthTargetY;
 
       const determineDisplacement = (gap, playerDimension, targetDimension) => {
         let min = gap;
