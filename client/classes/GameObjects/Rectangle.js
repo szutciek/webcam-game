@@ -13,8 +13,6 @@ export default class Rectangle extends GameObject {
 
     this.dynamic = options.dynamic;
     this.colliding = options.colliding;
-
-    console.log(this);
   }
 
   collidingWithSquare(target) {

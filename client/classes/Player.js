@@ -164,100 +164,61 @@ export default class Player {
     return true;
   }
 
-  sideIntersect(a, aL, b, bL) {
-    // console.log(a, aL, b, bL);
-    if (a < b + bL && a > b) {
-      return Math.sign(a - (b + bL));
-    }
-    if (a + aL > b && a + aL < b + bL) {
-      return Math.sign(a + aL - b);
-    }
-    if (a > b && a + aL < b + bL) {
-      return Math.sign(a - b);
-    }
-    return false;
-  }
+  collisionDetectionSAT(target) {
+    if (target.shape === "rect") {
+      if (!target.colliding) return;
 
-  checkCollisions(currPos, obstacles, react = true) {
-    if (!currPos || !obstacles)
-      throw new Error("Incomplete data for collision detection");
-
-    let horizontalCollision = false;
-
-    const max = obstacles.length;
-    for (let i = 0; i < max; i++) {
       if (
-        this.rectIntersect(
-          currPos.x,
-          currPos.y,
-          currPos.w,
-          currPos.h,
-          obstacles[i].xMap,
-          obstacles[i].yMap,
-          obstacles[i].w,
-          obstacles[i].h
-        ) === false
-      ) {
-        continue;
-      }
+        !this.rectIntersect(
+          this.#x,
+          this.#y,
+          this.#w,
+          this.#h,
+          target.xMap,
+          target.yMap,
+          target.w,
+          target.h
+        )
+      )
+        return;
 
-      const oHit = {
-        x: obstacles[i].xMap,
-        y: obstacles[i].yMap,
-        w: obstacles[i].w,
-        h: obstacles[i].h,
+      const halfWidthPlayerX = this.#w / 2;
+      const halfWidthTargetX = target.w / 2;
+
+      const centerPlayerX = this.#x + halfWidthPlayerX;
+      const centerTargetX = target.xMap + halfWidthTargetX;
+
+      const diffX = centerTargetX - centerPlayerX;
+      let gapX = diffX - halfWidthPlayerX - halfWidthTargetX;
+
+      const halfWidthPlayerY = this.#h / 2;
+      const halfWidthTargetY = target.h / 2;
+
+      const centerPlayerY = this.#y + halfWidthPlayerY;
+      const centerTargetY = target.yMap + halfWidthTargetY;
+
+      const diffY = centerTargetY - centerPlayerY;
+      let gapY = diffY - halfWidthPlayerY - halfWidthTargetY;
+
+      const determineDisplacement = (gap, playerDimension, targetDimension) => {
+        let min = gap;
+
+        const other = gap + playerDimension + targetDimension;
+        if (other < Math.abs(min)) min = other;
+
+        return min;
       };
 
-      const colHor = this.sideIntersect(currPos.x, currPos.w, oHit.x, oHit.w);
-      const colVert = this.sideIntersect(currPos.y, currPos.h, oHit.y, oHit.h);
+      const xDisp = determineDisplacement(gapX, this.#w, target.w);
+      const yDisp = determineDisplacement(gapY, this.#h, target.h);
 
-      if (colHor !== false) {
-        const sign = Math.sign(-this.#velX);
-        this.#velX = 0;
-        let pos = currPos.x;
-
-        for (let i = 0; i < 100; i++) {
-          pos += sign;
-          if (!this.sideIntersect(pos, currPos.w, oHit.x, oHit.w)) {
-            this.#x = pos;
-            break;
-          }
-        }
-      }
-      if (colVert !== false) {
-        const sign = Math.sign(-this.#velY);
+      if (Math.abs(yDisp) < Math.abs(xDisp)) {
         this.#velY = 0;
-        let pos = Math.round(currPos.y);
-
-        for (let i = 0; i < 100; i++) {
-          pos += sign;
-          if (!this.sideIntersect(pos, currPos.h, oHit.y, oHit.h)) {
-            this.#y = pos;
-            break;
-          }
-        }
+        this.#y += yDisp;
+      } else {
+        this.#velX = 0;
+        this.#x += xDisp;
       }
-
-      console.log(react);
-      if (react === true) {
-        if (this.#x + this.#w + 30 > oHit.x) {
-          horizontalCollision = true;
-          this.pose.madLeft = true;
-        }
-        if (this.#x - 25 < oHit.x + oHit.w) {
-          console.log("yr");
-          horizontalCollision = true;
-          this.pose.madRight = true;
-        }
-      }
-    }
-
-    this.prevPos = currPos;
-
-    if (!horizontalCollision) {
-      // console.log("back");
-      this.pose.madLeft = false;
-      this.pose.madRight = false;
     }
   }
 

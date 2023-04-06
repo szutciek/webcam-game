@@ -56,8 +56,6 @@ export default class GameController {
       const notRounded = this.serverTimeOrigin - performance.timeOrigin + now;
       const milisecondsServerStart = Math.round(notRounded * 1000) / 1000;
 
-      // console.log(milisecondsServerStart);
-
       // ==========================================================================
       // PREPARING ELEMENTS IN VIEWPORT ===========================================
       // ==========================================================================
@@ -77,14 +75,12 @@ export default class GameController {
       // COLLISIONS ===============================================================
       // ==========================================================================
 
-      const playerBox = {
-        x: this.player.x,
-        y: this.player.y,
-        w: this.player.w,
-        h: this.player.h,
-      };
-      this.player.checkCollisions(playerBox, items, false);
-      this.player.checkCollisions(playerBox, players, true);
+      items.forEach((item) => {
+        this.player.collisionDetectionSAT(item, false);
+      });
+      players.forEach((item) => {
+        this.player.collisionDetectionSAT(item, true);
+      });
 
       // ==========================================================================
       // SENDING POSITION TO SERVER (for validation) ==============================

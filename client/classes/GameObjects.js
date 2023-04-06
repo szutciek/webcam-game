@@ -1,5 +1,6 @@
 import Rectangle from "/classes/GameObjects/Rectangle.js";
 import Circle from "/classes/GameObjects/Circle.js";
+import Player from "./GameObjects/Player.js";
 
 export default class GameObjects {
   #elements = new Map();
@@ -12,15 +13,25 @@ export default class GameObjects {
   }
 
   updatePlayer(id, data) {
-    const player = this.#players.get(id) || {};
-    player.x = data.position[0];
-    player.y = data.position[1];
-    player.w = data.position[2];
-    player.h = data.position[3];
-    player.pose = data.pose;
-    if (data.username) player.username = data.username;
-    if (data.camera) player.camera = data.camera;
-    player.lastUpdate = new Date().getTime();
+    const player =
+      this.#players.get(id) ||
+      new Player(
+        {
+          x: data.position[0],
+          y: data.position[1],
+          w: data.position[2],
+          h: data.position[3],
+        },
+        {
+          username: data.username,
+          camera: data?.camera,
+        }
+      );
+
+    player.updatePosition(data.position);
+    player.updatePose(data.pose);
+    player.updateInfo(data);
+
     this.#players.set(id, player);
   }
 
