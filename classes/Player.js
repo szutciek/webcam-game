@@ -10,6 +10,8 @@ const f = (x) => {
 };
 
 module.exports = class Player {
+  shape = "player";
+
   updatedChunks = new Map();
 
   position = {
@@ -91,21 +93,7 @@ module.exports = class Player {
     return true;
   }
 
-  sideIntersect(a, aL, b, bL) {
-    // console.log(a, aL, b, bL);
-    if (a < b + bL && a > b) {
-      return Math.sign(a - (b + bL));
-    }
-    if (a + aL > b && a + aL < b + bL) {
-      return Math.sign(a + aL - b);
-    }
-    if (a > b && a + aL < b + bL) {
-      return Math.sign(a - b);
-    }
-    return false;
-  }
-
-  correctMovement(secondsPassed, currentTime) {
+  correctMovement(secondsPassed, currentTime, objects = []) {
     if (this.clientTicks.length === 0) return false;
 
     let valid = true;
@@ -171,6 +159,15 @@ module.exports = class Player {
 
     this.lastTickClientTime = newestClientTime;
     this.lastTickClient = newestTick;
+
+    // loop over and check for collisions
+    objects.forEach((object) => {
+      // checks and overrides
+      if (this.collisionDetectionSAT(object)) {
+        valid = false;
+      }
+    });
+
     if (valid) {
       this.position.x = newestPos.x;
       this.position.y = newestPos.y;
@@ -188,22 +185,89 @@ module.exports = class Player {
     }
   }
 
-  checkCollision(hitbox) {
-    const cX = hitbox.x;
-    const cY = hitbox.y;
-    const cH = hitbox.h;
-    const cW = hitbox.w;
+  rectIntersect(
+    x1,
+    y1,
+    w1,
+    h1,
+    x2 = this.position.x,
+    y2 = this.position.y,
+    w2 = this.position.w,
+    h2 = this.position.h
+  ) {
+    if (x2 >= w1 + x1 || x1 >= w2 + x2 || y2 >= h1 + y1 || y1 >= h2 + y2) {
+      return false;
+    }
+    return true;
+  }
 
-    const pX = this.position.x;
-    const pY = this.position.y;
-    const pH = this.position.h;
-    const pW = this.position.w;
+  collisionDetectionSAT(target) {
+    try {
+      if (target.shape === "rect" || target.shape === "player") {
+        if (!target.colliding && target.shape !== "player") return;
 
-    // const colVert = top <= o.yMap + o.h && bottom >= o.yMap;
-    const colVert = cY <= pY + pH && cY + cH >= pY;
-    const colHor = cX <= pX + pW && cX + cW >= pX;
+        if (
+          !this.rectIntersect(
+            this.position.x,
+            this.position.y,
+            this.position.w,
+            this.position.h,
+            target.x,
+            target.y,
+            target.w,
+            target.h
+          )
+        )
+          return;
 
-    return colHor && colVert;
+        const halfWidthPlayerX = this.position.w / 2;
+        const halfWidthTargetX = target.w / 2;
+
+        const centerPlayerX = this.position.x + halfWidthPlayerX;
+        const centerTargetX = target.x + halfWidthTargetX;
+
+        const diffX = centerTargetX - centerPlayerX;
+        let gapX = diffX - halfWidthPlayerX - halfWidthTargetX;
+
+        const halfWidthPlayerY = this.position.h / 2;
+        const halfWidthTargetY = target.h / 2;
+
+        const centerPlayerY = this.position.y + halfWidthPlayerY;
+        const centerTargetY = target.y + halfWidthTargetY;
+
+        const diffY = centerTargetY - centerPlayerY;
+        let gapY = diffY - halfWidthPlayerY - halfWidthTargetY;
+
+        const determineDisplacement = (
+          gap,
+          playerDimension,
+          targetDimension
+        ) => {
+          let min = gap;
+
+          const other = gap + playerDimension + targetDimension;
+          if (other < Math.abs(min)) min = other;
+
+          return min;
+        };
+
+        const xDisp = determineDisplacement(gapX, this.position.w, target.w);
+        const yDisp = determineDisplacement(gapY, this.position.h, target.h);
+
+        if (Math.abs(yDisp) < Math.abs(xDisp)) {
+          this.velocities.velY = 0;
+          this.position.y += yDisp;
+        } else {
+          this.velocities.velX = 0;
+          this.position.x += xDisp;
+        }
+
+        // to override client
+        return true;
+      }
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   get x() {

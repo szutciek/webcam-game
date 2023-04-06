@@ -2,7 +2,15 @@ let waiting = false;
 let loggedIn = false;
 const inputs = [...document.querySelectorAll(".fancyInput")];
 
-const message = new URLSearchParams(document.location.search).get("message");
+const search = new URLSearchParams(document.location.search);
+const message = search.get("message");
+
+const query = [];
+const gameRoom = search.get("room");
+if (gameRoom) query.push(`room=${gameRoom}`);
+const gameMap = search.get("map");
+if (gameMap) query.push(`map=${gameMap}`);
+
 const newUrl = window.location.origin + window.location.pathname;
 window.history.pushState({ path: newUrl }, "", newUrl);
 
@@ -177,7 +185,7 @@ const login = () => {
         saveUserData(message.user);
         loggedIn = true;
         setTimeout(() => {
-          window.location = "/";
+          window.location = `/${query.length ? `?${query.join("&")}` : ""}`;
         }, 1 * 1000);
         resolve();
       }

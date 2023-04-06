@@ -159,13 +159,13 @@ export default class ClientController {
       console.warn(
         `Illegal movement, correction: [${message.position.x}, ${message.position.y}]`
       );
-      UIController.showMessage(
-        `Illegal movement, correction: [${
-          Math.round(message.position.x * 10) / 10
-        }, ${Math.round(message.position.y * 10) / 10}]`,
-        "alert",
-        "warning"
-      );
+      // UIController.showMessage(
+      //   `Illegal movement, correction: [${
+      //     Math.round(message.position.x * 10) / 10
+      //   }, ${Math.round(message.position.y * 10) / 10}]`,
+      //   "alert",
+      //   "warning"
+      // );
     }
     if (message.type === "event") {
       UIController.showMessage(
@@ -188,7 +188,12 @@ export default class ClientController {
     }
     if (message.type === "error") {
       if ([401, 403].includes(message.code)) {
-        window.location = `/signin?message=${message.message}`;
+        const search = new URLSearchParams(document.location.search);
+        const room = search.get("room");
+        const map = search.get("map");
+        window.location = `/signin?message=${message.message}${
+          room ? `&room=${room}` : ""
+        }${map ? `&map=${map}` : ""}`;
       } else {
         UIController.showMessage(message.message, "alert", "warning");
       }

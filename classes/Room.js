@@ -61,7 +61,11 @@ module.exports = class Room {
     // do all kinds of calculations
     this.#players.forEach((player) => {
       // calculate if the player hit a dynamic
-      const correction = player.correctMovement(secondsPassed, currentTime);
+      const correction = player.correctMovement(
+        secondsPassed,
+        currentTime,
+        this.getPlayerChunks(player)
+      );
       if (correction !== undefined)
         clients.find(player.uuid)?.sendTo({
           type: "movovd",
@@ -105,11 +109,7 @@ module.exports = class Room {
       let collides = false;
 
       this.#players.forEach((p) => {
-        const playerCollides = p.checkCollision({
-          ...s,
-          w: 100,
-          h: 200,
-        });
+        const playerCollides = p.rectIntersect(s.x, s.y, 100, 200);
         if (playerCollides) collides = true;
       });
 
@@ -292,9 +292,9 @@ module.exports = class Room {
     this.#players.set(uuid, player);
   }
 
-  sendChunks(player) {
-    const chunkX = this.identifyChunk(player.x);
-    const chunkY = this.identifyChunk(player.y);
+  getPlayerChunks(player, preview = true) {
+    const chunkX = this.identifyChunk(player.position.x);
+    const chunkY = this.identifyChunk(player.position.y);
 
     const chunkLeft = chunkX - (1600 * maxRenderDistance) / 2;
     const chunkRight = chunkX + (1600 * maxRenderDistance) / 2;
@@ -309,11 +309,24 @@ module.exports = class Room {
         const chunk = this.findChunk(x, y);
         if (!chunk) continue;
         if (chunk.gameObjects.size === 0) continue;
-        if (player.updatedChunks.get(`${x}:${y}`) >= chunk.lastUpdate) continue;
-        player.updatedChunks.set(`${x}:${y}`, Date.now());
-        list.push(...chunk.gameObjects.values());
+        if (
+          preview === false &&
+          player.updatedChunks.get(`${x}:${y}`) >= chunk.lastUpdate
+        ) {
+          continue;
+        }
+        if (preview === false) {
+          player.updatedChunks.set(`${x}:${y}`, Date.now());
+        }
+        list.push(...chunk.allObjects);
       }
     }
+
+    return list;
+  }
+
+  sendChunks(player) {
+    const list = this.getPlayerChunks(player, false);
 
     if (list.length === 0) return;
 

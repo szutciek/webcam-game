@@ -4,13 +4,27 @@ import { requestCameraPermission, startStream, stream } from "/camera.js";
 
 let clientController;
 
+const redirectToSignin = (message, room, map) => {
+  window.location = `/signin?message=${message}${room ? `&room=${room}` : ""}${
+    map ? `&map=${map}` : ""
+  }`;
+};
+
 const setup = async () => {
   try {
-    const token = window.localStorage.getItem("token");
-    if (!token) window.location = "/signin?message=Please log in to play";
-    const user = JSON.parse(window.localStorage.getItem("user"));
-    if (!user) window.location = "/signin?message=Please log in to play";
+    // handle room selection with ui
+    const search = new URLSearchParams(window.location.search);
+    const room = search.get("room");
+    const map = search.get("map");
 
+    const token = window.localStorage.getItem("token", room, map);
+    if (!token) {
+      redirectToSignin("Please log in to play");
+    }
+    const user = JSON.parse(window.localStorage.getItem("user"));
+    if (!user) {
+      redirectToSignin("Please log in to play", room, map);
+    }
     UIController.showLoadingScreen(
       user.username,
       user?.profile,
@@ -30,11 +44,6 @@ const setup = async () => {
     });
 
     UIController.showUser(user.username, user.panelColor);
-
-    // handle room selection with ui
-    const search = new URLSearchParams(window.location.search);
-    const room = search.get("room");
-    const map = search.get("map");
 
     UIController.changeLoadStatus(`Joining room ${room || "default"}`);
     if (!clientController.changeRoom(room, map)) return;

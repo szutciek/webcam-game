@@ -151,8 +151,8 @@ export default class Player {
   }
 
   serverOverride({ x, y, w, h }) {
-    this.#x = lerp(this.#x, x, 0.2);
-    this.#y = lerp(this.#y, y, 0.2);
+    this.#x = lerp(this.#x, x, 0.15);
+    this.#y = lerp(this.#y, y, 0.15);
     this.#w = w;
     this.#h = h;
   }
@@ -165,8 +165,8 @@ export default class Player {
   }
 
   collisionDetectionSAT(target) {
-    if (target.shape === "rect") {
-      if (!target.colliding) return;
+    if (target.shape === "rect" || target.shape === "player") {
+      if (!target.colliding && target.shape !== "player") return;
 
       if (
         !this.rectIntersect(

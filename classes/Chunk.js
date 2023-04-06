@@ -52,6 +52,10 @@ module.exports = class Chunk {
     return new Map([...this.dynamicObjects, ...this.staticObjects]);
   }
 
+  get allObjects() {
+    return [...this.staticObjects.values(), ...this.dynamicObjects.values()];
+  }
+
   calculateDynamicObjectMovement() {
     console.log("Calculating movement of dynamic objects");
   }

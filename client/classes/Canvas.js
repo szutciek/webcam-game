@@ -58,24 +58,28 @@ export default class Canvas {
   }
 
   drawPlayer(player, camera, pose) {
-    let { x, y, w, h } = player;
+    try {
+      let { x, y, w, h } = player;
 
-    // this.ctx.fillStyle = "#F2CCB7";
-    // this.ctx.fillRect(x, y, w, h);
+      // this.ctx.fillStyle = "#F2CCB7";
+      // this.ctx.fillRect(x, y, w, h);
 
-    if (pose.crouching === true) {
-      y += 50;
-      h = 150;
+      if (pose.crouching === true) {
+        y += 50;
+        h = 150;
+      }
+
+      // this.ctx.fillStyle = "#ff9999";
+      // this.ctx.fillRect(x, y, w, h);
+
+      if (player.username !== "Anonymous") {
+        drawTag(this.ctx, x, y, w, h, player.username);
+      }
+      drawBody(this.ctx, x, y, w, h, pose);
+      if (camera != undefined) drawFace(this.ctx, x, y, w, h, camera);
+    } catch (err) {
+      throw err;
     }
-
-    // this.ctx.fillStyle = "#ff9999";
-    // this.ctx.fillRect(x, y, w, h);
-
-    if (player.username !== "Anonymous") {
-      drawTag(this.ctx, x, y, w, h, player.username);
-    }
-    drawBody(this.ctx, x, y, w, h, pose);
-    drawFace(this.ctx, x, y, w, h, camera);
   }
 
   clear() {

@@ -13,7 +13,7 @@ export default class Player {
     this.lastUpdate = new Date().getTime();
   }
 
-  updatePosition(x, y, w, h) {
+  updatePosition([x, y, w, h]) {
     this.x = x;
     this.y = y;
     this.w = w;
@@ -28,6 +28,8 @@ export default class Player {
 
   updateInfo(info) {
     if (info.username) this.username = info.username;
-    if (info.camera) this.camera = info.camera;
+    if (info.camera) {
+      this.camera = info.camera;
+    }
   }
 }
