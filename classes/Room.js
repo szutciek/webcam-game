@@ -35,7 +35,7 @@ module.exports = class Room {
 
   changeGameMode(mode) {
     this.game = mode;
-    console.log(`Game mode changed to ${this.game.mode} in room ${this.code}`);
+    // console.log(`Game mode changed to ${this.game.mode} in room ${this.code}`);
     this.broadcast({
       type: "event",
       event: `Game mode changed to ${this.game.mode}`,
@@ -56,60 +56,65 @@ module.exports = class Room {
       if (this.#players.size === 0) this.stopGameClock();
       this.gameTick();
     }, 1000 / 60);
-    console.log(`Starting game in room ${this.code}.`);
+    // console.log(`Starting game in room ${this.code}.`);
     this.#players.forEach((p) => this.sendRoomInfo(p.uuid));
   }
 
   gameTick() {
-    const secondsPassed = (performance.now() - this.lastTimeStamp) / 1000;
-    const currentTime = Math.round(performance.now() * 1000) / 1000;
+    try {
+      const secondsPassed = (performance.now() - this.lastTimeStamp) / 1000;
+      const currentTime = Math.round(performance.now() * 1000) / 1000;
 
-    if (this.#players.size === 0) {
-      console.log(`Room ${this.code} is empty. Pausing game.`);
-      this.stopGameClock();
+      if (this.#players.size === 0) {
+        // console.log(`Room ${this.code} is empty. Pausing game.`);
+        this.stopGameClock();
+      }
+
+      // do all kinds of calculations
+      this.#players.forEach((player) => {
+        // calculate if the player hit a dynamic
+        const correction = player.correctMovement(
+          secondsPassed,
+          currentTime,
+          this.getPlayerChunks(player)
+        );
+        if (correction !== undefined)
+          clients.find(player.uuid)?.sendTo({
+            type: "movovd",
+            position: correction,
+          });
+      });
+
+      // collect all data
+      let list = [];
+      if (this.#includeCam % 3 === 0) {
+        list = this.getAllPlayersQuickData(true);
+
+        this.#includeCam = 0;
+      } else {
+        list = this.getAllPlayersQuickData(false);
+      }
+      this.#includeCam++;
+
+      // get game mode to do its stuff
+      this.game.tick(currentTime);
+
+      // sending chunks to all players
+      this.#players.forEach((p) => {
+        this.sendChunks(p);
+      });
+
+      // broadcast the data to clients
+      this.broadcast({
+        type: "pinfo",
+        data: list,
+      });
+
+      this.lastTimeStamp = performance.now();
+    } catch (err) {
+      console.log(err);
+      throw err;
     }
-
-    // do all kinds of calculations
-    this.#players.forEach((player) => {
-      // calculate if the player hit a dynamic
-      const correction = player.correctMovement(
-        secondsPassed,
-        currentTime,
-        this.getPlayerChunks(player)
-      );
-      if (correction !== undefined)
-        clients.find(player.uuid)?.sendTo({
-          type: "movovd",
-          position: correction,
-        });
-    });
-
-    // collect all data
-    let list = [];
-    if (this.#includeCam % 3 === 0) {
-      list = this.getAllPlayersQuickData(true);
-
-      this.#includeCam = 0;
-    } else {
-      list = this.getAllPlayersQuickData(false);
-    }
-    this.#includeCam++;
-
-    // get game mode to do its stuff
-    this.game.tick(currentTime);
-
-    // sending chunks to all players
-    this.#players.forEach((p) => {
-      this.sendChunks(p);
-    });
-
-    // broadcast the data to clients
-    this.broadcast({
-      type: "pinfo",
-      data: list,
-    });
-
-    this.lastTimeStamp = performance.now();
   }
 
   setSpawnPoints(points) {
@@ -299,6 +304,7 @@ module.exports = class Room {
       code: this.code,
       map: this.map,
       players: pList,
+      game: this.game.mode,
     };
   }
 
@@ -376,7 +382,7 @@ module.exports = class Room {
       data: list,
     };
 
-    clients.find(player.uuid).sendTo(message);
+    clients.find(player.uuid)?.sendTo(message);
   }
 
   inside(uuid) {

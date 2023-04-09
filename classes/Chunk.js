@@ -44,11 +44,11 @@ module.exports = class Chunk {
     // num so that it is possible to place but also wont appear suddenly
     if (
       this.x <= coordinates.x &&
-      this.maxX + 200 >= coordinates.x + coordinates.w
+      this.maxX + 400 >= coordinates.x + coordinates.w
     ) {
       if (
         this.y <= coordinates.y &&
-        this.maxY + 200 >= coordinates.y + coordinates.h
+        this.maxY + 400 >= coordinates.y + coordinates.h
       ) {
         return true;
       }
@@ -74,10 +74,6 @@ module.exports = class Chunk {
       list.push(o.objectInfo);
     });
     return list;
-  }
-
-  calculateDynamicObjectMovement() {
-    console.log("Calculating movement of dynamic objects");
   }
 
   findObjectId(id) {
@@ -149,7 +145,9 @@ module.exports = class Chunk {
         );
 
       // handle errors when too wide
-      if (inBounds && !this.checkIfExists(coordinates)) {
+      // we dont care about existing
+      // if (inBounds && !this.checkIfExists(coordinates)) {
+      if (inBounds) {
         const id = crypto.randomUUID();
         if (options.dynamic === true) {
           object = this.objectFromClass(id, coordinates, texture, options);

@@ -1,10 +1,13 @@
 module.exports = class GameObject {
   currentChunk = undefined;
 
-  constructor(id, texture, dynamic) {
+  constructor(id, texture, options) {
     this.id = id;
     this.texture = texture;
-    this.dynamic = dynamic;
+
+    Object.entries(options).forEach(([key, value]) => {
+      this[key] = value;
+    });
   }
 
   updateTexture(texture) {

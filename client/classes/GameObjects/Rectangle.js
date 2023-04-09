@@ -4,15 +4,12 @@ export default class Rectangle extends GameObject {
   shape = "rect";
 
   constructor(id, { x, y, w, h }, texture, options) {
-    super(id, texture);
+    super(id, texture, options);
 
     this.x = x;
     this.y = y;
     this.w = w;
     this.h = h;
-
-    this.dynamic = options.dynamic;
-    this.colliding = options.colliding;
   }
 
   collidingWithSquare(target) {

@@ -4,6 +4,10 @@ import GameObjects from "/classes/GameObjects.js";
 import GameController from "/classes/GameController.js";
 import UIController from "/classes/UIController.js";
 
+const gameModes = ["soccer", "open"];
+import Soccer from "/classes/GameModes/Soccer.js";
+import Open from "/classes/GameModes/Open.js";
+
 export default class ClientController {
   #ws = undefined;
 
@@ -99,22 +103,38 @@ export default class ClientController {
     console.log("No longer listening to server...");
   }
 
+  changeGameMode(gameMode) {
+    console.log(`Changing game mode to ${gameMode}`);
+    if (!gameModes.includes(gameMode)) {
+      UIController.showMessage(
+        `Game mode "${gameMode}" not supported. Try shift + reload.`,
+        "alert",
+        "warning"
+      );
+    }
+
+    if (gameMode === "soccer") {
+      this.gameModeController = new Soccer(this, this.#ws);
+    }
+    if (gameMode === "open") {
+      this.gameModeController = new Open(this, this.#ws);
+    }
+  }
+
   updateRoomInfo(info) {
     if (info.syncStartTime) {
       this.setServerTimeOrigin(info.syncStartTime);
     }
     UIController.updateRoomInfo(info);
+
+    if (info.game !== this.currentGameMode) {
+      this.changeGameMode(info.game);
+    }
   }
 
   startRender() {
     this.gameObjects = new GameObjects();
-    this.gameController = new GameController(
-      this.player,
-      this.#ws,
-      this.user.uuid,
-      this.gameObjects,
-      this.serverTimeOrigin
-    );
+    this.gameController = new GameController(this, this.#ws);
     this.gameController.startGame();
   }
 
@@ -159,14 +179,13 @@ export default class ClientController {
       console.warn(
         `Illegal movement, correction: [${message.position.x}, ${message.position.y}]`
       );
-      // annoying for production
-      UIController.showMessage(
-        `Illegal movement, correction: [${
-          Math.round(message.position.x * 10) / 10
-        }, ${Math.round(message.position.y * 10) / 10}]`,
-        "alert",
-        "warning"
-      );
+      // UIController.showMessage(
+      //   `Illegal movement, correction: [${
+      //     Math.round(message.position.x * 10) / 10
+      //   }, ${Math.round(message.position.y * 10) / 10}]`,
+      //   "alert",
+      //   "warning"
+      // );
     }
     if (message.type === "event") {
       UIController.showMessage(

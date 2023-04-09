@@ -17,13 +17,16 @@ export default class GameController {
   serverTimeOrigin = 0;
   currentTick = 0;
 
-  constructor(player, ws, uuid, gameObjects, serverTimeOrigin) {
-    if (!player) throw new Error("Can't create game - player undefined");
-    this.player = player;
+  constructor(controller, ws) {
+    if (!controller.player)
+      throw new Error("Can't create game - player undefined");
+
+    this.controller = controller;
+    this.player = controller.player;
     this.#ws = ws;
-    this.uuid = uuid;
-    this.gameObjects = gameObjects;
-    this.serverTimeOrigin = serverTimeOrigin;
+    this.uuid = controller.uuid;
+    this.gameObjects = controller.gameObjects;
+    this.serverTimeOrigin = controller.serverTimeOrigin;
   }
 
   startGame() {
@@ -106,14 +109,26 @@ export default class GameController {
       // ==========================================================================
 
       this.centerPlayer();
-      const promises = players.map((player) => canvas.prepareCamera(player));
+      const promises = [];
+      players.forEach((player) => promises.push(canvas.prepareCamera(player)));
+      items.forEach((item) => {
+        if (item.texture.type === "graphic") {
+          canvas.prepareGraphic(item);
+        }
+      });
       const pT = this.translateInView(this.player);
       promises.push(canvas.prepareCamera(pT));
       const prepared = await Promise.all(promises);
 
       canvas.clear();
       items.forEach((i) => canvas.drawItem(i));
-      prepared.forEach((i) => canvas.drawPlayer(i, i.image, i.pose));
+      prepared.forEach((i) => canvas.drawPlayer(i));
+
+      // ==========================================================================
+      // GAME TICK ===============================================================
+      // ==========================================================================
+
+      this.controller.gameModeController.tick();
 
       // ==========================================================================
       // DISPLAYING STATS =========================================================

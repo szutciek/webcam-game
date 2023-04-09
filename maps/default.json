@@ -16,6 +16,160 @@
   ],
   "objects": [
     {
+      "coords": { "x": 800, "y": 0, "w": 800, "h": 400 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/infoBoardHowToPlay.png"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    },
+
+    {
+      "coords": { "x": 50, "y": 50, "w": 300, "h": 400 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/spawnPoint.png"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    },
+    {
+      "coords": { "x": 800, "y": -600, "w": 600, "h": 300 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/gameMath.png"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    },
+    {
+      "coords": { "x": 1250, "y": -475, "w": 150, "h": 200 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://kanapka.eu/assets/ceo.png"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    },
+    {
+      "coords": { "x": 800, "y": -350, "w": 300, "h": 300 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/gameMathSign.png"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    },
+
+    {
+      "coords": { "x": 180, "y": -540, "w": 160, "h": 300 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/tree_2.png"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    },
+    {
+      "coords": { "x": 100, "y": -400, "w": 160, "h": 300 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/tree_2.png"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    },
+    {
+      "coords": { "x": 270, "y": -340, "w": 160, "h": 300 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/tree_1.png"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    },
+    {
+      "coords": { "x": 400, "y": -450, "w": 160, "h": 300 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/tree_2.png"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    },
+
+    {
+      "coords": { "x": 570, "y": -100, "w": 160, "h": 300 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/tree_1.png"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    },
+    {
+      "coords": { "x": 700, "y": 100, "w": 160, "h": 300 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/tree_2.png"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    },
+    {
+      "coords": { "x": 850, "y": 260, "w": 160, "h": 300 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/tree_1.png"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    },
+    {
+      "coords": { "x": 600, "y": 300, "w": 160, "h": 300 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/tree_2.png"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    },
+    {
+      "coords": { "x": 780, "y": 400, "w": 160, "h": 300 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/tree_2.png"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    },
+    {
+      "coords": { "x": 960, "y": 450, "w": 100, "h": 125 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/rock_1.png"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true
+    },
+
+    {
       "coords": { "x": 0, "y": 0, "w": 50, "h": 50 },
       "texture": { "type": "color", "value": "#6A5506" },
       "shape": "rect",

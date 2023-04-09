@@ -4,14 +4,12 @@ module.exports = class Rectangle extends GameObject {
   shape = "rect";
 
   constructor(id, { x, y, w, h }, texture, options) {
-    super(id, texture, options.dynamic);
+    super(id, texture, options);
 
     this.x = x;
     this.y = y;
     this.w = w;
     this.h = h;
-
-    this.colliding = options.colliding || false;
   }
 
   get objectInfo() {
@@ -25,6 +23,7 @@ module.exports = class Rectangle extends GameObject {
       texture: this.texture,
       colliding: this.colliding,
       dynamic: this.dynamic,
+      class: this?.class,
     };
   }
 };

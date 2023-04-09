@@ -51,6 +51,7 @@ exports.handleRoomJoin = async (message, ws, client) => {
           colliding: obj.colliding,
           dynamic: obj.dynamic,
           shape: obj.shape,
+          class: obj?.class,
         });
       });
     }

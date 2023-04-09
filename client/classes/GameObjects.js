@@ -49,6 +49,12 @@ export default class GameObjects {
 
   updateObjects(data) {
     data.forEach((i) => {
+      const item = this.#elements.get(i.id);
+      // if (i.shape === "circ") {
+      //   console.log(i);
+      // }
+      if (item) return item.updateData(i);
+
       if (i.shape === "rect") {
         this.#elements.set(
           i.id,
