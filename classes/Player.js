@@ -287,7 +287,7 @@ module.exports = class Player {
         return true;
       }
     } catch (err) {
-      console.log(err);
+      throw err;
     }
   }
 

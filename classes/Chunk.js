@@ -1,3 +1,5 @@
+const UserError = require("../utils/UserError.js");
+
 const Rectangle = require("./GameObjects/Rectangle.js");
 const Circle = require("./GameObjects/Circle.js");
 
@@ -5,9 +7,10 @@ module.exports = class Chunk {
   staticObjects = new Map();
   dynamicObjects = new Map();
 
-  constructor(x, y) {
+  constructor(x, y, findChunk) {
     this.x = x;
     this.y = y;
+    this.findChunk = findChunk;
 
     // this.maxX = x + 1600;
     // this.maxY = y + 1600;
@@ -31,6 +34,12 @@ module.exports = class Chunk {
   checkIfInBounds(coordinates) {
     // checks if the object indeed matches this chunk
     // every object is 100px wide so we need to account for that by adding 100
+    if (!coordinates) return false;
+
+    if (coordinates.r) {
+      coordinates.w = coordinates.r;
+      coordinates.h = coordinates.r;
+    }
 
     // num so that it is possible to place but also wont appear suddenly
     if (
@@ -44,7 +53,7 @@ module.exports = class Chunk {
         return true;
       }
     }
-    console.log("Object out of bounds!");
+
     return false;
   }
 
@@ -52,8 +61,20 @@ module.exports = class Chunk {
     return new Map([...this.dynamicObjects, ...this.staticObjects]);
   }
 
+  get staticObjects() {
+    return [...this.staticObjects];
+  }
+
   get allObjects() {
-    return [...this.staticObjects.values(), ...this.dynamicObjects.values()];
+    const list = [];
+    this.staticObjects.forEach((o) => {
+      list.push(o.objectInfo);
+    });
+    this.dynamicObjects.forEach((o) => {
+      list.push(o.objectInfo);
+    });
+    // console.log(list);
+    return list;
   }
 
   calculateDynamicObjectMovement() {
@@ -62,6 +83,10 @@ module.exports = class Chunk {
 
   findObjectId(id) {
     return this.gameObjects.get(id);
+  }
+
+  removeObjectId(id) {
+    return this.gameObjects.delete(id);
   }
 
   findObject(x, y) {
@@ -93,47 +118,59 @@ module.exports = class Chunk {
 
   objectFromClass(id, coordinates, texture, options) {
     if (!options.shape) {
-      throw new Error("Shape not defined");
+      throw new UserError("Error while loading map: Shape not defined.", 400);
     }
 
     switch (options.shape) {
       case "rect":
-        return new Rectangle(id, coordinates, texture, options);
+        return new Rectangle(id, coordinates, texture, options, this);
       case "circ":
-        return new Circle(id, coordinates, texture, options);
+        return new Circle(id, coordinates, texture, options, this);
     }
 
-    throw new Error("Coundn't create game object");
+    throw new UserError(
+      "Error while loading map: Coundn't create game object.",
+      400
+    );
   }
 
-  // 100x100
   createObject(
     coordinates,
     texture = { type: "color", value: "white" },
     options = { colliding: true, dynamic: false, shape: "rect" }
   ) {
-    // if (!this.checkIfMultiple(coordinates.x)) return;
-    // if (!this.checkIfMultiple(coordinates.y)) return;
-    if (coordinates.x === undefined) return;
-    if (coordinates.y === undefined) return;
-    if (!coordinates.w) return;
-    if (!coordinates.h) return;
-    // handle errors when too wide
-    if (this.checkIfInBounds(coordinates) && !this.checkIfExists(coordinates)) {
-      const id = crypto.randomUUID();
-      if (options.dynamic === true) {
-        this.dynamicObjects.set(
-          id,
-          this.objectFromClass(id, coordinates, texture, options)
-        );
-      } else {
-        this.staticObjects.set(
-          id,
-          this.objectFromClass(id, coordinates, texture, options)
-        );
-      }
+    try {
+      let object = undefined;
 
-      this.lastUpdate = Date.now();
+      const inBounds = this.checkIfInBounds(coordinates);
+      if (!inBounds)
+        throw new UserError(
+          "Error while adding object: Out of chunk bounds.",
+          400
+        );
+
+      // handle errors when too wide
+      if (inBounds && !this.checkIfExists(coordinates)) {
+        const id = crypto.randomUUID();
+        if (options.dynamic === true) {
+          object = this.objectFromClass(id, coordinates, texture, options);
+          this.dynamicObjects.set(id, object);
+        } else {
+          object = this.objectFromClass(id, coordinates, texture, options);
+          this.staticObjects.set(id, object);
+        }
+
+        this.lastUpdate = Date.now();
+
+        return object;
+      }
+    } catch (err) {
+      throw err;
     }
+  }
+
+  importObject(object) {
+    // most likely dynamic
+    this.dynamicObjects.set(object.id, object);
   }
 };

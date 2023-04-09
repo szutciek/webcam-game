@@ -33,6 +33,17 @@ module.exports = class Room {
     this.createStartChunks(2);
   }
 
+  changeGameMode(mode) {
+    this.game = mode;
+    console.log(`Game mode changed to ${this.game.mode} in room ${this.code}`);
+    this.broadcast({
+      type: "event",
+      event: `Game mode changed to ${this.game.mode}`,
+      icon: "info",
+      classification: "normal",
+    });
+  }
+
   stopGameClock() {
     this.#running = false;
     clearInterval(this.#clock);
@@ -84,6 +95,9 @@ module.exports = class Room {
     }
     this.#includeCam++;
 
+    // get game mode to do its stuff
+    this.game.tick(currentTime);
+
     // sending chunks to all players
     this.#players.forEach((p) => {
       this.sendChunks(p);
@@ -103,23 +117,27 @@ module.exports = class Room {
   }
 
   determineStartPos() {
-    const points = [];
+    try {
+      const points = [];
 
-    this.spawnPoints.forEach((s) => {
-      let collides = false;
+      this.spawnPoints.forEach((s) => {
+        let collides = false;
 
-      this.#players.forEach((p) => {
-        const playerCollides = p.rectIntersect(s.x, s.y, 100, 200);
-        if (playerCollides) collides = true;
+        this.#players.forEach((p) => {
+          const playerCollides = p.rectIntersect(s.x, s.y, 100, 200);
+          if (playerCollides) collides = true;
+        });
+
+        if (!collides) points.push(s);
       });
 
-      if (!collides) points.push(s);
-    });
-
-    const index = Math.floor(Math.random() * this.spawnPoints.length);
-    if (points.length === 0) return this.spawnPoints[index];
-    const secondIndex = Math.floor(Math.random() * points.length);
-    return points[secondIndex];
+      const index = Math.floor(Math.random() * this.spawnPoints.length);
+      if (points.length === 0) return this.spawnPoints[index];
+      const secondIndex = Math.floor(Math.random() * points.length);
+      return points[secondIndex];
+    } catch (err) {
+      throw err;
+    }
   }
 
   getAllPlayersQuickData(camera) {
@@ -135,33 +153,49 @@ module.exports = class Room {
     for (let x = -numPx; x <= numPx; x += 1600) {
       this.chunks.set(x, new Map());
       for (let y = -numPx; y <= numPx; y += 1600) {
-        this.chunks.get(x).set(y, new Chunk(x, y));
+        this.chunks.get(x).set(y, new Chunk(x, y, this.getChunk));
       }
     }
   }
 
-  addObject(coords, texture, options) {
+  findCreateReturnChunk(coords) {
     if (coords.x === undefined || coords.y === undefined) return;
-    const chunk = this.getChunk(coords.x, coords.y);
-    if (!chunk)
-      this.addChunk(this.identifyChunk(coords.x), this.identifyChunk(coords.y));
-    this.findChunk(
-      this.identifyChunk(coords.x),
-      this.identifyChunk(coords.y)
-    ).createObject(coords, texture, options);
+    let chunk = this.getChunk(coords.x, coords.y);
+    if (!chunk) {
+      chunk = this.addChunk(
+        this.identifyChunk(coords.x),
+        this.identifyChunk(coords.y)
+      );
+    }
+    return chunk;
   }
 
-  getChunk(xI, yI) {
-    // find the chunk
+  addObject(coords, texture, options) {
+    try {
+      const chunk = this.findCreateReturnChunk(coords);
+      const obj = chunk.createObject(coords, texture, options);
+      return obj;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  addSpecialObject(coords, texture, options) {
+    const chunk = this.findCreateReturnChunk(coords);
+    const obj = chunk.createObject(coords, texture, options);
+    return obj;
+  }
+
+  getChunk = (xI, yI) => {
     if (xI === undefined || yI === undefined) return;
     const x = this.identifyChunk(xI);
     if (!this.chunks.has(x)) this.chunks.set(x, new Map());
     const row = this.chunks.get(x);
     const y = this.identifyChunk(yI);
     const chunk = row.get(y);
-    if (!chunk) row.set(y, new Chunk(x, y));
+    if (!chunk) row.set(y, new Chunk(x, y, this.getChunk));
     return chunk;
-  }
+  };
 
   updateObject(coords, texture) {
     const chunk = this.getChunk(coords.x, coords.y);
@@ -188,7 +222,9 @@ module.exports = class Room {
     if (!this.checkIfAvalibleChunk(x, y)) return;
     // if row missing, add
     if (!this.chunks.has(x)) this.chunks.set(x, new Map());
-    this.chunks.get(x).set(y, new Chunk());
+    const chunk = this.chunks.get(x).set(y, new Chunk(x, y, this.getChunk));
+    // method not tested
+    return chunk;
   }
 
   checkIfMultiple(num) {
@@ -286,10 +322,12 @@ module.exports = class Room {
   }
 
   updatePlayerCamera(uuid, camera) {
-    const player = this.getPlayer(uuid);
-    if (!player) return;
-    player.camera = camera;
-    this.#players.set(uuid, player);
+    if (camera != undefined) {
+      const player = this.getPlayer(uuid);
+      if (!player) return;
+      player.camera = camera;
+      this.#players.set(uuid, player);
+    }
   }
 
   getPlayerChunks(player, preview = true) {
@@ -350,6 +388,10 @@ module.exports = class Room {
         }
       }
     }
+  }
+
+  get players() {
+    return this.#players;
   }
 
   get size() {

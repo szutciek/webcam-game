@@ -21,21 +21,25 @@ export default class Canvas {
   }
 
   drawItem(item) {
-    if (!item.x || !item.y || !item.w || !item.h) return;
-    if (!this.el.getContext) throw new Error("Canvas broken");
     if (!item.texture) throw new Error("Texture not specified");
+
     // works only with colors for now
     this.ctx.fillStyle = item.texture.value;
     if (!item.shape) return this.ctx.fillRect(item.x, item.y, item.w, item.h);
-    if (item.shape === "rect")
-      return this.ctx.fillRect(item.x, item.y, item.w, item.h);
-    // if (shape === "circ") {
-    //   this.ctx.fillStyle = color;
-    //   this.ctx.beginPath();
-    //   this.ctx.arc(coords[0], coords[1], coords[2], 0, 2 * Math.PI);
-    //   this.ctx.fill();
-    //   return;
-    // }
+    if (item.shape === "rect") {
+      if (!item.x || !item.y || !item.w || !item.h) return;
+      this.ctx.fillRect(item.x, item.y, item.w, item.h);
+      return;
+    }
+
+    if (item.shape === "circ") {
+      if (!item.x || !item.y || !item.r) return;
+      this.ctx.fillStyle = item.texture.value;
+      this.ctx.beginPath();
+      this.ctx.arc(item.x + item.r, item.y + item.r, item.r, 0, 2 * Math.PI);
+      this.ctx.fill();
+      return;
+    }
   }
 
   prepareCamera(player) {

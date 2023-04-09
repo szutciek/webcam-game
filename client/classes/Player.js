@@ -166,6 +166,7 @@ export default class Player {
 
   collisionDetectionSAT(target) {
     if (target.shape === "rect" || target.shape === "player") {
+      // if not colliding and is not a player return
       if (!target.colliding && target.shape !== "player") return;
 
       if (
@@ -191,14 +192,14 @@ export default class Player {
       const diffX = centerTargetX - centerPlayerX;
       const gapX = diffX - halfWidthPlayerX - halfWidthTargetX;
 
-      const halfWidthPlayerY = this.#h / 2;
-      const halfWidthTargetY = target.h / 2;
+      const halfHeightPlayer = this.#h / 2;
+      const halfHeightTarget = target.h / 2;
 
-      const centerPlayerY = this.#y + halfWidthPlayerY;
-      const centerTargetY = target.yMap + halfWidthTargetY;
+      const centerPlayerY = this.#y + halfHeightPlayer;
+      const centerTargetY = target.yMap + halfHeightTarget;
 
       const diffY = centerTargetY - centerPlayerY;
-      const gapY = diffY - halfWidthPlayerY - halfWidthTargetY;
+      const gapY = diffY - halfHeightPlayer - halfHeightTarget;
 
       const determineDisplacement = (gap, playerDimension, targetDimension) => {
         let min = gap;
@@ -219,6 +220,13 @@ export default class Player {
         this.#velX = 0;
         this.#x += xDisp;
       }
+
+      return;
+    } else if (target.shape === "circ") {
+      // if not colliding return
+      if (!target.colliding) return;
+
+      return;
     }
   }
 

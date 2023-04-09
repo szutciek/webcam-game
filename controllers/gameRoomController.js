@@ -2,6 +2,10 @@ const rooms = require("../state/rooms");
 const UserError = require("../utils/UserError");
 const { loadMap, findAvalibleMaps } = require("./gameMapController");
 
+const GameMode = require("../classes/GameModes/GameMode.js");
+const Soccer = require("../classes/GameModes/Soccer.js");
+const Open = require("../classes/GameModes/Open.js");
+
 exports.handleRoomJoin = async (message, ws, client) => {
   try {
     let room = rooms.find(message.room);
@@ -30,16 +34,17 @@ exports.handleRoomJoin = async (message, ws, client) => {
       if (!map) throw new UserError("Map couldn't be loaded", 404);
       const data = JSON.parse(map);
 
-      // data.objects.forEach((obj, i) => {
-      //   setTimeout(() => {
-      //     room.addObject(obj.coords, { type: "color", value: "aqua" });
-      //     setTimeout(() => {
-      //       room.updateObject(obj.coords, obj.texture, obj.ignore);
-      //     }, 30);
-      //   }, i * 20);
-      // });
-
       room.setSpawnPoints(data.spawnPoints);
+
+      if (data.config.gameMode == undefined)
+        throw new UserError("Map game mode not specified", 400);
+      if (GameMode.avalibleGameModes.includes(data.config.gameMode)) {
+        if (data.config.gameMode === "soccer") {
+          room.changeGameMode(new Soccer(client.user._id, room));
+        } else {
+          room.changeGameMode(new Open(client.user._id, room));
+        }
+      }
 
       data.objects.forEach((obj) => {
         room.addObject(obj.coords, obj.texture, {
@@ -71,7 +76,6 @@ exports.handleRoomJoin = async (message, ws, client) => {
       })
     );
   } catch (err) {
-    console.log(err);
     throw err;
   }
 };

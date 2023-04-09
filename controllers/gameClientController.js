@@ -43,5 +43,4 @@ exports.handleAuthClient = async (data, ws) => {
 exports.handleClientLeave = (uuid, client) => {
   client?.leaveRoom();
   clients.removeClient(uuid);
-  console.log(`Client disconnected. Now online: ${clients.size}`);
 };

@@ -78,6 +78,7 @@ export default class GameController {
       items.forEach((item) => {
         this.player.collisionDetectionSAT(item, false);
       });
+
       players.forEach((item) => {
         this.player.collisionDetectionSAT(item, true);
       });
@@ -145,12 +146,13 @@ export default class GameController {
   }
 
   returnItemsFrame = (items) => {
-    if (!(items instanceof Map)) return;
+    if (items == undefined) return;
+    // if (!(items instanceof Map)) return;
 
     const maxRight = this.#x + this.#vw;
     const maxBottom = this.#y + this.#vh;
 
-    let list = [];
+    const list = [];
     items.forEach((i) => {
       if (
         i.x < maxRight &&
@@ -162,6 +164,7 @@ export default class GameController {
         i.yMap = i.y;
         list.push(this.translateInView(i));
       }
+      return;
     });
     return list;
   };
