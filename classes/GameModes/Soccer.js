@@ -78,7 +78,10 @@ module.exports = class Soccer extends GameMode {
   }
 
   controlBallPosition() {
-    if (Math.abs(this.ball.x) > 1000 && Math.abs(this.ball.y) > 600) {
+    if (Math.abs(this.ball.y) > 480) {
+      this.ballVelocity.y = -this.ballVelocity.y / 2;
+    }
+    if (Math.abs(this.ball.x) > 1500) {
       this.ball.x = -15;
       this.ball.y = -15;
       this.ballVelocity = { x: 0, y: 0 };
@@ -98,11 +101,11 @@ module.exports = class Soccer extends GameMode {
     if (!colliding) return;
 
     const momentumXPlayer = Number(this.playerMass * velocities.x);
-    const momentumXBall = Number(this.ballMass * this.ballVelocity.x);
+    // const momentumXBall = Number(this.ballMass * this.ballVelocity.x);
     this.ballVelocity.x = momentumXPlayer / this.ballMass;
 
     const momentumYPlayer = Number(this.playerMass * velocities.y);
-    const momentumYBall = Number(this.ballMass * this.ballVelocity.y);
+    // const momentumYBall = Number(this.ballMass * this.ballVelocity.y);
     this.ballVelocity.y = momentumYPlayer / this.ballMass;
   }
 

@@ -192,8 +192,11 @@ module.exports = class Room {
     if (!this.chunks.has(x)) this.chunks.set(x, new Map());
     const row = this.chunks.get(x);
     const y = this.identifyChunk(yI);
-    const chunk = row.get(y);
-    if (!chunk) row.set(y, new Chunk(x, y, this.getChunk));
+    let chunk = row.get(y);
+    if (!chunk) {
+      chunk = new Chunk(x, y, this.getChunk);
+      row.set(y, chunk);
+    }
     return chunk;
   };
 

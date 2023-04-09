@@ -34,6 +34,8 @@ export default class GameController {
     this.centerPlayer();
 
     this.renderFrame();
+
+    // OLD METHOD
     this.#interval = setInterval(() => {
       this.renderFrame();
     }, 1000 / 60);
@@ -131,6 +133,11 @@ export default class GameController {
       this.#iteration++;
       if (this.#iteration === 120) this.#iteration === 0;
       this.lastTimeStamp = performance.now();
+
+      // dont work but has potential
+      // window.requestAnimationFrame(() => {
+      //   this.renderFrame();
+      // });
     } catch (err) {
       console.warn(err);
     }

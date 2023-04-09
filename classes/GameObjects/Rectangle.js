@@ -16,6 +16,7 @@ module.exports = class Rectangle extends GameObject {
 
   get objectInfo() {
     return {
+      id: this.id,
       shape: "rect",
       x: this.x,
       y: this.y,

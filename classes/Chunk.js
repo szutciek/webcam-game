@@ -73,7 +73,6 @@ module.exports = class Chunk {
     this.dynamicObjects.forEach((o) => {
       list.push(o.objectInfo);
     });
-    // console.log(list);
     return list;
   }
 

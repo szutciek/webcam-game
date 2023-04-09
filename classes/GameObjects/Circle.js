@@ -15,6 +15,7 @@ module.exports = class Circle extends GameObject {
 
   get objectInfo() {
     return {
+      id: this.id,
       shape: "circ",
       x: this.x,
       y: this.y,

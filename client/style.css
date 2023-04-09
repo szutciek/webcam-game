@@ -33,7 +33,7 @@ body {
 }
 .fixed .chat {
   pointer-events: auto;
-  user-select: all;
+  user-select: auto;
 
   width: 420px;
 }
@@ -53,6 +53,7 @@ body {
 .fixed .chat input::placeholder {
   font-size: 1rem;
   color: #b4b4b4;
+  user-select: none;
 }
 .fixed .chat input:hover,
 .fixed .chat input:focus {
@@ -223,7 +224,6 @@ body {
 
   cursor: pointer;
   pointer-events: auto;
-  user-select: auto;
 
   transition: 0.2s;
 }
