@@ -114,9 +114,11 @@ export default class ClientController {
     }
 
     if (gameMode === "soccer") {
+      this.currentGameMode = "soccer";
       this.gameModeController = new Soccer(this, this.#ws);
     }
     if (gameMode === "open") {
+      this.currentGameMode = "open";
       this.gameModeController = new Open(this, this.#ws);
     }
   }

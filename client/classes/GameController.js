@@ -134,12 +134,12 @@ export default class GameController {
       // DISPLAYING STATS =========================================================
       // ==========================================================================
 
-      document.getElementById(
-        "renderedPlayers"
-      ).innerText = `${prepared.length} Players`;
-      document.getElementById(
-        "renderedItems"
-      ).innerText = `${items.length} Objects, `;
+      // document.getElementById(
+      //   "renderedPlayers"
+      // ).innerText = `${prepared.length} Players`;
+      // document.getElementById(
+      //   "renderedItems"
+      // ).innerText = `${items.length} Objects, `;
 
       // ==========================================================================
       // FINISHING TOUCHES ========================================================
