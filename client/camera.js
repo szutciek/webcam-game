@@ -3,13 +3,13 @@ const canvasStream = document.createElement("canvas");
 const context = canvasStream.getContext("2d");
 
 const [width, height] = [100, 100];
-let stream = undefined;
+export let stream = undefined;
 
 export const requestCameraPermission = () => {
   return new Promise(async (res, rej) => {
     try {
       const permission = await navigator.permissions.query({ name: "camera" });
-      if (permission.state === "granted") res();
+      if (permission.state !== "denied") res();
       rej(new Error("Couldn't get camera permissions"));
     } catch (err) {
       rej(new Error("Couldn't get camera permissions"));

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign up - Webcam game</title>
+    <link rel="stylesheet" href="/font.css" />
+    <link rel="stylesheet" href="/pages/signup.css" />
+    <link rel="stylesheet" href="/pages/fancyInput.css" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <script src="/pages/signup.js" defer type="module"></script>
+  </head>
+  <body>
+    <ul class="navigation flexVert">
+      <li class="flexVert">
+        <img
+          src="https://assets.kanapka.eu/icons/chevron-back-outline.svg"
+          alt="Back icon"
+        />
+        <a href="/">Player</a>
+      </li>
+    </ul>
+
+    <ul class="messages" id="messages"></ul>
+
+    <div class="container">
+      <div class="progress">
+        <ul>
+          <li data-page="customization" class="active">Customization</li>
+          <li data-page="information">Information</li>
+          <li data-page="authentication">Authentication</li>
+        </ul>
+        <div class="bar"><div id="indicator"></div></div>
+      </div>
+      <div class="grid">
+        <div class="slider">
+          <div id="sliding">
+            <div class="page" data-title="customization">
+              <div class="top">
+                <div class="title">
+                  <h1>Sign up</h1>
+                  <h2>
+                    Begin by filling the inputs below with your preffered
+                    information.
+                  </h2>
+                </div>
+
+                <div class="form">
+                  <div
+                    class="fancyInput"
+                    data-field="username"
+                    data-page="customization"
+                  >
+                    <div class="inputArea">
+                      <p id="placeholder">Username</p>
+                      <input type="text" />
+                    </div>
+                    <div class="errorArea hidden">
+                      <!-- prettier-ignore -->
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M248,64C146.39,64,64,146.39,64,248s82.39,184,184,184,184-82.39,184-184S349.61,64,248,64Z" style="fill:none;stroke:#FFF;stroke-miterlimit:10;stroke-width:32px"/><polyline points="220 220 252 220 252 336" style="fill:none;stroke:#FFF;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="208" y1="340" x2="296" y2="340" style="fill:none;stroke:#FFF;stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px"/><path style="fill:#FFF" d="M248,130a26,26,0,1,0,26,26A26,26,0,0,0,248,130Z"/></svg>
+                      <h6 id="error"></h6>
+                    </div>
+                  </div>
+                  <div
+                    class="fancyInput"
+                    data-field="panelColor"
+                    data-page="customization"
+                  >
+                    <div class="inputArea">
+                      <p id="placeholder">Panel Color</p>
+                      <input type="color" />
+                    </div>
+                    <div class="errorArea hidden">
+                      <!-- prettier-ignore -->
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M248,64C146.39,64,64,146.39,64,248s82.39,184,184,184,184-82.39,184-184S349.61,64,248,64Z" style="fill:none;stroke:#FFF;stroke-miterlimit:10;stroke-width:32px"/><polyline points="220 220 252 220 252 336" style="fill:none;stroke:#FFF;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="208" y1="340" x2="296" y2="340" style="fill:none;stroke:#FFF;stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px"/><path style="fill:#FFF" d="M248,130a26,26,0,1,0,26,26A26,26,0,0,0,248,130Z"/></svg>
+                      <h6 id="error"></h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="bottom">
+                <button class="pageChange next" data-page="information">
+                  Next step
+                </button>
+              </div>
+            </div>
+            <div class="page" data-title="information">
+              <div class="top">
+                <div class="title">
+                  <h2>Continue by entering real contact information.</h2>
+                </div>
+
+                <div class="form">
+                  <div
+                    class="fancyInput"
+                    data-field="email"
+                    data-page="information"
+                  >
+                    <div class="inputArea">
+                      <p id="placeholder">Email</p>
+                      <input type="email" />
+                    </div>
+                    <div class="errorArea hidden">
+                      <!-- prettier-ignore -->
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M248,64C146.39,64,64,146.39,64,248s82.39,184,184,184,184-82.39,184-184S349.61,64,248,64Z" style="fill:none;stroke:#FFF;stroke-miterlimit:10;stroke-width:32px"/><polyline points="220 220 252 220 252 336" style="fill:none;stroke:#FFF;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="208" y1="340" x2="296" y2="340" style="fill:none;stroke:#FFF;stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px"/><path style="fill:#FFF" d="M248,130a26,26,0,1,0,26,26A26,26,0,0,0,248,130Z"/></svg>
+                      <h6 id="error"></h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="bottom">
+                <button class="pageChange secondary" data-page="customization">
+                  Back
+                </button>
+                <button class="pageChange next" data-page="authentication">
+                  Next step
+                </button>
+              </div>
+            </div>
+            <div class="page" data-title="authentication">
+              <div class="top">
+                <div class="title">
+                  <h2>
+                    Enter information that you will remember as I don't have a
+                    mail server yet.
+                  </h2>
+                </div>
+
+                <div class="form">
+                  <div
+                    class="fancyInput"
+                    data-field="password"
+                    data-page="authentication"
+                  >
+                    <div class="inputArea">
+                      <p id="placeholder">Create Password</p>
+                      <input type="password" />
+                    </div>
+                    <div class="errorArea hidden">
+                      <!-- prettier-ignore -->
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M248,64C146.39,64,64,146.39,64,248s82.39,184,184,184,184-82.39,184-184S349.61,64,248,64Z" style="fill:none;stroke:#FFF;stroke-miterlimit:10;stroke-width:32px"/><polyline points="220 220 252 220 252 336" style="fill:none;stroke:#FFF;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="208" y1="340" x2="296" y2="340" style="fill:none;stroke:#FFF;stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px"/><path style="fill:#FFF" d="M248,130a26,26,0,1,0,26,26A26,26,0,0,0,248,130Z"/></svg>
+                      <h6 id="error"></h6>
+                    </div>
+                  </div>
+                  <div
+                    class="fancyInput"
+                    data-field="passwordRepeat"
+                    data-page="authentication"
+                  >
+                    <div class="inputArea">
+                      <p id="placeholder">Repeat Password</p>
+                      <input type="password" />
+                    </div>
+                    <div class="errorArea hidden">
+                      <!-- prettier-ignore -->
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M248,64C146.39,64,64,146.39,64,248s82.39,184,184,184,184-82.39,184-184S349.61,64,248,64Z" style="fill:none;stroke:#FFF;stroke-miterlimit:10;stroke-width:32px"/><polyline points="220 220 252 220 252 336" style="fill:none;stroke:#FFF;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="208" y1="340" x2="296" y2="340" style="fill:none;stroke:#FFF;stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px"/><path style="fill:#FFF" d="M248,130a26,26,0,1,0,26,26A26,26,0,0,0,248,130Z"/></svg>
+                      <h6 id="error"></h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="bottom">
+                <button class="pageChange secondary" data-page="information">
+                  Back
+                </button>
+                <button class="pageChange submit" id="submit">Sign up</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="preview" id="colorPreview">
+            <video id="cameraPreview"></video>
+            <h1 id="usernamePreview"></h1>
+            <p id="emailPreview"></p>
+          </div>
+        </div>
+      </div>
+      <div class="other">
+        <a href="/signin">Sign in</a>
+      </div>
+    </div>
+  </body>
+</html>

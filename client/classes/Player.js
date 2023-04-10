@@ -1,13 +1,20 @@
 const maxS = 15;
+const diff = 1;
 
 const f = (x) => {
   // 2 is vert stretch, 1 is horizontal translation, using change of base
-  return (15 * Math.log(x + 1)) / Math.log(8);
+  return (10 * (15 * Math.log(x + 1))) / Math.log(8);
+};
+
+const lerp = (s, e, t) => {
+  return (1 - t) * s + t * e;
 };
 
 export default class Player {
   #x = 0;
   #y = 0;
+
+  prevPos = undefined;
 
   #w = 100;
   #h = 200;
@@ -26,65 +33,68 @@ export default class Player {
     madRight: false,
   };
 
-  constructor(position = [0, 0, 100, 200]) {
+  lastTimeStamp = undefined;
+
+  constructor(position = [0, 0, 100, 200], username = "Anonymous") {
     this.#x = position[0];
     this.#y = position[1];
     this.#w = position[2];
     this.#h = position[3];
+
+    this.username = username;
   }
 
-  #subtractVelocity = () => {
+  subtractVelocity = () => {
     if (!this.pose.crouching) {
       if (!this.#inpS && !this.#inpN) {
-        this.#velY /= 1.2;
+        this.#velY = lerp(this.#velY, 0, 0.1);
       }
       if (!this.#inpW && !this.#inpE) {
-        this.#velX /= 1.2;
+        this.#velX = lerp(this.#velX, 0, 0.1);
       }
     } else {
       if (!this.#inpS && !this.#inpN) {
-        this.#velY /= 1.7;
+        this.#velY = lerp(this.#velY, 0, 0.3);
       }
       if (!this.#inpW && !this.#inpE) {
-        this.#velX /= 1.7;
+        this.#velX = lerp(this.#velX, 0, 0.3);
       }
     }
   };
-  #addVelocity = () => {
-    // if (this.#inpN && this.#velY < maxX) {
-    //   this.#velY += 0.6;
-    // }
-    // if (this.#inpS && this.#velY > -maxX) {
-    //   this.#velY -= 0.6;
-    // }
-
+  addVelocity = () => {
     let currentMax = maxS;
     if (this.pose.crouching) currentMax /= 20;
 
     if (this.#inpN && this.#velY > -currentMax) {
-      this.#velY -= 0.6;
+      this.#velY -= diff;
     }
     if (this.#inpS && this.#velY < currentMax) {
-      this.#velY += 0.6;
+      this.#velY += diff;
     }
-
     if (this.#inpE && this.#velX < currentMax) {
-      this.#velX += 0.6;
+      this.#velX += diff;
     }
     if (this.#inpW && this.#velX > -currentMax) {
-      this.#velX -= 0.6;
+      this.#velX -= diff;
+    }
+
+    if (Math.abs(this.#velX) > currentMax) {
+      this.#velX = Math.sign(this.#velX) * currentMax;
+    }
+    if (Math.abs(this.#velY) > currentMax) {
+      this.#velY = Math.sign(this.#velY) * currentMax;
+    }
+
+    if (Math.abs(this.#velX) < 0.1) {
+      this.#velX = 0;
+    }
+    if (Math.abs(this.#velY) < 0.1) {
+      this.#velY = 0;
     }
   };
 
   activateMovement() {
-    document.addEventListener("keypress", (e) => {
-      // e.stopPropagation();
-      // e.preventDefault();
-    });
     document.addEventListener("keydown", (e) => {
-      // e.stopPropagation();
-      // e.preventDefault();
-
       if (e.key === "w" || e.key === "W") {
         this.#inpN = true;
       }
@@ -98,7 +108,6 @@ export default class Player {
         this.#inpE = true;
       }
 
-      // SPECIAL KEYS
       if (e.key === "Shift") {
         this.pose.crouching = true;
 
@@ -124,7 +133,6 @@ export default class Player {
         this.#inpE = false;
       }
 
-      // SPECIAL KEYS
       if (e.key === "Shift") {
         this.pose.crouching = false;
 
@@ -142,106 +150,94 @@ export default class Player {
     document.removeEventListener("keypress");
   }
 
-  checkCollisions(currPos, obstacles, react = false) {
-    if (!currPos || !obstacles)
-      throw new Error("Incomplete data for collision detection");
+  serverOverride({ x, y, w, h }) {
+    this.#x = lerp(this.#x, x, 0.4);
+    this.#y = lerp(this.#y, y, 0.4);
+    this.#w = w;
+    this.#h = h;
+  }
 
-    const right = currPos.x + currPos.w;
-    const left = currPos.x;
-    const bottom = currPos.y + currPos.h;
-    const top = currPos.y;
-
-    let horizontalCollision = false;
-
-    for (const o of obstacles) {
-      const colVert = top <= o.yMap + o.h && bottom >= o.yMap;
-      const colHor = left <= o.xMap + o.w && right >= o.xMap;
-
-      if (colHor && o.ignore) horizontalCollision = true;
-
-      if (!o.ignore && colHor && colVert) {
-        horizontalCollision = true;
-
-        if (
-          bottom <= o.yMap + o.h &&
-          bottom >= o.yMap &&
-          right - 25 > o.xMap &&
-          left + 25 < o.xMap + o.w
-        ) {
-          this.#velY = 0;
-          this.#y = o.yMap - currPos.h;
-        }
-
-        if (
-          top <= o.yMap + o.h &&
-          top >= o.yMap &&
-          right - 25 > o.xMap &&
-          left + 25 < o.xMap + o.w
-        ) {
-          this.#velY = 0;
-          this.#y = o.yMap + o.h;
-        }
-
-        if (
-          right <= o.xMap + o.w &&
-          right >= o.xMap &&
-          bottom - 25 > o.yMap &&
-          top + 25 < o.yMap + o.h
-        ) {
-          this.#velX = 0;
-          this.#x = o.xMap - currPos.w;
-          // react to the right
-          react && (this.pose.madRight = true);
-        }
-
-        if (
-          left <= o.xMap + o.w &&
-          left >= o.xMap &&
-          bottom - 25 > o.yMap &&
-          top + 25 < o.yMap + o.h
-        ) {
-          this.#velX = 0;
-          this.#x = o.xMap + o.w;
-          // react to the left
-          react && (this.pose.madLeft = true);
-        }
-      }
+  rectIntersect(x1, y1, w1, h1, x2, y2, w2, h2) {
+    if (x2 >= w1 + x1 || x1 >= w2 + x2 || y2 >= h1 + y1 || y1 >= h2 + y2) {
+      return false;
     }
+    return true;
+  }
 
-    if (!horizontalCollision) {
-      this.pose.madLeft = false;
-      this.pose.madRight = false;
+  collisionDetectionSAT(target) {
+    if (target.shape === "rect" || target.shape === "player") {
+      // if not colliding and is not a player return
+      if (!target.colliding && target.shape !== "player") return;
+
+      if (
+        !this.rectIntersect(
+          this.#x,
+          this.#y,
+          this.#w,
+          this.#h,
+          target.xMap,
+          target.yMap,
+          target.w,
+          target.h
+        )
+      )
+        return;
+
+      const halfWidthPlayerX = this.#w / 2;
+      const halfWidthTargetX = target.w / 2;
+
+      const centerPlayerX = this.#x + halfWidthPlayerX;
+      const centerTargetX = target.xMap + halfWidthTargetX;
+
+      const diffX = centerTargetX - centerPlayerX;
+      const gapX = diffX - halfWidthPlayerX - halfWidthTargetX;
+
+      const halfHeightPlayer = this.#h / 2;
+      const halfHeightTarget = target.h / 2;
+
+      const centerPlayerY = this.#y + halfHeightPlayer;
+      const centerTargetY = target.yMap + halfHeightTarget;
+
+      const diffY = centerTargetY - centerPlayerY;
+      const gapY = diffY - halfHeightPlayer - halfHeightTarget;
+
+      const determineDisplacement = (gap, playerDimension, targetDimension) => {
+        let min = gap;
+
+        const other = gap + playerDimension + targetDimension;
+        if (other < Math.abs(min)) min = other;
+
+        return min;
+      };
+
+      const xDisp = determineDisplacement(gapX, this.#w, target.w);
+      const yDisp = determineDisplacement(gapY, this.#h, target.h);
+
+      if (Math.abs(yDisp) < Math.abs(xDisp)) {
+        this.#velY = 0;
+        this.#y += yDisp;
+      } else {
+        this.#velX = 0;
+        this.#x += xDisp;
+      }
+
+      return;
+    } else if (target.shape === "circ") {
+      // if not colliding return
+      if (!target.colliding) return;
+
+      return;
     }
   }
 
-  calcMovement = (obstacles) => {
-    this.#addVelocity();
-    this.#subtractVelocity();
-
-    // we doing velocity in px/frame
-    // actually kinda stupid cause velocity isnt velocity but anyways
-
-    if (this.#velX < 0) this.#x += -f(Math.abs(this.#velX));
-    if (this.#velX > 0) this.#x += f(Math.abs(this.#velX));
-    if (this.#velY < 0) this.#y += -f(Math.abs(this.#velY));
-    if (this.#velY > 0) this.#y += f(Math.abs(this.#velY));
-
-    this.checkCollisions(
-      { x: this.#x, y: this.#y, w: this.#w, h: this.#h },
-      obstacles
-    );
-
-    // this.#x += this.#velX;
-    // this.#y += this.#velY;
+  performMovement = (secondsPassed) => {
+    this.#x += Math.sign(this.#velX) * f(Math.abs(this.#velX * secondsPassed));
+    this.#y += Math.sign(this.#velY) * f(Math.abs(this.#velY * secondsPassed));
 
     document.getElementById("position").innerText = `${Math.floor(
       this.#x
     )}, ${Math.floor(this.#y)}`;
   };
-
-  syncMovement() {
-    currentSync.syncPosition(this.#x, this.#y);
-  }
 
   get x() {
     return this.#x;
@@ -254,5 +250,33 @@ export default class Player {
   }
   get h() {
     return this.#h;
+  }
+  get velX() {
+    return this.#velX;
+  }
+  get velY() {
+    return this.#velY;
+  }
+  get position() {
+    return {
+      x: this.#x,
+      y: this.#y,
+      w: this.#w,
+      h: this.#h,
+    };
+  }
+  get velocities() {
+    return {
+      x: this.#velX,
+      y: this.#velY,
+    };
+  }
+  get inputs() {
+    return {
+      n: this.#inpN,
+      e: this.#inpE,
+      s: this.#inpS,
+      w: this.#inpW,
+    };
   }
 }

@@ -1,20 +1,17 @@
-const { randomUUID } = require("crypto");
-const { WebSocketServer: WSS, WebSocket: ws } = require("ws");
+const { WebSocketServer: WSS } = require("ws");
 const UserError = require("./utils/UserError.js");
 const handleSendError = require("./utils/handleSendError.js");
-const { validateUUID } = require("./utils/validators");
 const clients = require("./state/clients");
 const {
   handleAuthClient,
   handleClientLeave,
 } = require("./controllers/gameClientController");
 const {
-  handleSyncPosition,
-  handleSyncPositionAndCamera,
+  handleSyncMovement,
+  handleSyncCam,
+  handleChatMessage,
 } = require("./controllers/gameSyncController.js");
 const { handleRoomJoin } = require("./controllers/gameRoomController");
-
-const objects = require("./gameObjects");
 
 const wss = new WSS({ port: 5501 });
 
@@ -26,24 +23,27 @@ wss.on("connection", function connection(ws) {
         return await handleAuthClient(message, ws);
       }
 
-      if (!message.uuid) throw new UserError("UUID required to sync");
       if (!ws.uuid) throw new UserError("UUID required to sync");
-      if (ws.uuid !== message.uuid) throw new UserError("UUID is not the same");
-      if (!validateUUID(message.uuid)) throw new UserError("UUID is not valid");
-      const client = clients.find(message.uuid);
+      message.uuid = ws.uuid;
+
+      const client = clients.find(ws.uuid);
       if (!client) throw new UserError("Unknown UUID");
 
-      if (message.type === "inf") {
-        return handleSyncPosition(message, client, ws);
+      if (message.type === "ping") {
+        ws.send(JSON.stringify({ type: "pong", time: message.time }));
       }
 
-      if (message.type === "infcam") {
-        return handleSyncPositionAndCamera(message, client, ws);
+      if (message.type === "mov") {
+        return handleSyncMovement(message, client, ws);
       }
 
-      // if (message.type === "cam") {
-      //   return handleSyncCam(message, client, ws);
-      // }
+      if (message.type === "cam") {
+        return handleSyncCam(message, client, ws);
+      }
+
+      if (message.type === "chatmsg") {
+        return handleChatMessage(message, client);
+      }
 
       if (message.type === "roomjoin") {
         return await handleRoomJoin(message, ws, client);
@@ -55,14 +55,18 @@ wss.on("connection", function connection(ws) {
     } catch (err) {
       if (err.name === "JsonWebTokenError")
         err = new UserError("Error while decoding token", 400);
-
-      console.log(err);
+      if (err.name === "TokenExpiredError")
+        err = new UserError("Token expired. Log in again", 401);
 
       handleSendError(err, ws);
     }
   });
 
   ws.on("close", () => {
+    handleClientLeave(ws.uuid, clients.find(ws.uuid));
+  });
+
+  ws.on("error", () => {
     handleClientLeave(ws.uuid, clients.find(ws.uuid));
   });
 });

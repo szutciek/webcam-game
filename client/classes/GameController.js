@@ -11,15 +11,22 @@ export default class GameController {
   #vh = window.innerHeight;
 
   #interval = undefined;
-  #includeCam = 0;
-  #webcamInterval = undefined;
+  #iteration = 0;
 
-  constructor(player, ws, uuid, gameObjects) {
-    if (!player) throw new Error("Can't create game - player undefined");
-    this.player = player;
+  lastTimeStamp = 0.015;
+  serverTimeOrigin = 0;
+  currentTick = 0;
+
+  constructor(controller, ws) {
+    if (!controller.player)
+      throw new Error("Can't create game - player undefined");
+
+    this.controller = controller;
+    this.player = controller.player;
     this.#ws = ws;
-    this.uuid = uuid;
-    this.gameObjects = gameObjects;
+    this.uuid = controller.uuid;
+    this.gameObjects = controller.gameObjects;
+    this.serverTimeOrigin = controller.serverTimeOrigin;
   }
 
   startGame() {
@@ -30,19 +37,11 @@ export default class GameController {
     this.centerPlayer();
 
     this.renderFrame();
+
+    // OLD METHOD
     this.#interval = setInterval(() => {
       this.renderFrame();
     }, 1000 / 60);
-
-    // this.#webcamInterval = setInterval(async () => {
-    //   try {
-    //     if (!this.player) return;
-    //     this.player.camera = await takePicture();
-    //     this.syncCamera(this.uuid, this?.player?.camera);
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
-    // }, 1000 / 24);
   }
   stopGame() {
     clearInterval(this.#interval);
@@ -56,60 +55,104 @@ export default class GameController {
 
   async renderFrame() {
     try {
-      const s = performance.now();
+      this.currentTick++;
+      const now = performance.now();
+      const secondsPassed = (now - this.lastTimeStamp) / 1000;
+      const notRounded = this.serverTimeOrigin - performance.timeOrigin + now;
+      const milisecondsServerStart = Math.round(notRounded * 1000) / 1000;
+
+      // ==========================================================================
+      // PREPARING ELEMENTS IN VIEWPORT ===========================================
+      // ==========================================================================
 
       const items = this.returnItemsFrame(this.gameObjects.allObjects);
       const players = this.returnItemsFrame(this.gameObjects.allPlayers);
 
-      this.player.calcMovement(items);
-      this.player.checkCollisions(
-        {
-          x: this.player.x,
-          y: this.player.y,
-          w: this.player.w,
-          h: this.player.h,
-        },
-        players,
-        true
-      );
+      // ==========================================================================
+      // MOVEMENT =================================================================
+      // ==========================================================================
+
+      this.player.addVelocity();
+      this.player.subtractVelocity();
+      this.player.performMovement(secondsPassed);
+
+      // ==========================================================================
+      // COLLISIONS ===============================================================
+      // ==========================================================================
+
+      items.forEach((item) => {
+        this.player.collisionDetectionSAT(item, false);
+      });
+
+      players.forEach((item) => {
+        this.player.collisionDetectionSAT(item, true);
+      });
+
+      // ==========================================================================
+      // SENDING POSITION TO SERVER (for validation) ==============================
+      // ==========================================================================
 
       if (this.#ws.readyState === WebSocket.OPEN) {
-        // camera script
-        if (this.#includeCam % 3 === 0) {
+        if (this.#iteration % 3 === 0) {
           if (!this.player) return;
-          this.player.camera = await takePicture();
-          this.syncPositionAndCamera();
-          this.#includeCam = 0;
-        } else {
-          this.syncPosition();
+          this.player.camera = takePicture();
+          this.syncCamera();
         }
-        // only position script
+        if (this.#iteration % 30 === 0) {
+          this.ping();
+        }
+        this.syncMovement(milisecondsServerStart);
       }
-      // comment out to have stationary camera
-      this.centerPlayer();
 
-      const promises = players.map((player) => canvas.prepareCamera(player));
+      // ==========================================================================
+      // RENDERING PROCESS ========================================================
+      // ==========================================================================
+
+      this.centerPlayer();
+      const promises = [];
+      players.forEach((player) => promises.push(canvas.prepareCamera(player)));
+      items.forEach((item) => {
+        if (item.texture.type === "graphic") {
+          canvas.prepareGraphic(item);
+        }
+      });
       const pT = this.translateInView(this.player);
       promises.push(canvas.prepareCamera(pT));
       const prepared = await Promise.all(promises);
 
       canvas.clear();
-      // change to support image textures
       items.forEach((i) => canvas.drawItem(i));
-      // players.forEach((i) => canvas.draw([i.x, i.y, i.w, i.h], "#555555"));
-      prepared.forEach((i) => canvas.drawPlayer(i, i.image, i.pose));
+      prepared.forEach((i) => canvas.drawPlayer(i));
 
-      document.getElementById("renderTime").innerText = `${
-        performance.now() - s
-      }`;
-      document.getElementById(
-        "renderedPlayers"
-      ).innerText = `${prepared.length} Players`;
-      document.getElementById(
-        "renderedItems"
-      ).innerText = `${items.length} Objects, `;
+      // ==========================================================================
+      // GAME TICK ===============================================================
+      // ==========================================================================
 
-      this.#includeCam++;
+      this.controller.gameModeController?.tick();
+
+      // ==========================================================================
+      // DISPLAYING STATS =========================================================
+      // ==========================================================================
+
+      // document.getElementById(
+      //   "renderedPlayers"
+      // ).innerText = `${prepared.length} Players`;
+      // document.getElementById(
+      //   "renderedItems"
+      // ).innerText = `${items.length} Objects, `;
+
+      // ==========================================================================
+      // FINISHING TOUCHES ========================================================
+      // ==========================================================================
+
+      this.#iteration++;
+      if (this.#iteration === 120) this.#iteration === 0;
+      this.lastTimeStamp = performance.now();
+
+      // dont work but has potential
+      // window.requestAnimationFrame(() => {
+      //   this.renderFrame();
+      // });
     } catch (err) {
       console.warn(err);
     }
@@ -125,12 +168,13 @@ export default class GameController {
   }
 
   returnItemsFrame = (items) => {
-    if (!(items instanceof Map)) return;
+    if (items == undefined) return;
+    // if (!(items instanceof Map)) return;
 
     const maxRight = this.#x + this.#vw;
     const maxBottom = this.#y + this.#vh;
 
-    let list = [];
+    const list = [];
     items.forEach((i) => {
       if (
         i.x < maxRight &&
@@ -142,43 +186,36 @@ export default class GameController {
         i.yMap = i.y;
         list.push(this.translateInView(i));
       }
+      return;
     });
     return list;
   };
 
-  syncPositionAndCamera() {
+  setServerTimeOrigin(time) {
+    this.serverTimeOrigin = time;
+  }
+
+  syncCamera() {
     this.send(
       JSON.stringify({
-        type: "infcam",
-        uuid: this.uuid,
-        position: [this.player.x, this.player.y, this.player.w, this.player.h],
-        pose: this.player.pose,
+        type: "cam",
         camera: this.player?.camera,
       })
     );
   }
 
-  syncPosition() {
+  syncMovement(timeStamp) {
     this.send(
       JSON.stringify({
-        type: "inf",
-        uuid: this.uuid,
-        position: [this.player.x, this.player.y, this.player.w, this.player.h],
+        type: "mov",
+        velocities: this.player.velocities,
+        position: this.player.position,
         pose: this.player.pose,
+        relativeTimeStamp: timeStamp,
+        tick: this.currentTick,
       })
     );
   }
-
-  // too many requests - cam data added every 3rd instead
-  // syncCamera(id, b64) {
-  //   this.send(
-  //     JSON.stringify({
-  //       type: "cam",
-  //       uuid: id,
-  //       data: b64,
-  //     })
-  //   );
-  // }
 
   send(payload) {
     if (this.#ws.readyState === WebSocket.OPEN) this.#ws.send(payload);
@@ -195,5 +232,14 @@ export default class GameController {
     window.addEventListener("resize", () => {
       this.windowResize();
     });
+  }
+
+  ping() {
+    this.#ws.send(
+      JSON.stringify({
+        type: "ping",
+        time: performance.now(),
+      })
+    );
   }
 }

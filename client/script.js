@@ -1,25 +1,60 @@
 import ClientController from "/classes/ClientController.js";
-import { requestCameraPermission, startStream } from "/camera.js";
+import UIController from "/classes/UIController.js";
+import { requestCameraPermission, startStream, stream } from "/camera.js";
+
+let clientController;
+
+const redirectToSignin = (message, room, map) => {
+  window.location = `/signin?message=${message}${room ? `&room=${room}` : ""}${
+    map ? `&map=${map}` : ""
+  }`;
+};
 
 const setup = async () => {
   try {
+    // handle room selection with ui
+    const search = new URLSearchParams(window.location.search);
+    const room = search.get("room");
+    const map = search.get("map");
+
+    const token = window.localStorage.getItem("token", room, map);
+    if (!token) {
+      redirectToSignin("Please log in to play");
+    }
+    const user = JSON.parse(window.localStorage.getItem("user"));
+    if (!user) {
+      redirectToSignin("Please log in to play", room, map);
+    }
+    UIController.showLoadingScreen(
+      user.username,
+      user?.profile,
+      user?.panelColor
+    );
+
+    UIController.changeLoadStatus("Starting camera stream");
     await requestCameraPermission();
     await startStream();
 
-    // handle user stuff with ui
-    const clientController = new ClientController({
-      token: crypto.randomUUID(),
-      username: "Developer",
+    UIController.showCameraLoadingScreen(stream);
+
+    UIController.changeLoadStatus("Connecting to server");
+    clientController = new ClientController({
+      token,
+      username: user.username,
     });
 
-    // handle room selection with ui
-    let room = new URLSearchParams(window.location.search).get("room");
+    UIController.showUser(user.username, user.panelColor);
 
-    if (!clientController.changeRoom(room || "default")) return;
+    UIController.changeLoadStatus(`Joining room ${room || "default"}`);
+    if (!clientController.changeRoom(room, map)) return;
+    UIController.changeLoadStatus("Starting game");
     clientController.startGame();
+    UIController.hideLoadingScreen();
   } catch (err) {
     console.log(err);
   }
 };
 
 setup();
+
+export { clientController };

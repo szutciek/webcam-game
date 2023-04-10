@@ -13,14 +13,17 @@ module.exports = class Client {
 
   changeRoom(code) {
     this.leaveRoom();
-    this.joinRoom(code);
-  }
 
-  joinRoom(code) {
     this.room = code;
-    rooms.find(code)?.joinRoom(this.uuid);
     this.roomRef = rooms.find(code);
   }
+
+  // breaks because player created on room join method
+  // joinRoom(code) {
+  //   this.room = code;
+  //   rooms.find(code)?.joinRoom(this.uuid);
+  //   this.roomRef = rooms.find(code);
+  // }
 
   leaveRoom() {
     if (!this.room) return;

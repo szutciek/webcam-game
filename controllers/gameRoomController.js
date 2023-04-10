@@ -2,37 +2,57 @@ const rooms = require("../state/rooms");
 const UserError = require("../utils/UserError");
 const { loadMap, findAvalibleMaps } = require("./gameMapController");
 
+const GameMode = require("../classes/GameModes/GameMode.js");
+const Soccer = require("../classes/GameModes/Soccer.js");
+const Open = require("../classes/GameModes/Open.js");
+
 exports.handleRoomJoin = async (message, ws, client) => {
   try {
     let room = rooms.find(message.room);
 
     if (!room) {
-      room = rooms.addRoom(message.room, client.user?._id, 20);
-
-      // add option to choose map and create room in a different way later on
-      let mapCode = undefined;
       const avalibleMaps = await findAvalibleMaps();
-      if (avalibleMaps.includes(`${room.code}.json`)) {
-        mapCode = room.code;
+
+      let mapName;
+      if (
+        avalibleMaps.includes(`${message.map}.json`) &&
+        message.room !== "default"
+      ) {
+        mapName = message.map;
       } else {
-        mapCode = "default";
+        mapName = "default";
       }
 
-      const map = await loadMap(mapCode);
+      room = rooms.addRoom(
+        message.room || "default",
+        mapName,
+        client.user._id,
+        20
+      );
+
+      const map = await loadMap(room.map);
       if (!map) throw new UserError("Map couldn't be loaded", 404);
       const data = JSON.parse(map);
 
-      // data.objects.forEach((obj, i) => {
-      //   setTimeout(() => {
-      //     room.addObject(obj.coords, { type: "color", value: "aqua" });
-      //     setTimeout(() => {
-      //       room.updateObject(obj.coords, obj.texture, obj.ignore);
-      //     }, 30);
-      //   }, i * 20);
-      // });
+      room.setSpawnPoints(data.spawnPoints);
+
+      if (data.config.gameMode == undefined)
+        throw new UserError("Map game mode not specified", 400);
+      if (GameMode.avalibleGameModes.includes(data.config.gameMode)) {
+        if (data.config.gameMode === "soccer") {
+          room.changeGameMode(new Soccer(client.user._id, room));
+        } else {
+          room.changeGameMode(new Open(client.user._id, room));
+        }
+      }
 
       data.objects.forEach((obj) => {
-        room.addObject(obj.coords, obj.texture, obj.ignore);
+        room.addObject(obj.coords, obj.texture, {
+          colliding: obj.colliding,
+          dynamic: obj.dynamic,
+          shape: obj.shape,
+          class: obj?.class,
+        });
       });
     }
 
@@ -40,7 +60,11 @@ exports.handleRoomJoin = async (message, ws, client) => {
       throw new UserError(`Room ${message.room} is currently full`);
     }
 
-    room.joinRoom(message.uuid);
+    const startPos = room.determineStartPos();
+    startPos.w = 100;
+    startPos.h = 200;
+
+    room.joinRoom(message.uuid, startPos, client.user.username);
     client.changeRoom(message.room);
 
     ws.send(
@@ -48,12 +72,7 @@ exports.handleRoomJoin = async (message, ws, client) => {
         type: "roomjoinOk",
         room: message.room,
         data: {
-          position: [
-            Math.floor(Math.random() * 500) - 250,
-            Math.floor(Math.random() * 500) - 250,
-            100,
-            200,
-          ],
+          position: [startPos.x, startPos.y, startPos.w, startPos.h],
         },
       })
     );
@@ -63,13 +82,17 @@ exports.handleRoomJoin = async (message, ws, client) => {
 };
 
 exports.handleRoomLeave = (message, ws, client) => {
-  // leaves in room and client
-  client.leaveRoom(message.room);
+  try {
+    // leaves in room and client
+    client.leaveRoom(message.room);
 
-  ws?.send(
-    JSON.stringify({
-      type: "roomleaveOk",
-      room: message.room,
-    })
-  );
+    ws?.send(
+      JSON.stringify({
+        type: "roomleaveOk",
+        room: message.room,
+      })
+    );
+  } catch (err) {
+    throw err;
+  }
 };

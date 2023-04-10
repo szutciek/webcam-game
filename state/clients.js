@@ -27,6 +27,16 @@ class Clients {
     }
   }
 
+  alreadyOnline(id) {
+    let online = false;
+    this.#clients.forEach((cl) => {
+      if (String(cl.user._id) === String(id)) {
+        online = true;
+      }
+    });
+    return online;
+  }
+
   allClients() {
     return this.#clients;
   }

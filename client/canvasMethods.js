@@ -107,3 +107,10 @@ export const drawBody = (ctx, x, y, w, h, pose) => {
 
   ctx.stroke();
 };
+
+export const drawTag = (ctx, x, y, w, _, name) => {
+  ctx.font = "16px Poppins";
+  ctx.fillStyle = "black";
+  ctx.textAlign = "center";
+  ctx.fillText(name, x + w / 2, y - 10);
+};

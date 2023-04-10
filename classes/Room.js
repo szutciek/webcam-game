@@ -5,23 +5,152 @@ const { maxPlayersRoom, maxRenderDistance } = require("../config");
 const Chunk = require("./Chunk");
 
 module.exports = class Room {
+  #clock = undefined;
+  #includeCam = 0;
+  #running = false;
+
   #players = new Map();
 
   // 1600px x 1600px
   chunks = new Map();
+  spawnPoints = [];
+
+  lastTimeStamp = 0.015;
+  syncStartTime = undefined;
 
   constructor(
     code,
+    map,
     creatorId,
     maxPlayers = maxPlayersRoom,
     renderDistance = maxRenderDistance
   ) {
     this.code = code;
+    this.map = map;
     this.creatorId = creatorId;
     this.maxPlayers = maxPlayers;
     this.renderDistance = renderDistance;
-
     this.createStartChunks(2);
+  }
+
+  changeGameMode(mode) {
+    this.game = mode;
+    // console.log(`Game mode changed to ${this.game.mode} in room ${this.code}`);
+    this.broadcast({
+      type: "event",
+      event: `Game mode changed to ${this.game.mode}`,
+      icon: "info",
+      classification: "normal",
+    });
+  }
+
+  stopGameClock() {
+    this.#running = false;
+    clearInterval(this.#clock);
+  }
+
+  startGameClock() {
+    this.syncStartTime = performance.timeOrigin;
+    this.#running = true;
+    this.#clock = setInterval(() => {
+      if (this.#players.size === 0) this.stopGameClock();
+      this.gameTick();
+    }, 1000 / 60);
+    // console.log(`Starting game in room ${this.code}.`);
+    this.#players.forEach((p) => this.sendRoomInfo(p.uuid));
+  }
+
+  gameTick() {
+    try {
+      const secondsPassed = (performance.now() - this.lastTimeStamp) / 1000;
+      const currentTime = Math.round(performance.now() * 1000) / 1000;
+
+      if (this.#players.size === 0) {
+        // console.log(`Room ${this.code} is empty. Pausing game.`);
+        this.stopGameClock();
+      }
+
+      // do all kinds of calculations
+      this.#players.forEach((player) => {
+        // calculate if the player hit a dynamic
+        const correction = player.correctMovement(
+          secondsPassed,
+          currentTime,
+          this.getPlayerChunks(player)
+        );
+        if (correction !== undefined)
+          clients.find(player.uuid)?.sendTo({
+            type: "movovd",
+            position: correction,
+          });
+      });
+
+      // collect all data
+      let list = [];
+      if (this.#includeCam % 3 === 0) {
+        list = this.getAllPlayersQuickData(true);
+
+        this.#includeCam = 0;
+      } else {
+        list = this.getAllPlayersQuickData(false);
+      }
+      this.#includeCam++;
+
+      // get game mode to do its stuff
+      this.game.tick(currentTime);
+
+      // sending chunks to all players
+      this.#players.forEach((p) => {
+        this.sendChunks(p);
+      });
+
+      // broadcast the data to clients
+      this.broadcast({
+        type: "pinfo",
+        data: list,
+      });
+
+      this.lastTimeStamp = performance.now();
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
+  setSpawnPoints(points) {
+    this.spawnPoints = points;
+  }
+
+  determineStartPos() {
+    try {
+      const points = [];
+
+      this.spawnPoints.forEach((s) => {
+        let collides = false;
+
+        this.#players.forEach((p) => {
+          const playerCollides = p.rectIntersect(s.x, s.y, 100, 200);
+          if (playerCollides) collides = true;
+        });
+
+        if (!collides) points.push(s);
+      });
+
+      const index = Math.floor(Math.random() * this.spawnPoints.length);
+      if (points.length === 0) return this.spawnPoints[index];
+      const secondIndex = Math.floor(Math.random() * points.length);
+      return points[secondIndex];
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  getAllPlayersQuickData(camera) {
+    const data = [];
+    this.#players.forEach((p) => {
+      data.push(p.quickData(camera));
+    });
+    return data;
   }
 
   createStartChunks(num) {
@@ -29,33 +158,52 @@ module.exports = class Room {
     for (let x = -numPx; x <= numPx; x += 1600) {
       this.chunks.set(x, new Map());
       for (let y = -numPx; y <= numPx; y += 1600) {
-        this.chunks.get(x).set(y, new Chunk(x, y));
+        this.chunks.get(x).set(y, new Chunk(x, y, this.getChunk));
       }
     }
   }
 
-  addObject(coords, texture, ignore) {
+  findCreateReturnChunk(coords) {
     if (coords.x === undefined || coords.y === undefined) return;
-    const chunk = this.getChunk(coords.x, coords.y);
-    if (!chunk)
-      this.addChunk(this.identifyChunk(coords.x), this.identifyChunk(coords.y));
-    this.findChunk(
-      this.identifyChunk(coords.x),
-      this.identifyChunk(coords.y)
-    ).createObject(coords, texture, ignore);
+    let chunk = this.getChunk(coords.x, coords.y);
+    if (!chunk) {
+      chunk = this.addChunk(
+        this.identifyChunk(coords.x),
+        this.identifyChunk(coords.y)
+      );
+    }
+    return chunk;
   }
 
-  getChunk(xI, yI) {
-    // find the chunk
+  addObject(coords, texture, options) {
+    try {
+      const chunk = this.findCreateReturnChunk(coords);
+      const obj = chunk.createObject(coords, texture, options);
+      return obj;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  addSpecialObject(coords, texture, options) {
+    const chunk = this.findCreateReturnChunk(coords);
+    const obj = chunk.createObject(coords, texture, options);
+    return obj;
+  }
+
+  getChunk = (xI, yI) => {
     if (xI === undefined || yI === undefined) return;
     const x = this.identifyChunk(xI);
     if (!this.chunks.has(x)) this.chunks.set(x, new Map());
     const row = this.chunks.get(x);
     const y = this.identifyChunk(yI);
-    const chunk = row.get(y);
-    if (!chunk) row.set(y, new Chunk(x, y));
+    let chunk = row.get(y);
+    if (!chunk) {
+      chunk = new Chunk(x, y, this.getChunk);
+      row.set(y, chunk);
+    }
     return chunk;
-  }
+  };
 
   updateObject(coords, texture) {
     const chunk = this.getChunk(coords.x, coords.y);
@@ -82,7 +230,9 @@ module.exports = class Room {
     if (!this.checkIfAvalibleChunk(x, y)) return;
     // if row missing, add
     if (!this.chunks.has(x)) this.chunks.set(x, new Map());
-    this.chunks.get(x).set(y, new Chunk());
+    const chunk = this.chunks.get(x).set(y, new Chunk(x, y, this.getChunk));
+    // method not tested
+    return chunk;
   }
 
   checkIfMultiple(num) {
@@ -112,35 +262,86 @@ module.exports = class Room {
     return true;
   }
 
-  joinRoom(uuid) {
-    this.#players.set(uuid, new Player(uuid, { x: 0, y: 0, w: 100, h: 200 }));
+  joinRoom(uuid, startPos, username = "Anonymous") {
+    if (!this.#running) this.startGameClock();
+
+    this.#players.set(uuid, new Player(uuid, startPos, username));
+
+    this.sendRoomInfo(uuid);
+
+    this.broadcastRoomInfo();
+    this.broadcast({
+      type: "event",
+      event: `${username} joined the room`,
+      icon: "userJoin",
+      classification: "normal",
+    });
   }
 
   leaveRoom(uuid) {
+    const player = this.#players.get(uuid);
     this.#players.delete(uuid);
+
+    this.broadcastRoomInfo();
+    this.broadcast({
+      type: "event",
+      event: `${player?.username} left the room`,
+      icon: "userLeave",
+      classification: "warning",
+    });
   }
 
-  updatePlayerPosition(uuid, position) {
-    const player = this.#players.get(uuid);
-    if (!player) return;
-    player.updatePosition(position);
-    this.sendChunks(player);
+  getRoomInfo() {
+    const pList = [];
+    this.#players.forEach((p) => {
+      pList.push({
+        uuid: p.uuid,
+        username: p.username,
+      });
+    });
+    return {
+      type: "roominfo",
+      code: this.code,
+      map: this.map,
+      players: pList,
+      game: this.game.mode,
+    };
   }
-  updatePlayerPose(uuid, pose) {
-    const player = this.#players.get(uuid);
-    if (!player) return;
-    player.updatePose(pose);
+
+  sendRoomInfo(uuid) {
+    clients
+      .find(uuid)
+      .sendTo({ ...this.getRoomInfo(), syncStartTime: this.syncStartTime });
   }
+
+  broadcastRoomInfo() {
+    this.broadcast(this.getRoomInfo());
+  }
+
+  getPlayer(uuid) {
+    return this.#players.get(uuid);
+  }
+
+  updatePlayerState(uuid, data) {
+    const player = this.getPlayer(uuid);
+    if (!player) return;
+    player.addClientTick(data);
+    // maybe sending data immediately after tick is better
+    // this.sendChunks(player);
+  }
+
   updatePlayerCamera(uuid, camera) {
-    const player = this.#players.get(uuid);
-    if (!player) return;
-    player.camera = camera;
-    this.#players.set(uuid, player);
+    if (camera != undefined) {
+      const player = this.getPlayer(uuid);
+      if (!player) return;
+      player.camera = camera;
+      this.#players.set(uuid, player);
+    }
   }
 
-  sendChunks(player) {
-    const chunkX = this.identifyChunk(player.x);
-    const chunkY = this.identifyChunk(player.y);
+  getPlayerChunks(player, preview = true) {
+    const chunkX = this.identifyChunk(player.position.x);
+    const chunkY = this.identifyChunk(player.position.y);
 
     const chunkLeft = chunkX - (1600 * maxRenderDistance) / 2;
     const chunkRight = chunkX + (1600 * maxRenderDistance) / 2;
@@ -155,35 +356,51 @@ module.exports = class Room {
         const chunk = this.findChunk(x, y);
         if (!chunk) continue;
         if (chunk.gameObjects.size === 0) continue;
-        if (player.updatedChunks.get(`${x}:${y}`) >= chunk.lastUpdate) continue;
-        player.updatedChunks.set(`${x}:${y}`, Date.now());
-        list.push(...chunk.gameObjects.values());
+        if (
+          preview === false &&
+          player.updatedChunks.get(`${x}:${y}`) >= chunk.lastUpdate
+        ) {
+          continue;
+        }
+        if (preview === false) {
+          player.updatedChunks.set(`${x}:${y}`, Date.now());
+        }
+        list.push(...chunk.allObjects);
       }
     }
 
+    return list;
+  }
+
+  sendChunks(player) {
+    const list = this.getPlayerChunks(player, false);
+
     if (list.length === 0) return;
 
-    // message containing multiple objects - mobj
     const message = {
       type: "mobj",
       data: list,
     };
 
-    clients.find(player.uuid).sendTo(message);
+    clients.find(player.uuid)?.sendTo(message);
   }
 
   inside(uuid) {
     return this.#players.has(uuid);
   }
 
-  broadcast(message, uuid) {
+  broadcast(message, uuid = false) {
     for (const [id, client] of clients.allClients()) {
       if (client.room === this.code) {
-        if (id !== uuid) {
+        if (!uuid || id !== uuid) {
           client.sendTo(message);
         }
       }
     }
+  }
+
+  get players() {
+    return this.#players;
   }
 
   get size() {

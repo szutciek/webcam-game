@@ -3,5 +3,8 @@ module.exports = {
   maxClients: 20,
   maxPlayersRoom: 20,
   maxRenderDistance: 2,
+
   rootDir: __dirname,
+  database: "wcgame",
+  expressPort: 5500,
 };

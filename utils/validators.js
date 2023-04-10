@@ -16,6 +16,12 @@ exports.validateId = (str) => {
   return pattern.test(str);
 };
 
+exports.validateURL = (str) => {
+  if (typeof str !== "string" || str.length > 200) return false;
+  const pattern = /https:[A-Za-z0-9 &/.]+$/;
+  return pattern.test(str);
+};
+
 exports.validateJWT = (str) => {
   if (typeof str !== "string" || str.length > 200) return false;
   const pattern = /^[A-Za-z0-9]+$/;
@@ -54,4 +60,9 @@ exports.validateIp = (str) => {
   if (typeof str !== "string" || str.length > 125) return false;
   const pattern = /^[0-9 fF.:]*$/;
   return pattern.test(str);
+};
+
+exports.rgbMap = (letter) => {
+  const letters = ["a", "b", "c", "d", "e", "f"];
+  return letters.indexOf(letter) + 10;
 };
