@@ -7,6 +7,9 @@ const lerp = (s, e, t) => {
 module.exports = class Soccer extends GameMode {
   mode = "soccer";
 
+  lastContact = undefined;
+  score = [0, 0];
+
   ballVelocity = {
     x: 0,
     y: 0,
@@ -23,6 +26,7 @@ module.exports = class Soccer extends GameMode {
   posts = [];
   goals = [];
 
+  inGoal = false;
   goalArea = {
     y: -150,
     h: 350,
@@ -98,7 +102,7 @@ module.exports = class Soccer extends GameMode {
   tick(currentTime) {
     // check if touching any players
     this.room.players.forEach((p) => {
-      this.ballImpact(p.position, p.velocities);
+      this.ballImpact(p.position, p.velocities, p.uuid);
     });
 
     // check if on border to bounce
@@ -122,11 +126,33 @@ module.exports = class Soccer extends GameMode {
     this.ballVelocity.y = Math.floor((79 * this.ballVelocity.y) / 80);
   }
 
-  centerBall() {
+  resetBall() {
+    this.inGoal = false;
     this.ballVelocity.x = 0;
     this.ballVelocity.y = 0;
     this.ball.r = 30;
     this.ball.updatePosition({ x: -30, y: -30 });
+  }
+
+  handleGoal(goalNr) {
+    let player;
+    this.room.players.forEach((p) => {
+      if (p.uuid === this.lastContact) player = p.username;
+    });
+    if (!player) player = "Anonymous";
+
+    this.inGoal = true;
+    this.score[goalNr]++;
+    this.ball.r = lerp(this.ball.r, 0, 0.2);
+    setTimeout(() => {
+      this.resetBall();
+    }, 1000);
+    this.room.broadcast({
+      type: "game",
+      event: "goal",
+      message: `${player} scored a goal! ${this.score[0]}:${this.score[1]}`,
+      score: this.score,
+    });
   }
 
   controlBallPosition() {
@@ -160,26 +186,21 @@ module.exports = class Soccer extends GameMode {
     });
 
     this.goals.forEach((goal) => {
+      if (this.inGoal === true) return;
       if (goal.class === "soccer_goal_0") {
         if (this.ball.x + this.ball.r * 2 < goal.x + goal.w) {
-          this.ball.r = lerp(this.ball.r, 0, 0.2);
-          setTimeout(() => {
-            this.centerBall();
-          }, 1000);
+          this.handleGoal(0);
         }
       }
       if (goal.class === "soccer_goal_1") {
         if (this.ball.x > goal.x) {
-          this.ball.r = lerp(this.ball.r, 0, 0.2);
-          setTimeout(() => {
-            this.centerBall();
-          }, 1000);
+          this.handleGoal(1);
         }
       }
     });
   }
 
-  ballImpact(position, velocities) {
+  ballImpact(position, velocities, uuid) {
     const colliding = this.circleRectangleCollision(
       {
         x: this.ball.x,
@@ -198,6 +219,8 @@ module.exports = class Soccer extends GameMode {
     const momentumYPlayer = Number(this.playerMass * velocities.y);
     // const momentumYBall = Number(this.ballMass * this.ballVelocity.y);
     this.ballVelocity.y = momentumYPlayer / this.ballMass;
+
+    this.lastContact = uuid;
   }
 
   circleRectangleCollision(circle, rectangle) {

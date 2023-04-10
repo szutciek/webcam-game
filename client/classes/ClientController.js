@@ -186,14 +186,18 @@ export default class ClientController {
       //   "alert",
       //   "warning"
       // );
+      return;
     }
+
     if (message.type === "event") {
       UIController.showMessage(
         message.event,
         message.icon,
         message.classification
       );
+      return;
     }
+
     if (message.type === "chatmsg") {
       UIController.showMessage(
         `${this.user.uuid === message.uuid ? "You" : message.username}: ${
@@ -202,10 +206,18 @@ export default class ClientController {
         "chat",
         "normal"
       );
+      return;
     }
+
     if (message.type === "mobj") {
       this.gameObjects.updateObjects(message.data);
+      return;
     }
+
+    if (message.type === "game") {
+      this.gameModeController.handleMessage(message);
+    }
+
     if (message.type === "error") {
       if ([401, 403].includes(message.code)) {
         const search = new URLSearchParams(document.location.search);
@@ -219,6 +231,7 @@ export default class ClientController {
       }
       return;
     }
+
     if (message.type === "authclientOk") {
       this.user.uuid = message.data.uuid;
       this.updateUser(message.data);
@@ -226,6 +239,7 @@ export default class ClientController {
 
       return;
     }
+
     if (message.type === "roomjoinOk") {
       console.log(`Successfully joined room ${this.room}`);
       UIController.showMessage(
@@ -242,13 +256,17 @@ export default class ClientController {
       this.startRender();
       return;
     }
+
     if (message.type === "userdata") {
       this.updateUser(message.data);
       return;
     }
+
     if (message.type === "roominfo") {
       this.updateRoomInfo(message);
+      return;
     }
+
     if (message.type === "latwarn") {
       console.warn(`High latency: ${message.latency}`);
       UIController.showMessage(
@@ -256,12 +274,18 @@ export default class ClientController {
         "info",
         "warning"
       );
+      return;
     }
 
     if (message.type === "pong") {
       const ping = (performance.now() - message.time) / 2;
       UIController.showPing(ping);
+      return;
     }
+  }
+
+  showMessage(message) {
+    UIController.showMessage(message);
   }
 
   async waitForUUID() {

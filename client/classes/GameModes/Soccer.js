@@ -9,6 +9,37 @@ export default class Soccer {
   constructor(controller, ws) {
     this.controller = controller;
     this.#ws = ws;
+
+    this.createElement();
+  }
+
+  createElement() {
+    this.element = document.getElementById("soccer");
+    const score = document.createElement("div");
+    score.classList.add("score");
+
+    this.homeElement = document.createElement("p");
+    this.homeElement.classList.add("home");
+    this.homeElement.innerText = 0;
+    this.guestsElement = document.createElement("p");
+    this.guestsElement.classList.add("guests");
+    this.guestsElement.innerText = 0;
+
+    score.insertAdjacentElement("beforeend", this.homeElement);
+    score.insertAdjacentElement("beforeend", this.guestsElement);
+    this.element.insertAdjacentElement("afterbegin", score);
+  }
+
+  updateScore(home, guests) {
+    this.homeElement.innerText = home;
+    this.guestsElement.innerText = guests;
+  }
+
+  handleMessage(message) {
+    if (message.event === "goal") {
+      this.controller.showMessage(message.message, "info", "normal");
+      this.updateScore(message.score[0], message.score[1]);
+    }
   }
 
   findBall() {

@@ -1,0 +1,33 @@
+#soccer {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#soccer .score {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+#soccer .score .home {
+  background-color: #e79e55;
+  color: #3a55ec;
+  font-size: 2rem;
+  font-weight: 700;
+  padding: 0.2rem 1rem;
+  min-width: 60px;
+  border-radius: 6px 0 0 6px;
+}
+
+#soccer .score .guests {
+  background-color: #3a55ec;
+  color: #e79e55;
+  font-size: 2rem;
+  font-weight: 700;
+  padding: 0.2rem 1rem;
+  min-width: 60px;
+  border-radius: 0 6px 6px 0;
+}
