@@ -36,12 +36,9 @@ export default class GameController {
     this.player.activateMovement();
     this.centerPlayer();
 
-    this.renderFrame();
-
-    // OLD METHOD
-    this.#interval = setInterval(() => {
+    requestAnimationFrame(() => {
       this.renderFrame();
-    }, 1000 / 60);
+    });
   }
   stopGame() {
     clearInterval(this.#interval);
@@ -55,6 +52,7 @@ export default class GameController {
 
   async renderFrame() {
     try {
+      console.log(this);
       this.currentTick++;
       const now = performance.now();
       const secondsPassed = (now - this.lastTimeStamp) / 1000;
@@ -149,10 +147,9 @@ export default class GameController {
       if (this.#iteration === 120) this.#iteration === 0;
       this.lastTimeStamp = performance.now();
 
-      // dont work but has potential
-      // window.requestAnimationFrame(() => {
-      //   this.renderFrame();
-      // });
+      requestAnimationFrame(() => {
+        this.renderFrame();
+      });
     } catch (err) {
       console.warn(err);
     }
@@ -224,8 +221,6 @@ export default class GameController {
   windowResize() {
     canvas.el.width = window.innerWidth;
     canvas.el.height = window.innerHeight;
-
-    this.renderFrame();
   }
 
   addResizeListener() {

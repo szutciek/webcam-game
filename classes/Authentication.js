@@ -10,7 +10,7 @@ module.exports = class Authentication {
   static encodeToken(_id) {
     return jwt.sign(
       {
-        exp: Math.floor(new Date().getTime() / 1000) + 60 * 60,
+        exp: Math.floor(new Date().getTime() / 1000) + 1 * 24 * 60 * 60,
         _id,
       },
       jwtSecret
