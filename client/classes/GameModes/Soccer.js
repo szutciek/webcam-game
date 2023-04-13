@@ -10,6 +10,7 @@ export default class Soccer {
     this.controller = controller;
     this.#ws = ws;
 
+    this.soccerBallPosition = document.getElementById("soccerBallPosition");
     this.createElement();
   }
 
@@ -60,5 +61,18 @@ export default class Soccer {
     this.ball.rotation += (diff / 2) * Math.sign(diffX);
 
     this.lastBallPosition = { x: this.ball.x, y: this.ball.y };
+
+    const angle = Math.atan(
+      (this.ball.y - this.controller.player.y) /
+        (this.ball.x - this.controller.player.x)
+    );
+
+    const realAngle = 90 + (angle * 180) / Math.PI;
+
+    if (this.ball.x - this.controller.player.x < 0) {
+      this.soccerBallPosition.style.transform = `rotate(${180 + realAngle}deg)`;
+    } else {
+      this.soccerBallPosition.style.transform = `rotate(${realAngle}deg)`;
+    }
   }
 }

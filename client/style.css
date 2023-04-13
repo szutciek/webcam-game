@@ -31,6 +31,18 @@ body {
   top: 2rem;
   left: 2rem;
 }
+.fixed .maps {
+  position: absolute;
+  top: 7rem;
+  right: 2rem;
+  background-color: #00000024;
+  width: 6rem;
+  height: 6rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
 .fixed .chat {
   pointer-events: auto;
   user-select: auto;

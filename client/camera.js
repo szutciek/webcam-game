@@ -24,7 +24,7 @@ export const startStream = () => {
         video: {
           width: 100,
           height: 100,
-          frameRate: 24,
+          frameRate: 15,
           facingMode: "user",
         },
         audio: false,
@@ -83,7 +83,7 @@ const preloadPicture = () => {
 let lastPicture = "";
 setInterval(async () => {
   lastPicture = await preloadPicture();
-}, 1000 / 60);
+}, 1000 / 15);
 
 export const takePicture = () => {
   return lastPicture;

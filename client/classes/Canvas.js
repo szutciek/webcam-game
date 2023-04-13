@@ -125,10 +125,12 @@ export default class Canvas {
       // this.ctx.fillStyle = "#ff9999";
       // this.ctx.fillRect(x, y, w, h);
 
+      drawBody(this.ctx, player);
+
       if (player.username !== "Anonymous") {
         drawTag(this.ctx, x, y, w, h, player.username);
       }
-      drawBody(this.ctx, x, y, w, h, player.pose);
+
       if (player.camera != undefined)
         drawFace(this.ctx, x, y, w, h, player.image);
     } catch (err) {

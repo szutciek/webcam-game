@@ -26,7 +26,7 @@ class UIController {
   };
 
   updateRoomInfo(info) {
-    this.roomPlayersElement.innerText = `${info.code}: ${info.players.length} online, ${info.map}`;
+    this.roomPlayersElement.innerText = `${info.players.length} online, room ${info.code}`;
   }
 
   showLoadingScreen(username, profile, color = "#ffffff") {

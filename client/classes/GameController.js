@@ -52,7 +52,6 @@ export default class GameController {
 
   async renderFrame() {
     try {
-      console.log(this);
       this.currentTick++;
       const now = performance.now();
       const secondsPassed = (now - this.lastTimeStamp) / 1000;
@@ -91,7 +90,7 @@ export default class GameController {
       // ==========================================================================
 
       if (this.#ws.readyState === WebSocket.OPEN) {
-        if (this.#iteration % 3 === 0) {
+        if (this.#iteration % 15 === 0) {
           if (!this.player) return;
           this.player.camera = takePicture();
           this.syncCamera();
@@ -116,11 +115,11 @@ export default class GameController {
       });
       const pT = this.translateInView(this.player);
       promises.push(canvas.prepareCamera(pT));
-      const prepared = await Promise.all(promises);
+      const preparedCameras = await Promise.all(promises);
 
       canvas.clear();
       items.forEach((i) => canvas.drawItem(i));
-      prepared.forEach((i) => canvas.drawPlayer(i));
+      preparedCameras.forEach((i) => canvas.drawPlayer(i));
 
       // ==========================================================================
       // GAME TICK ===============================================================
