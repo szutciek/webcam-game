@@ -163,8 +163,8 @@ export default class Player {
   }
 
   serverOverride({ x, y, w, h }) {
-    this.#x = lerp(this.#x, x, 0.4);
-    this.#y = lerp(this.#y, y, 0.4);
+    this.#x = x;
+    this.#y = y;
     this.#w = w;
     this.#h = h;
   }

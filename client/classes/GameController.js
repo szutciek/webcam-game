@@ -95,11 +95,18 @@ export default class GameController {
           this.player.camera = takePicture();
           this.syncCamera();
         }
-        if (this.#iteration % 30 === 0) {
+        if (this.#iteration % 100 === 0) {
           this.ping();
         }
         this.syncMovement(milisecondsServerStart);
       }
+
+      // ==========================================================================
+      // PREDICTING CHANGES =======================================================
+      // ==========================================================================
+
+      this.gameObjects.predictMovement(secondsPassed);
+      this.controller.gameModeController.predictMovement(secondsPassed);
 
       // ==========================================================================
       // RENDERING PROCESS ========================================================
@@ -125,7 +132,7 @@ export default class GameController {
       // GAME TICK ===============================================================
       // ==========================================================================
 
-      this.controller.gameModeController?.tick();
+      this.controller.gameModeController.tick();
 
       // ==========================================================================
       // DISPLAYING STATS =========================================================
@@ -226,6 +233,14 @@ export default class GameController {
     window.addEventListener("resize", () => {
       this.windowResize();
     });
+  }
+
+  get secondsPassed() {
+    return (performance.now() - this.lastTimeStamp) / 1000;
+  }
+
+  get milisecondsServerStart() {
+    return this.serverTimeOrigin - performance.timeOrigin + performance.now();
   }
 
   ping() {

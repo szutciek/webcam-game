@@ -218,6 +218,7 @@ export default class ClientController {
 
     if (message.type === "game") {
       this.gameModeController.handleMessage(message);
+      return;
     }
 
     if (message.type === "error") {
@@ -266,6 +267,9 @@ export default class ClientController {
 
     if (message.type === "roominfo") {
       this.updateRoomInfo(message);
+      if (this.gameModeController !== undefined) {
+        this.gameModeController.handleMessage(message);
+      }
       return;
     }
 

@@ -1,3 +1,8 @@
+const f = (x) => {
+  // 2 is vert stretch, 1 is horizontal translation, using change of base
+  return (10 * (15 * Math.log(x + 1))) / Math.log(8);
+};
+
 const lerp = (s, e, t) => {
   return (1 - t) * s + t * e;
 };
@@ -30,6 +35,11 @@ export default class Player {
     this.camera = info?.camera;
 
     this.lastUpdate = new Date().getTime();
+  }
+
+  predictMovement(secondsPassed) {
+    this.x += Math.sign(this.velX) * f(Math.abs(this.velX * secondsPassed));
+    this.y += Math.sign(this.velY) * f(Math.abs(this.velY * secondsPassed));
   }
 
   updatePosition([x, y, w, h]) {

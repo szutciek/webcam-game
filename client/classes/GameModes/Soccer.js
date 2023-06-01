@@ -6,12 +6,24 @@ export default class Soccer {
     y: -15,
   };
 
+  previousVelocities = {
+    x: 0,
+    y: 0,
+  };
+  lastBallMove = 0;
+
   constructor(controller, ws) {
     this.controller = controller;
     this.#ws = ws;
 
-    this.soccerBallPosition = document.getElementById("soccerBallPosition");
+    this.initializeMap();
     this.createElement();
+  }
+
+  initializeMap() {
+    const mapDiv = document.getElementById("mapDiv");
+    mapDiv.innerHTML = `<div class="map"><div id="soccerBallPosition"><div class="arrow"></div></div></div>`;
+    this.soccerBallPosition = document.getElementById("soccerBallPosition");
   }
 
   createElement() {
@@ -41,6 +53,15 @@ export default class Soccer {
       this.controller.showMessage(message.message, "info", "normal");
       this.updateScore(message.score[0], message.score[1]);
     }
+    if (message.type === "roominfo") {
+      if (message.score) {
+        this.updateScore(message.score[0], message.score[1]);
+      }
+    }
+  }
+
+  predictMovement(secondsPassed) {
+    this.predictBallMovement(secondsPassed);
   }
 
   findBall() {
@@ -52,15 +73,40 @@ export default class Soccer {
     });
   }
 
+  predictBallMovement(secondsPassed) {
+    // if (this.ball === undefined) return;
+    // const [diffX, diffY] = this.calculateBallMovement();
+    // if (diffX === 0 && diffY === 0) return;
+    // const time =
+    //   this.controller.gameController.milisecondsServerStart - this.lastBallMove;
+    // const velX = diffX / time;
+    // const velY = diffX / time;
+    // console.log(velX * secondsPassed, velY);
+    // // this.ball.x += velX * secondsPassed;
+    // // this.ball.y += velY * secondsPassed;
+    // this.updateLastBallPosition(this.ball.x, this.ball.y);
+  }
+
+  calculateBallMovement() {
+    return [
+      this.ball.x - this.lastBallPosition.x,
+      this.ball.y - this.lastBallPosition.y,
+    ];
+  }
+
+  updateLastBallPosition(x, y) {
+    this.lastBallPosition = { x, y };
+    this.lastBallMove = this.controller.gameController.milisecondsServerStart;
+  }
+
   tick() {
     if (!this.ball) return this.findBall();
 
-    const diffX = this.ball.x - this.lastBallPosition.x;
-    const diffY = this.ball.y - this.lastBallPosition.y;
+    const [diffX, diffY] = this.calculateBallMovement();
     const diff = Math.abs(diffX) + Math.abs(diffY);
     this.ball.rotation += (diff / 2) * Math.sign(diffX);
 
-    this.lastBallPosition = { x: this.ball.x, y: this.ball.y };
+    this.updateLastBallPosition(this.ball.x, this.ball.y);
 
     const angle = Math.atan(
       (this.ball.y - this.controller.player.y) /

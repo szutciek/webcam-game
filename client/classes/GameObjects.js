@@ -74,6 +74,10 @@ export default class GameObjects {
     });
   }
 
+  predictMovement(secondsPassed) {
+    this.#players.forEach((p) => p.predictMovement(secondsPassed));
+  }
+
   set allObjects(elements) {
     elements.forEach(([id, e]) => {
       this.#elements.set(id, e);

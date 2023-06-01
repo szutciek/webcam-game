@@ -7,6 +7,7 @@ const Chunk = require("./Chunk");
 module.exports = class Room {
   #clock = undefined;
   #includeCam = 0;
+  #sendPackets = 0;
   #running = false;
 
   #players = new Map();
@@ -55,7 +56,7 @@ module.exports = class Room {
     this.#clock = setInterval(() => {
       if (this.#players.size === 0) this.stopGameClock();
       this.gameTick();
-    }, 1000 / 60);
+    }, 1000 / 128);
     // console.log(`Starting game in room ${this.code}.`);
     this.#players.forEach((p) => this.sendRoomInfo(p.uuid));
   }
@@ -85,30 +86,29 @@ module.exports = class Room {
           });
       });
 
-      // collect all data
-      let list = [];
-      if (this.#includeCam % 3 === 0) {
-        list = this.getAllPlayersQuickData(true);
-
-        this.#includeCam = 0;
-      } else {
-        list = this.getAllPlayersQuickData(false);
-      }
-      this.#includeCam++;
-
-      // get game mode to do its stuff
       this.game.tick(currentTime);
 
-      // sending chunks to all players
-      this.#players.forEach((p) => {
-        this.sendChunks(p);
-      });
+      // reduce the frequency of sending packets
+      if (this.#sendPackets % 4 === 0) {
+        let list = [];
+        if (this.#includeCam % 3 === 0) {
+          list = this.getAllPlayersQuickData(true);
+          this.#includeCam = 0;
+        } else {
+          list = this.getAllPlayersQuickData(false);
+        }
+        this.#includeCam++;
 
-      // broadcast the data to clients
-      this.broadcast({
-        type: "pinfo",
-        data: list,
-      });
+        this.#players.forEach((p) => this.sendChunks(p));
+
+        this.broadcast({
+          type: "pinfo",
+          data: list,
+        });
+
+        this.#sendPackets = 0;
+      }
+      this.#sendPackets++;
 
       this.lastTimeStamp = performance.now();
     } catch (err) {
@@ -304,6 +304,7 @@ module.exports = class Room {
       code: this.code,
       map: this.map,
       players: pList,
+      score: this.game.score,
       game: this.game.mode,
     };
   }

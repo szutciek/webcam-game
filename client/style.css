@@ -31,7 +31,11 @@ body {
   top: 2rem;
   left: 2rem;
 }
-.fixed .maps {
+.fixed .map {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
   position: absolute;
   top: 7rem;
   right: 2rem;
@@ -42,6 +46,9 @@ body {
   justify-content: center;
   align-items: center;
   border-radius: 50%;
+}
+.fixed .hiddenElement {
+  display: block;
 }
 .fixed .chat {
   pointer-events: auto;
