@@ -247,7 +247,11 @@ export default class GameController {
   }
 
   get milisecondsServerStart() {
-    return this.serverTimeOrigin - performance.timeOrigin + performance.now();
+    return (
+      performance.now() +
+      performance.timeOrigin -
+      this.controller.serverTimeOrigin
+    );
   }
 
   get dimensions() {

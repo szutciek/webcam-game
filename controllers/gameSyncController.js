@@ -33,6 +33,20 @@ exports.handleSyncCam = (data, client, ws) => {
   }
 };
 
+exports.handleGameEvent = (data, client) => {
+  try {
+    if (!client.roomRef || !client.room)
+      throw new UserError("Join a room first");
+
+    if (data.event === null || typeof data.event !== "object")
+      throw new UserError("Input data type wrong");
+
+    client.roomRef.handleEvent(client.uuid, data.event);
+  } catch (err) {
+    throw err;
+  }
+};
+
 exports.handleChatMessage = (data, client) => {
   try {
     client.roomRef.broadcast({

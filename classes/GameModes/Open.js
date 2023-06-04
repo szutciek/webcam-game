@@ -7,6 +7,8 @@ module.exports = class Open extends GameMode {
     super(host, room);
   }
 
+  handleEvent(player, data) {}
+
   tick() {}
 
   get info() {

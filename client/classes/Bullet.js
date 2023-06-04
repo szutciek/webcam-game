@@ -22,7 +22,6 @@ export default class Bullet {
     return {
       timestamp: this.timestamp,
       angle: this.angle,
-      origin: this.origin,
     };
   }
 }

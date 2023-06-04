@@ -251,6 +251,8 @@ module.exports = class Soccer extends GameMode {
     );
   }
 
+  handleEvent(player, data) {}
+
   get info() {
     return {
       score: this.score,

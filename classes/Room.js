@@ -269,7 +269,9 @@ module.exports = class Room {
   joinRoom(uuid, startPos, username = "Anonymous") {
     if (!this.#running) this.startGameClock();
 
-    this.#players.set(uuid, new Player(uuid, startPos, username));
+    const player = new Player(uuid, startPos, username);
+    this.#players.set(uuid, player);
+    this.game.playerJoin(player);
 
     this.sendRoomInfo(uuid);
 
@@ -284,6 +286,7 @@ module.exports = class Room {
 
   leaveRoom(uuid) {
     const player = this.#players.get(uuid);
+    this.game.playerLeave(player);
     this.#players.delete(uuid);
 
     this.broadcastRoomInfo();
@@ -293,6 +296,16 @@ module.exports = class Room {
       icon: "userLeave",
       classification: "warning",
     });
+  }
+
+  handleEvent(uuid, data) {
+    const player = this.#players.get(uuid);
+    if (!player) return;
+
+    if (data.type === "game") {
+      this.game.handleEvent(player, data);
+      return;
+    }
   }
 
   getRoomInfo() {

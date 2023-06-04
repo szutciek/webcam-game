@@ -56,7 +56,14 @@ export default class ShooterV1 {
         canvas.el.height / 2,
     ];
     const bullet = new Bullet(timeStamp, angle, origin, weapon);
-    this.#ws.send();
+    this.controller.sendJSON({
+      type: "gameevt",
+      event: {
+        type: "game",
+        subType: "shot",
+        data: bullet.info,
+      },
+    });
     bullet.draw(canvas);
   }
 
