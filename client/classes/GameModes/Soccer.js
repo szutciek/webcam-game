@@ -54,8 +54,8 @@ export default class Soccer {
       this.updateScore(message.score[0], message.score[1]);
     }
     if (message.type === "roominfo") {
-      if (message.score) {
-        this.updateScore(message.score[0], message.score[1]);
+      if (message.gameInfo.score) {
+        this.updateScore(message.gameInfo.score[0], message.gameInfo.score[1]);
       }
     }
   }
@@ -97,6 +97,10 @@ export default class Soccer {
   updateLastBallPosition(x, y) {
     this.lastBallPosition = { x, y };
     this.lastBallMove = this.controller.gameController.milisecondsServerStart;
+  }
+
+  handleClick(e) {
+    console.log(e);
   }
 
   tick() {

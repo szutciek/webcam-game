@@ -12,5 +12,9 @@ export default class Open {
 
   predictMovement(secondsPassed) {}
 
+  handleClick(e) {
+    console.log(e);
+  }
+
   tick() {}
 }

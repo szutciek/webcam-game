@@ -5,6 +5,6 @@ module.exports = class GameMode {
   }
 
   static get avalibleGameModes() {
-    return ["open", "soccer"];
+    return ["open", "soccer", "shooterV1"];
   }
 };

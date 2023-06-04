@@ -2,11 +2,11 @@ import { wsURL } from "/config.js";
 import Player from "/classes/Player.js";
 import GameObjects from "/classes/GameObjects.js";
 import GameController from "/classes/GameController.js";
-import UIController from "/classes/UIController.js";
 
-const gameModes = ["soccer", "open"];
+const gameModes = ["soccer", "open", "shooterV1"];
 import Soccer from "/classes/GameModes/Soccer.js";
 import Open from "/classes/GameModes/Open.js";
+import ShooterV1 from "/classes/GameModes/ShooterV1.js";
 
 export default class ClientController {
   #ws = undefined;
@@ -19,9 +19,12 @@ export default class ClientController {
   player = undefined;
   serverTimeOrigin = undefined;
 
-  constructor(user) {
+  constructor(user, UIController) {
     if (!user) throw new Error("User required to run client");
     this.user = user;
+
+    this.UIController = UIController;
+    UIController.setClientController(this);
   }
 
   changeRoom(room, map) {
@@ -106,7 +109,7 @@ export default class ClientController {
   changeGameMode(gameMode) {
     console.log(`Changing game mode to ${gameMode}`);
     if (!gameModes.includes(gameMode)) {
-      UIController.showMessage(
+      this.UIController.showMessage(
         `Game mode "${gameMode}" not supported. Try shift + reload.`,
         "alert",
         "warning"
@@ -116,6 +119,10 @@ export default class ClientController {
     if (gameMode === "soccer") {
       this.currentGameMode = "soccer";
       this.gameModeController = new Soccer(this, this.#ws);
+    }
+    if (gameMode === "shooterV1") {
+      this.currentGameMode = "shooterV1";
+      this.gameModeController = new ShooterV1(this, this.#ws);
     }
     if (gameMode === "open") {
       this.currentGameMode = "open";
@@ -127,7 +134,7 @@ export default class ClientController {
     if (info.syncStartTime) {
       this.setServerTimeOrigin(info.syncStartTime);
     }
-    UIController.updateRoomInfo(info);
+    this.UIController.updateRoomInfo(info);
 
     if (info.game !== this.currentGameMode) {
       this.changeGameMode(info.game);
@@ -181,7 +188,7 @@ export default class ClientController {
       console.warn(
         `Illegal movement, correction: [${message.position.x}, ${message.position.y}]`
       );
-      // UIController.showMessage(
+      // this.UIController.showMessage(
       //   `Illegal movement, correction: [${
       //     Math.round(message.position.x * 10) / 10
       //   }, ${Math.round(message.position.y * 10) / 10}]`,
@@ -192,7 +199,7 @@ export default class ClientController {
     }
 
     if (message.type === "event") {
-      UIController.showMessage(
+      this.UIController.showMessage(
         message.event,
         message.icon,
         message.classification
@@ -201,7 +208,7 @@ export default class ClientController {
     }
 
     if (message.type === "chatmsg") {
-      UIController.showMessage(
+      this.UIController.showMessage(
         `${this.user.uuid === message.uuid ? "You" : message.username}: ${
           message.message
         }`,
@@ -230,7 +237,7 @@ export default class ClientController {
           room ? `&room=${room}` : ""
         }${map ? `&map=${map}` : ""}`;
       } else {
-        UIController.showMessage(message.message, "alert", "warning");
+        this.UIController.showMessage(message.message, "alert", "warning");
       }
       return;
     }
@@ -245,7 +252,7 @@ export default class ClientController {
 
     if (message.type === "roomjoinOk") {
       console.log(`Successfully joined room ${this.room}`);
-      UIController.showMessage(
+      this.UIController.showMessage(
         `Successfully joined room ${this.room}`,
         "info",
         "normal"
@@ -275,7 +282,7 @@ export default class ClientController {
 
     if (message.type === "latwarn") {
       console.warn(`High latency: ${message.latency}`);
-      UIController.showMessage(
+      this.UIController.showMessage(
         `High latency: ${Math.round(message.latency * 10) / 10}ms`,
         "info",
         "warning"
@@ -285,13 +292,18 @@ export default class ClientController {
 
     if (message.type === "pong") {
       const ping = (performance.now() - message.time) / 2;
-      UIController.showPing(ping);
+      this.UIController.showPing(ping);
       return;
     }
   }
 
   showMessage(message) {
-    UIController.showMessage(message);
+    this.this.UIController.showMessage(message);
+  }
+
+  handleGameClick(e) {
+    this.gameController.handleClick(e);
+    this.gameModeController.handleClick(e);
   }
 
   async waitForUUID() {

@@ -1,7 +1,7 @@
 const GameMode = require("./GameMode.js");
 
 module.exports = class Open extends GameMode {
-  mode = "open";
+  mode = "shooterV1";
 
   constructor(host, room) {
     super(host, room);

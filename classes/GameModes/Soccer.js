@@ -250,4 +250,10 @@ module.exports = class Soccer extends GameMode {
       (intYTop || intYMiddle || intYBottom)
     );
   }
+
+  get info() {
+    return {
+      score: this.score,
+    };
+  }
 };

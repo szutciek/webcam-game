@@ -112,8 +112,12 @@ module.exports = class Room {
 
       this.lastTimeStamp = performance.now();
     } catch (err) {
+      this.broadcast({
+        type: "error",
+        message: "The room crashed, try to create a new one",
+      });
       console.log(err);
-      throw err;
+      this.stopGameClock();
     }
   }
 
@@ -304,8 +308,8 @@ module.exports = class Room {
       code: this.code,
       map: this.map,
       players: pList,
-      score: this.game.score,
       game: this.game.mode,
+      gameInfo: this.game.info,
     };
   }
 

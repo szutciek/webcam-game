@@ -2,6 +2,7 @@ const UserError = require("./UserError.js");
 
 module.exports = (err, ws) => {
   if (!err || !ws) return;
+  console.log(err);
 
   if (err instanceof UserError) sendUserError(err, ws);
   else sendSecretError(ws);

@@ -1,5 +1,5 @@
 import ClientController from "/classes/ClientController.js";
-import UIController from "/classes/UIController.js";
+import UIControllerClass from "/classes/UIController.js";
 import { requestCameraPermission, startStream, stream } from "/camera.js";
 
 let clientController;
@@ -25,6 +25,8 @@ const setup = async () => {
     if (!user) {
       redirectToSignin("Please log in to play", room, map);
     }
+
+    const UIController = new UIControllerClass();
     UIController.showLoadingScreen(
       user.username,
       user?.profile,
@@ -38,10 +40,13 @@ const setup = async () => {
     UIController.showCameraLoadingScreen(stream);
 
     UIController.changeLoadStatus("Connecting to server");
-    clientController = new ClientController({
-      token,
-      username: user.username,
-    });
+    clientController = new ClientController(
+      {
+        token,
+        username: user.username,
+      },
+      UIController
+    );
 
     UIController.showUser(user.username, user.panelColor);
 

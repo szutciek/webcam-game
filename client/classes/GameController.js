@@ -1,4 +1,4 @@
-import canvas from "/canvas.js";
+import Canvas from "/classes/Canvas.js";
 import { takePicture } from "/camera.js";
 
 export default class GameController {
@@ -27,6 +27,7 @@ export default class GameController {
     this.uuid = controller.uuid;
     this.gameObjects = controller.gameObjects;
     this.serverTimeOrigin = controller.serverTimeOrigin;
+    this.canvas = new Canvas("canvas");
   }
 
   startGame() {
@@ -114,19 +115,21 @@ export default class GameController {
 
       this.centerPlayer();
       const promises = [];
-      players.forEach((player) => promises.push(canvas.prepareCamera(player)));
+      players.forEach((player) =>
+        promises.push(this.canvas.prepareCamera(player))
+      );
       items.forEach((item) => {
         if (item.texture.type === "graphic") {
-          canvas.prepareGraphic(item);
+          this.canvas.prepareGraphic(item);
         }
       });
       const pT = this.translateInView(this.player);
-      promises.push(canvas.prepareCamera(pT));
+      promises.push(this.canvas.prepareCamera(pT));
       const preparedCameras = await Promise.all(promises);
 
-      canvas.clear();
-      items.forEach((i) => canvas.drawItem(i));
-      preparedCameras.forEach((i) => canvas.drawPlayer(i));
+      this.canvas.clear();
+      items.forEach((i) => this.canvas.drawItem(i));
+      preparedCameras.forEach((i) => this.canvas.drawPlayer(i));
 
       // ==========================================================================
       // GAME TICK ===============================================================
@@ -225,8 +228,8 @@ export default class GameController {
   }
 
   windowResize() {
-    canvas.el.width = window.innerWidth;
-    canvas.el.height = window.innerHeight;
+    this.canvas.el.width = window.innerWidth;
+    this.canvas.el.height = window.innerHeight;
   }
 
   addResizeListener() {
@@ -235,12 +238,25 @@ export default class GameController {
     });
   }
 
+  handleClick(e) {
+    console.log(`Canvas clicked at ${e.clientX}, ${e.clientY}`);
+  }
+
   get secondsPassed() {
     return (performance.now() - this.lastTimeStamp) / 1000;
   }
 
   get milisecondsServerStart() {
     return this.serverTimeOrigin - performance.timeOrigin + performance.now();
+  }
+
+  get dimensions() {
+    return {
+      x: this.#x,
+      y: this.#y,
+      w: this.#vw,
+      h: this.#vh,
+    };
   }
 
   ping() {
