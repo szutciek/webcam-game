@@ -31,7 +31,7 @@ wss.on("connection", function connection(ws) {
       if (!client) throw new UserError("Unknown UUID");
 
       if (message.type === "ping") {
-        ws.send(JSON.stringify({ type: "pong", time: message.time }));
+        return ws.send(JSON.stringify({ type: "pong", time: message.time }));
       }
 
       if (message.type === "mov") {
