@@ -1,5 +1,6 @@
 import "/classes/UIListener.js";
 import Message from "/classes/UIMessage.js";
+import GameUIController from "/classes/GameUIController.js";
 
 class UIController {
   messages = [];
@@ -11,6 +12,8 @@ class UIController {
     this.pingElement = document.getElementById("ping");
     this.userElement = document.getElementById("user");
     this.roomPlayersElement = document.getElementById("players");
+
+    this.createUIController();
   }
 
   hideLoadingScreen = () => {
@@ -26,7 +29,7 @@ class UIController {
   };
 
   updateRoomInfo(info) {
-    this.roomPlayersElement.innerText = `${info.code}: ${info.players.length} online, ${info.map}`;
+    this.roomPlayersElement.innerText = `${info.players.length} online, room ${info.code}`;
   }
 
   showLoadingScreen(username, profile, color = "#ffffff") {
@@ -85,6 +88,19 @@ class UIController {
       this.pingElement.closest("div").style.backgroundColor = "#00ff2622";
     }
   }
+
+  setClientController(controller) {
+    this.clientController = controller;
+  }
+
+  createUIController() {
+    this.gameUIController = new GameUIController(this);
+    this.gameUIController.addEventListeners();
+  }
+
+  handleGameClick(e) {
+    this.clientController.handleGameClick(e);
+  }
 }
 
-export default new UIController();
+export default UIController;

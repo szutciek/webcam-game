@@ -122,8 +122,12 @@ module.exports = class Soccer extends GameMode {
   }
 
   slowBallDown() {
-    this.ballVelocity.x = Math.floor((79 * this.ballVelocity.x) / 80);
-    this.ballVelocity.y = Math.floor((79 * this.ballVelocity.y) / 80);
+    this.ballVelocity.x =
+      Math.sign(this.ballVelocity.x) *
+      Math.floor(Math.abs((79 * this.ballVelocity.x) / 80));
+    this.ballVelocity.y =
+      Math.sign(this.ballVelocity.y) *
+      Math.floor(Math.abs((79 * this.ballVelocity.y) / 80));
   }
 
   resetBall() {
@@ -143,7 +147,6 @@ module.exports = class Soccer extends GameMode {
 
     this.inGoal = true;
     this.score[goalNr]++;
-    this.ball.r = lerp(this.ball.r, 0, 0.2);
     setTimeout(() => {
       this.resetBall();
     }, 1000);
@@ -157,6 +160,7 @@ module.exports = class Soccer extends GameMode {
 
   controlBallPosition() {
     this.horizontalWalls.forEach((wall) => {
+      if (this.inGoal === true) return;
       if (wall.y < 0) {
         if (this.ball.y < wall.y + wall.h) {
           this.ballVelocity.y = Math.abs(this.ballVelocity.y);
@@ -169,6 +173,7 @@ module.exports = class Soccer extends GameMode {
     });
 
     this.verticalWalls.forEach((wall) => {
+      if (this.inGoal === true) return;
       if (
         this.ball.y < this.goalArea.y ||
         this.ball.y + this.ball.r * 2 > this.goalArea.y + this.goalArea.h
@@ -189,12 +194,12 @@ module.exports = class Soccer extends GameMode {
       if (this.inGoal === true) return;
       if (goal.class === "soccer_goal_0") {
         if (this.ball.x + this.ball.r * 2 < goal.x + goal.w) {
-          this.handleGoal(0);
+          this.handleGoal(1);
         }
       }
       if (goal.class === "soccer_goal_1") {
         if (this.ball.x > goal.x) {
-          this.handleGoal(1);
+          this.handleGoal(0);
         }
       }
     });
@@ -244,5 +249,13 @@ module.exports = class Soccer extends GameMode {
       (intXLeft || intXMiddle || intXRight) &&
       (intYTop || intYMiddle || intYBottom)
     );
+  }
+
+  handleEvent(player, data) {}
+
+  get info() {
+    return {
+      score: this.score,
+    };
   }
 };

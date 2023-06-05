@@ -4,6 +4,7 @@ const { loadMap, findAvalibleMaps } = require("./gameMapController");
 
 const GameMode = require("../classes/GameModes/GameMode.js");
 const Soccer = require("../classes/GameModes/Soccer.js");
+const ShooterV1 = require("../classes/GameModes/ShooterV1.js");
 const Open = require("../classes/GameModes/Open.js");
 
 exports.handleRoomJoin = async (message, ws, client) => {
@@ -13,7 +14,7 @@ exports.handleRoomJoin = async (message, ws, client) => {
     if (!room) {
       const avalibleMaps = await findAvalibleMaps();
 
-      let mapName;
+      let mapName = undefined;
       if (
         avalibleMaps.includes(`${message.map}.json`) &&
         message.room !== "default"
@@ -41,6 +42,8 @@ exports.handleRoomJoin = async (message, ws, client) => {
       if (GameMode.avalibleGameModes.includes(data.config.gameMode)) {
         if (data.config.gameMode === "soccer") {
           room.changeGameMode(new Soccer(client.user._id, room));
+        } else if (data.config.gameMode === "shooterV1") {
+          room.changeGameMode(new ShooterV1(client.user._id, room));
         } else {
           room.changeGameMode(new Open(client.user._id, room));
         }

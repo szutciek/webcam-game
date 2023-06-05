@@ -9,6 +9,7 @@ const {
 const {
   handleSyncMovement,
   handleSyncCam,
+  handleGameEvent,
   handleChatMessage,
 } = require("./controllers/gameSyncController.js");
 const { handleRoomJoin } = require("./controllers/gameRoomController");
@@ -39,6 +40,10 @@ wss.on("connection", function connection(ws) {
 
       if (message.type === "cam") {
         return handleSyncCam(message, client, ws);
+      }
+
+      if (message.type === "gameevt") {
+        return handleGameEvent(message, client);
       }
 
       if (message.type === "chatmsg") {

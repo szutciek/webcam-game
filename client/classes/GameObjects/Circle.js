@@ -12,10 +12,10 @@ export default class Circle extends GameObject {
   }
 
   get w() {
-    return this.r;
+    return this.r * 2;
   }
   get h() {
-    return this.r;
+    return this.r * 2;
   }
 
   collidingWithSquare(target) {

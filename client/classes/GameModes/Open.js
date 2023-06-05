@@ -6,5 +6,15 @@ export default class Open {
     this.#ws = ws;
   }
 
+  handleMessage(message) {
+    console.log(message);
+  }
+
+  predictMovement(secondsPassed) {}
+
+  handleClick(e) {
+    console.log(e);
+  }
+
   tick() {}
 }

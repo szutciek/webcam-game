@@ -1,4 +1,4 @@
-import canvas from "/canvas.js";
+import Canvas from "/classes/Canvas.js";
 import { takePicture } from "/camera.js";
 
 export default class GameController {
@@ -27,6 +27,7 @@ export default class GameController {
     this.uuid = controller.uuid;
     this.gameObjects = controller.gameObjects;
     this.serverTimeOrigin = controller.serverTimeOrigin;
+    this.canvas = new Canvas("canvas");
   }
 
   startGame() {
@@ -52,7 +53,6 @@ export default class GameController {
 
   async renderFrame() {
     try {
-      console.log(this);
       this.currentTick++;
       const now = performance.now();
       const secondsPassed = (now - this.lastTimeStamp) / 1000;
@@ -91,16 +91,23 @@ export default class GameController {
       // ==========================================================================
 
       if (this.#ws.readyState === WebSocket.OPEN) {
-        if (this.#iteration % 3 === 0) {
+        if (this.#iteration % 15 === 0) {
           if (!this.player) return;
           this.player.camera = takePicture();
           this.syncCamera();
         }
-        if (this.#iteration % 30 === 0) {
+        if (this.#iteration % 100 === 0) {
           this.ping();
         }
         this.syncMovement(milisecondsServerStart);
       }
+
+      // ==========================================================================
+      // PREDICTING CHANGES =======================================================
+      // ==========================================================================
+
+      this.gameObjects.predictMovement(secondsPassed);
+      this.controller.gameModeController.predictMovement(secondsPassed);
 
       // ==========================================================================
       // RENDERING PROCESS ========================================================
@@ -108,25 +115,27 @@ export default class GameController {
 
       this.centerPlayer();
       const promises = [];
-      players.forEach((player) => promises.push(canvas.prepareCamera(player)));
+      players.forEach((player) =>
+        promises.push(this.canvas.prepareCamera(player))
+      );
       items.forEach((item) => {
         if (item.texture.type === "graphic") {
-          canvas.prepareGraphic(item);
+          this.canvas.prepareGraphic(item);
         }
       });
       const pT = this.translateInView(this.player);
-      promises.push(canvas.prepareCamera(pT));
-      const prepared = await Promise.all(promises);
+      promises.push(this.canvas.prepareCamera(pT));
+      const preparedCameras = await Promise.all(promises);
 
-      canvas.clear();
-      items.forEach((i) => canvas.drawItem(i));
-      prepared.forEach((i) => canvas.drawPlayer(i));
+      this.canvas.clear();
+      items.forEach((i) => this.canvas.drawItem(i));
+      preparedCameras.forEach((i) => this.canvas.drawPlayer(i));
 
       // ==========================================================================
       // GAME TICK ===============================================================
       // ==========================================================================
 
-      this.controller.gameModeController?.tick();
+      this.controller.gameModeController.tick();
 
       // ==========================================================================
       // DISPLAYING STATS =========================================================
@@ -219,14 +228,39 @@ export default class GameController {
   }
 
   windowResize() {
-    canvas.el.width = window.innerWidth;
-    canvas.el.height = window.innerHeight;
+    this.canvas.el.width = window.innerWidth;
+    this.canvas.el.height = window.innerHeight;
   }
 
   addResizeListener() {
     window.addEventListener("resize", () => {
       this.windowResize();
     });
+  }
+
+  handleClick(e) {
+    console.log(`Canvas clicked at ${e.clientX}, ${e.clientY}`);
+  }
+
+  get secondsPassed() {
+    return (performance.now() - this.lastTimeStamp) / 1000;
+  }
+
+  get milisecondsServerStart() {
+    return (
+      performance.now() +
+      performance.timeOrigin -
+      this.controller.serverTimeOrigin
+    );
+  }
+
+  get dimensions() {
+    return {
+      x: this.#x,
+      y: this.#y,
+      w: this.#vw,
+      h: this.#vh,
+    };
   }
 
   ping() {

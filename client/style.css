@@ -25,11 +25,31 @@ body {
   height: 100vh;
   pointer-events: none;
   user-select: none;
+  z-index: 998;
 }
 .fixed .technical {
   position: absolute;
   top: 2rem;
   left: 2rem;
+}
+.fixed .map {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: absolute;
+  top: 7rem;
+  right: 2rem;
+  background-color: #00000024;
+  width: 6rem;
+  height: 6rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+.fixed .hiddenElement {
+  display: block;
 }
 .fixed .chat {
   pointer-events: auto;
@@ -247,6 +267,7 @@ body {
   text-align: center;
 
   transition: 0.3s;
+  z-index: 999;
 }
 #loadingScreen .center h1 {
   font-size: 2rem;
