@@ -4,7 +4,7 @@ module.exports = (err, ws) => {
   if (!err || !ws) return;
   console.log(err);
 
-  if (err instanceof UserError) sendUserError(err, ws);
+  if (err.userError === true) sendUserError(err, ws);
   else sendSecretError(ws);
 };
 
