@@ -173,6 +173,10 @@ export default class GameController {
     return change;
   }
 
+  translateToCanvas([x, y]) {
+    return [x - this.#x, y - this.#y];
+  }
+
   returnItemsFrame = (items) => {
     if (items == undefined) return;
     // if (!(items instanceof Map)) return;
@@ -230,6 +234,8 @@ export default class GameController {
   windowResize() {
     this.canvas.el.width = window.innerWidth;
     this.canvas.el.height = window.innerHeight;
+    this.#vw = window.innerWidth;
+    this.#vh = window.innerHeight;
   }
 
   addResizeListener() {
@@ -239,7 +245,7 @@ export default class GameController {
   }
 
   handleClick(e) {
-    console.log(`Canvas clicked at ${e.clientX}, ${e.clientY}`);
+    // console.log(`Canvas clicked at ${e.clientX}, ${e.clientY}`);
   }
 
   get secondsPassed() {

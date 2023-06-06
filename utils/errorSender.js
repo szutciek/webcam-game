@@ -1,5 +1,5 @@
 const errorSender = (err, _, res, __) => {
-  if (err?.userError === true) {
+  if (err.userError === true) {
     sendUserError(err, res);
   } else {
     sendServerError(err, res);

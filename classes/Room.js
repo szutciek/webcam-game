@@ -56,7 +56,7 @@ module.exports = class Room {
     this.#clock = setInterval(() => {
       if (this.#players.size === 0) this.stopGameClock();
       this.gameTick();
-    }, 1000 / 128);
+    }, 1000 / 64);
     // console.log(`Starting game in room ${this.code}.`);
     this.#players.forEach((p) => this.sendRoomInfo(p.uuid));
   }
@@ -79,11 +79,12 @@ module.exports = class Room {
           currentTime,
           this.getPlayerChunks(player)
         );
-        if (correction !== undefined)
+        if (correction !== false) {
           clients.find(player.uuid)?.sendTo({
             type: "movovd",
             position: correction,
           });
+        }
       });
 
       this.game.tick(currentTime);
