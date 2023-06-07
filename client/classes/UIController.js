@@ -151,16 +151,15 @@ class UIController {
   }
 
   openMenu() {
+    this.menuScreen.querySelector(".username").innerText =
+      this.clientController.user.username;
+    this.menuScreen.querySelector(".email").innerText =
+      this.clientController.user.email;
     this.clientController.menuController.getDisplayPublicRooms();
 
     this.clientController.ignoreGameInput = true;
     this.menuScreen.style.opacity = 1;
     this.menuScreen.style.pointerEvents = "auto";
-
-    this.menuScreen.querySelector(".username").innerText =
-      this.clientController.user.username;
-    this.menuScreen.querySelector(".email").innerText =
-      this.clientController.user.email;
 
     this.menuScreen
       .querySelector(".overlay")
@@ -193,7 +192,11 @@ class UIController {
 
     const animationLayers = this.menuScreen.querySelectorAll(".animationLayer");
     animationLayers.forEach((layer) => {
-      layer.opacity = 0;
+      layer.animate(animationLayer, {
+        duration: 0,
+        fill: "forwards",
+        direction: "reverse",
+      });
     });
 
     this.showGameUI();
@@ -201,13 +204,15 @@ class UIController {
 
   hideGameUI() {
     document.querySelectorAll(".gameUI").forEach((element) => {
-      element.style.display = "none";
+      element.style.scale = 0.9;
+      element.style.filter = "blur(10px)";
     });
   }
 
   showGameUI() {
     document.querySelectorAll(".gameUI").forEach((element) => {
-      element.style.display = "block";
+      element.style.scale = 1;
+      element.style.filter = "blur(0)";
     });
   }
 
