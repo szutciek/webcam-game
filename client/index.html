@@ -11,6 +11,7 @@
     <script src="/script.js" defer type="module"></script>
 
     <link rel="stylesheet" href="/soccer.css" />
+    <link rel="stylesheet" href="/menu.css" />
   </head>
   <body>
     <div class="fixed">
@@ -27,7 +28,7 @@
               <div class="box ping">
                 <!-- prettier-ignore -->
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M332.41,310.59a115,115,0,0,0-152.8,0" style="fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><path d="M393.46,249.54a201.26,201.26,0,0,0-274.92,0" style="fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><path d="M447.72,182.11a288,288,0,0,0-383.44,0" style="fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><path style="fill:#000" d="M256,416a32,32,0,1,1,32-32A32,32,0,0,1,256,416Z"/></svg>
-                <p id="ping">0.000ms</p>
+                <p id="ping">0.0ms</p>
               </div>
               <div class="box position">
                 <!-- prettier-ignore -->
@@ -57,12 +58,32 @@
             src="https://assets.kanapka.eu/icons/grid-outline.svg"
             alt="Menu icon"
           />
+          <div class="hiddenP">
+            <p>Menu</p>
+          </div>
         </div>
       </div>
       <div class="bottom">
         <div id="soccer"></div>
         <div class="health"></div>
         <div class="inventory"></div>
+      </div>
+    </div>
+
+    <div class="fixed gameIgnoreClick" id="menuScreen">
+      <div class="container">
+        <div class="head">
+          <div class="user">
+            <video></video>
+            <div class="text">
+              <h1>Kanapkador</h1>
+              <p>24szuter_m@aswarsaw.org</p>
+            </div>
+          </div>
+          <div class="close">
+            <p>&#10005;</p>
+          </div>
+        </div>
       </div>
     </div>
 

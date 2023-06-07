@@ -12,6 +12,7 @@ class UIController {
     this.pingElement = document.getElementById("ping");
     this.userElement = document.getElementById("user");
     this.roomPlayersElement = document.getElementById("players");
+    this.menuScreen = document.getElementById("menuScreen");
 
     this.createUIController();
   }
@@ -45,6 +46,12 @@ class UIController {
     camera.srcObject = stream;
     camera.play();
     this.timeShown = new Date().getTime();
+  };
+
+  showCameraMenuScreen = (stream) => {
+    const camera = this.menuScreen.querySelector("video");
+    camera.srcObject = stream;
+    camera.play();
   };
 
   changeLoadStatus = (status) => {

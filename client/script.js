@@ -39,6 +39,9 @@ const setup = async () => {
 
     UIController.showCameraLoadingScreen(stream);
 
+    // TEMPORARY
+    UIController.showCameraMenuScreen(stream);
+
     UIController.changeLoadStatus("Connecting to server");
     clientController = new ClientController(
       {
