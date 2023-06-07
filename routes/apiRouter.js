@@ -17,6 +17,7 @@ const {
   findAvalibleMaps,
   loadMap,
 } = require("../controllers/gameMapController.js");
+const { rooms } = require("../controllers/gameRoomController.js");
 
 router.post("/login", async (req, res, next) => {
   try {
@@ -258,6 +259,7 @@ router.post("/signup", async (req, res, next) => {
     }
   }
 });
+
 router.get("/maps", async (req, res, next) => {
   try {
     const availibleMaps = await findAvalibleMaps();
@@ -269,7 +271,22 @@ router.get("/maps", async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "Maps recieved",
-      data: maps.map((map) => choose(map, ["displayName", "preview"])),
+      data: maps.map((map) =>
+        choose(map, ["name", "displayName", "preview", "displayGameMode"])
+      ),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/rooms", async (req, res, next) => {
+  try {
+    const roomData = rooms.publicRoomData();
+    res.status(200).json({
+      status: "success",
+      message: "Rooms recieved",
+      data: roomData,
     });
   } catch (err) {
     next(err);

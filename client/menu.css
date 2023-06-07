@@ -20,13 +20,13 @@
 }
 
 #menuScreen .animationLayer {
-  margin-bottom: 2rem;
   opacity: 0;
 }
 
 #menuScreen .head {
   display: flex;
   justify-content: space-between;
+  margin-bottom: 2rem;
 }
 
 #menuScreen .user {
@@ -34,7 +34,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.8rem;
-  padding: 0.5rem;
+  padding: 0 0 0 0.5rem;
   border-radius: 10px;
 }
 
@@ -89,10 +89,21 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
+  margin-bottom: 2rem;
+
+  max-width: 1200px;
 }
 
 #menuScreen .grid .creategame {
   grid-column: span 2;
+}
+
+#menuScreen .grid .statistics {
+  grid-column: span 2;
+}
+
+#menuScreen .grid .rooms {
+  grid-row: span 2;
 }
 
 #menuScreen .gridItem {
@@ -154,18 +165,53 @@
   border-radius: 5px;
   min-height: 100px;
   display: flex;
-  align-items: flex-end;
+  justify-content: flex-end;
+  flex-direction: column;
   background-color: #00000042;
   cursor: pointer;
   transition: 0.3s;
 
   background-size: 110%;
-  background-position: 10% 10%;
+  background-position: 5% 5%;
 }
 
 #menuScreen .gridItem .mapOption:hover {
-  scale: 1.03 1.06;
+  scale: 0.98;
 
   background-size: 100%;
   background-position: 0% 0%;
+}
+
+#menuScreen .gridItem .refreshRooms {
+  margin-left: auto;
+  margin-bottom: auto;
+  cursor: pointer;
+}
+
+#menuScreen .gridItem .roomOption {
+  padding: 0.5rem;
+  border-radius: 5px;
+  background-color: #00000042;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+
+  transition: 0.3s;
+}
+
+#menuScreen .gridItem .roomOption:hover {
+  background-color: #00000067;
+}
+
+#menuScreen .gridItem .roomOption h1 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #ffffff;
+
+  margin-bottom: 0.5rem;
+}
+
+#menuScreen .gridItem .roomOption p {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #d6d6d6;
 }

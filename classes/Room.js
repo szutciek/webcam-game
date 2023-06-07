@@ -267,10 +267,10 @@ module.exports = class Room {
     return true;
   }
 
-  joinRoom(uuid, startPos, username = "Anonymous") {
+  joinRoom(uuid, startPos, user) {
     if (!this.#running) this.startGameClock();
 
-    const player = new Player(uuid, startPos, username);
+    const player = new Player(uuid, startPos, user);
     this.#players.set(uuid, player);
     this.game.playerJoin(player);
 
@@ -279,7 +279,7 @@ module.exports = class Room {
     this.broadcastRoomInfo();
     this.broadcast({
       type: "event",
-      event: `${username} joined the room`,
+      event: `${user.username} joined the room`,
       icon: "userJoin",
       classification: "normal",
     });

@@ -67,7 +67,7 @@ exports.handleRoomJoin = async (message, ws, client) => {
     startPos.w = 100;
     startPos.h = 200;
 
-    room.joinRoom(message.uuid, startPos, client.user.username);
+    room.joinRoom(message.uuid, startPos, client.user);
     client.changeRoom(message.room);
 
     ws.send(
@@ -99,3 +99,5 @@ exports.handleRoomLeave = (message, ws, client) => {
     throw err;
   }
 };
+
+exports.rooms = rooms;

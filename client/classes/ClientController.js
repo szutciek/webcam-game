@@ -303,7 +303,7 @@ export default class ClientController {
   }
 
   showMessage(message) {
-    this.this.UIController.showMessage(message);
+    this.UIController.showMessage(message);
   }
 
   handleGameClick(e) {

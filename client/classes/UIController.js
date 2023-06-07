@@ -4,11 +4,13 @@ import Message from "/classes/UIMessage.js";
 const animationOverlay = [
   {
     opacity: 0,
+    display: "block",
     backdropFilter: "blur(0px)",
     webkitBackdropFilter: "blur(0px)",
   },
   {
     opacity: 1,
+    display: "block",
     backdropFilter: "blur(5px)",
     webkitBackdropFilter: "blur(5px)",
   },
@@ -18,10 +20,12 @@ const animationLayer = [
   {
     transform: "translateY(-25px) scale(1.1)",
     opacity: 0,
+    display: "block",
   },
   {
     transform: "translateY(0) scale(1)",
     opacity: 1,
+    display: "block",
   },
 ];
 
@@ -147,6 +151,8 @@ class UIController {
   }
 
   openMenu() {
+    this.clientController.menuController.getDisplayPublicRooms();
+
     this.clientController.ignoreGameInput = true;
     this.menuScreen.style.opacity = 1;
     this.menuScreen.style.pointerEvents = "auto";
@@ -186,7 +192,7 @@ class UIController {
     });
 
     const animationLayers = this.menuScreen.querySelectorAll(".animationLayer");
-    animationLayers.forEach((layer, i) => {
+    animationLayers.forEach((layer) => {
       layer.opacity = 0;
     });
 

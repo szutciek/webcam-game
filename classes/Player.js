@@ -2,7 +2,7 @@ const UserError = require("../utils/UserError");
 const clients = require("../state/clients");
 
 const maxS = 15;
-const errorMargin = 8;
+const errorMargin = 3;
 
 const f = (x) => {
   // 2 is vert stretch, 1 is horizontal translation, using change of base
@@ -33,10 +33,11 @@ module.exports = class Player {
 
   clientTicks = [];
 
-  constructor(uuid, position = { x: 0, y: 0, w: 100, h: 200 }, username) {
+  constructor(uuid, position = { x: 0, y: 0, w: 100, h: 200 }, user) {
     this.uuid = uuid;
     this.position = position;
-    this.username = username;
+    this.user = user;
+    this.username = user.username;
   }
 
   updatePose(pose) {
