@@ -106,61 +106,68 @@ export default class Player {
   };
 
   activateMovement() {
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "w" || e.key === "W") {
-        this.#inpN = true;
-      }
-      if (e.key === "s" || e.key === "S") {
-        this.#inpS = true;
-      }
-      if (e.key === "a" || e.key === "A") {
-        this.#inpW = true;
-      }
-      if (e.key === "d" || e.key === "D") {
-        this.#inpE = true;
-      }
-
-      if (e.key === "Shift") {
-        this.pose.crouching = true;
-
-        // // doesnt work with current collisions
-        // if (this.#h !== 150) this.#y += 50;
-        // this.#h = 150;
-      }
-    });
-    document.addEventListener("keyup", (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-
-      if (e.key === "w" || e.key === "W") {
-        this.#inpN = false;
-      }
-      if (e.key === "s" || e.key === "S") {
-        this.#inpS = false;
-      }
-      if (e.key === "a" || e.key === "A") {
-        this.#inpW = false;
-      }
-      if (e.key === "d" || e.key === "D") {
-        this.#inpE = false;
-      }
-
-      if (e.key === "Shift") {
-        this.pose.crouching = false;
-
-        // // doesnt work with current collisions
-        // if (this.#h !== 200 && this.nothing50Above()) {
-        //   this.#y -= 50;
-        // }
-        // this.#h = 200;
-      }
-    });
+    document.addEventListener("keydown", this.handleKeyDown);
+    document.addEventListener("keyup", this.handleKeyUp);
   }
   deactivateMovement() {
-    document.removeEventListener("keydown");
-    document.removeEventListener("keyup");
-    document.removeEventListener("keypress");
+    this.#inpN = false;
+    this.#inpS = false;
+    this.#inpW = false;
+    this.#inpE = false;
+    document.removeEventListener("keydown", this.handleKeyDown);
+    document.removeEventListener("keyup", this.handleKeyUp);
   }
+
+  handleKeyDown = (e) => {
+    if (e.key === "w" || e.key === "W") {
+      this.#inpN = true;
+    }
+    if (e.key === "s" || e.key === "S") {
+      this.#inpS = true;
+    }
+    if (e.key === "a" || e.key === "A") {
+      this.#inpW = true;
+    }
+    if (e.key === "d" || e.key === "D") {
+      this.#inpE = true;
+    }
+
+    if (e.key === "Shift") {
+      this.pose.crouching = true;
+
+      // // doesnt work with current collisions
+      // if (this.#h !== 150) this.#y += 50;
+      // this.#h = 150;
+    }
+  };
+
+  handleKeyUp = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (e.key === "w" || e.key === "W") {
+      this.#inpN = false;
+    }
+    if (e.key === "s" || e.key === "S") {
+      this.#inpS = false;
+    }
+    if (e.key === "a" || e.key === "A") {
+      this.#inpW = false;
+    }
+    if (e.key === "d" || e.key === "D") {
+      this.#inpE = false;
+    }
+
+    if (e.key === "Shift") {
+      this.pose.crouching = false;
+
+      // // doesnt work with current collisions
+      // if (this.#h !== 200 && this.nothing50Above()) {
+      //   this.#y -= 50;
+      // }
+      // this.#h = 200;
+    }
+  };
 
   serverOverride({ x, y, w, h }) {
     this.#x = x;

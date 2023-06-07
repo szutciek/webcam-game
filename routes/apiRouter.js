@@ -11,9 +11,12 @@ const {
   rgbMap,
 } = require("../utils/validators.js");
 const User = require("../models/User.js");
-const jwt = require("jsonwebtoken");
-const { jwtSecret } = require("../config.js");
 const Authentication = require("../classes/Authentication.js");
+
+const {
+  findAvalibleMaps,
+  loadMap,
+} = require("../controllers/gameMapController.js");
 
 router.post("/login", async (req, res, next) => {
   try {
@@ -253,6 +256,23 @@ router.post("/signup", async (req, res, next) => {
     } else {
       next(err);
     }
+  }
+});
+router.get("/maps", async (req, res, next) => {
+  try {
+    const availibleMaps = await findAvalibleMaps();
+    const promises = availibleMaps.map(async (name) =>
+      JSON.parse(await loadMap(name.split(".")[0]))
+    );
+    const maps = await Promise.all(promises);
+
+    res.status(200).json({
+      status: "success",
+      message: "Maps recieved",
+      data: maps.map((map) => choose(map, ["displayName", "preview"])),
+    });
+  } catch (err) {
+    next(err);
   }
 });
 

@@ -1,5 +1,7 @@
 {
   "name": "macios",
+  "displayName": "Macios",
+  "preview": "https://assets.kanapka.eu/images/maciosMapPreviewWCGAME.png",
   "config": {
     "gameMode": "open"
   },
