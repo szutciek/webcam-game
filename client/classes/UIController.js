@@ -157,6 +157,7 @@ class UIController {
       this.clientController.user.email;
     this.clientController.menuController.getDisplayPublicRooms();
 
+    this.hideGameUI();
     this.clientController.ignoreGameInput = true;
     this.menuScreen.style.opacity = 1;
     this.menuScreen.style.pointerEvents = "auto";
@@ -175,11 +176,10 @@ class UIController {
         easing: "cubic-bezier(0.34, 1.56, 0.64, 1)",
       });
     });
-
-    this.hideGameUI();
   }
 
   closeMenu() {
+    this.showGameUI();
     this.clientController.ignoreGameInput = false;
     this.menuScreen.style.opacity = 0;
     this.menuScreen.style.pointerEvents = "none";
@@ -198,8 +198,6 @@ class UIController {
         direction: "reverse",
       });
     });
-
-    this.showGameUI();
   }
 
   hideGameUI() {
