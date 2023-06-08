@@ -129,10 +129,12 @@ class UIController {
 
   addEventListeners() {
     document.addEventListener("click", (e) => this.handleClick(e));
+    document.addEventListener("mousemove", (e) => this.handleMouseMove(e));
   }
 
   removeEventListeners() {
     document.removeEventListener("click", (e) => this.handleClick(e));
+    document.removeEventListener("mousemove", (e) => this.handleMouseMove(e));
   }
 
   handleClick(e) {
@@ -157,6 +159,7 @@ class UIController {
       this.clientController.user.email;
     this.clientController.menuController.getDisplayPublicRooms();
 
+    this.hideGameUI();
     this.clientController.ignoreGameInput = true;
     this.menuScreen.style.opacity = 1;
     this.menuScreen.style.pointerEvents = "auto";
@@ -175,11 +178,10 @@ class UIController {
         easing: "cubic-bezier(0.34, 1.56, 0.64, 1)",
       });
     });
-
-    this.hideGameUI();
   }
 
   closeMenu() {
+    this.showGameUI();
     this.clientController.ignoreGameInput = false;
     this.menuScreen.style.opacity = 0;
     this.menuScreen.style.pointerEvents = "none";
@@ -198,8 +200,6 @@ class UIController {
         direction: "reverse",
       });
     });
-
-    this.showGameUI();
   }
 
   hideGameUI() {
@@ -217,7 +217,13 @@ class UIController {
   }
 
   handleGameClick(e) {
+    if (this.clientController === undefined) return;
     this.clientController.handleGameClick(e);
+  }
+
+  handleMouseMove(e) {
+    if (this.clientController === undefined) return;
+    this.clientController.handleGameMouseMove(e);
   }
 }
 

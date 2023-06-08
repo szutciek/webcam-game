@@ -7,13 +7,17 @@ export default class Open {
   }
 
   handleMessage(message) {
-    console.log(message);
+    console.table(message);
   }
 
   predictMovement(secondsPassed) {}
 
   handleClick(e) {
-    console.log(e);
+    // console.log(e);
+  }
+
+  handleMouseMove(e) {
+    // console.log(e)
   }
 
   tick() {}

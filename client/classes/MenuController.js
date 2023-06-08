@@ -92,7 +92,9 @@ export default class MenuController {
   }
 
   createNewGame(map, roomCode) {
-    window.location = `${window.location.origin}/?room=${roomCode}&map=${map}`;
+    // window.location = `${window.location.origin}/?room=${roomCode}&map=${map}`;
+    const change = this.clientController.changeRoom(roomCode, map);
+    if (change === true) this.clientController.joinRoom();
   }
 
   handleClick(e) {
@@ -118,7 +120,9 @@ export default class MenuController {
     const option = e.target.closest(".roomOption");
     if (option !== null) {
       const code = option.dataset.code;
-      if (code) window.location = `${window.location.origin}/?room=${code}`;
+      // if (code) window.location = `${window.location.origin}/?room=${code}`;
+      const change = this.clientController.changeRoom(code);
+      if (change === true) this.clientController.joinRoom();
     }
   }
 
