@@ -264,6 +264,7 @@ module.exports = class Room {
 
   checkSpaceAvalible() {
     if (this.#players.size >= this.maxPlayers) return false;
+
     return true;
   }
 
