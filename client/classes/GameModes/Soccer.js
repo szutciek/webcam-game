@@ -101,11 +101,7 @@ export default class Soccer {
   }
 
   handleClick(e) {
-    // console.log(e);
-  }
-
-  handleMouseMove(e) {
-    // console.log(e)
+    console.log(e);
   }
 
   tick() {

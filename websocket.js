@@ -55,7 +55,7 @@ wss.on("connection", function connection(ws) {
       }
 
       if (message.type === "roomleave") {
-        return handleRoomLeave(message, ws, client);
+        return handleRoomLeave(ws, client);
       }
     } catch (err) {
       if (err.name === "JsonWebTokenError")
