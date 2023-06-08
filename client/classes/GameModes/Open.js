@@ -13,7 +13,11 @@ export default class Open {
   predictMovement(secondsPassed) {}
 
   handleClick(e) {
-    console.log(e);
+    // console.log(e);
+  }
+
+  handleMouseMove(e) {
+    // console.log(e)
   }
 
   tick() {}

@@ -278,12 +278,15 @@ module.exports = class Room {
     this.sendRoomInfo(uuid);
 
     this.broadcastRoomInfo();
-    this.broadcast({
-      type: "event",
-      event: `${user.username} joined the room`,
-      icon: "userJoin",
-      classification: "normal",
-    });
+    this.broadcast(
+      {
+        type: "event",
+        event: `${user.username} joined the room`,
+        icon: "userJoin",
+        classification: "normal",
+      },
+      uuid
+    );
   }
 
   leaveRoom(uuid) {
@@ -292,12 +295,15 @@ module.exports = class Room {
     this.#players.delete(uuid);
 
     this.broadcastRoomInfo();
-    this.broadcast({
-      type: "event",
-      event: `${player?.username} left the room`,
-      icon: "userLeave",
-      classification: "warning",
-    });
+    this.broadcast(
+      {
+        type: "event",
+        event: `${player?.username} left the room`,
+        icon: "userLeave",
+        classification: "warning",
+      },
+      uuid
+    );
   }
 
   handleEvent(uuid, data) {
@@ -325,13 +331,12 @@ module.exports = class Room {
       players: pList,
       game: this.game.mode,
       gameInfo: this.game.info,
+      syncStartTime: this.syncStartTime,
     };
   }
 
   sendRoomInfo(uuid) {
-    clients
-      .find(uuid)
-      .sendTo({ ...this.getRoomInfo(), syncStartTime: this.syncStartTime });
+    clients.find(uuid).sendTo(this.getRoomInfo());
   }
 
   broadcastRoomInfo() {

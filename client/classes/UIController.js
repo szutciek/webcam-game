@@ -129,10 +129,14 @@ class UIController {
 
   addEventListeners() {
     document.addEventListener("click", (e) => this.handleClick(e));
+    document.addEventListener("mousemove", (e) => this.handleGameMouseMove(e));
   }
 
   removeEventListeners() {
     document.removeEventListener("click", (e) => this.handleClick(e));
+    document.removeEventListener("mousemove", (e) =>
+      this.handleGameMouseMove(e)
+    );
   }
 
   handleClick(e) {
@@ -218,6 +222,11 @@ class UIController {
 
   handleGameClick(e) {
     this.clientController.handleGameClick(e);
+  }
+
+  handleGameMouseMove(e) {
+    if (this.clientController === undefined) return;
+    this.clientController.handleGameMouseMove(e);
   }
 }
 

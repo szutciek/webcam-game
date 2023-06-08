@@ -36,18 +36,16 @@ export default class ClientController {
     if (!room) room = "default";
     console.log(`Changing room to ${room}`);
     this.room = room;
-    // only for new rooms
     this.roomMap = map;
-    // tell server about change
     return true;
   }
 
   joinRoom() {
+    console.warn(`Joining room ${this.room}`);
     if (!this.user.uuid || !this.room) return;
     this.#ws.send(
       JSON.stringify({
         type: "roomjoin",
-        uuid: this.user.uuid,
         room: this.room,
         map: this?.roomMap,
       })
@@ -58,17 +56,16 @@ export default class ClientController {
     return new Promise((resolve, reject) => {
       this.#ws = new WebSocket(wsURL);
       this.#ws.addEventListener("open", () => {
-        // remove event listeners
         resolve();
       });
       this.#ws.addEventListener("error", () => {
-        // remove event listeners
+        console.log("Connection error");
         reject();
       });
     });
   }
 
-  async startGame() {
+  async connectClient() {
     try {
       if (!this.room) return;
       console.log("Connecting to server...");
@@ -83,8 +80,6 @@ export default class ClientController {
       );
       this.startListen();
       await this.waitForUUID();
-      console.log(`Joining room ${this.room}`);
-      this.joinRoom();
     } catch (err) {
       console.log(err);
     }
@@ -141,26 +136,31 @@ export default class ClientController {
     }
     this.UIController.updateRoomInfo(info);
 
+    console.table(info);
+
     if (info.game !== this.currentGameMode) {
       this.changeGameMode(info.game);
     }
   }
 
   startRender() {
+    console.log("Creating Player & Game Controller");
     this.gameObjects = new GameObjects();
     this.gameController = new GameController(this, this.#ws);
     this.gameController.startGame();
   }
 
   stopRender() {
+    console.log("Stopping game & removing Game Controller");
+    if (this.gameController) this.gameController.stopGame();
     this.gameController = undefined;
+    console.log("Removing Player");
     this.player = undefined;
   }
 
   setServerTimeOrigin(time) {
-    if (!this.gameController) {
-      this.serverTimeOrigin = time;
-    } else {
+    this.serverTimeOrigin = time;
+    if (this.gameController !== undefined) {
       this.gameController.setServerTimeOrigin(time);
     }
   }
@@ -262,6 +262,7 @@ export default class ClientController {
         "info",
         "normal"
       );
+      this.stopRender();
       this.player = new Player([
         message?.data?.position[0],
         message?.data?.position[1],
@@ -309,6 +310,13 @@ export default class ClientController {
   handleGameClick(e) {
     this.gameController.handleClick(e);
     this.gameModeController.handleClick(e);
+  }
+
+  handleGameMouseMove(e) {
+    if (this.gameController === undefined) return;
+    this.gameController.handleMouseMove(e);
+    if (this.gameModeController === undefined) return;
+    this.gameModeController.handleMouseMove(e);
   }
 
   createMenuController() {

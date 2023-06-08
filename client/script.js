@@ -38,8 +38,6 @@ const setup = async () => {
     await startStream();
 
     UIController.showCameraLoadingScreen(stream);
-
-    // TEMPORARY
     UIController.showCameraMenuScreen(stream);
 
     UIController.changeLoadStatus("Connecting to server");
@@ -55,8 +53,11 @@ const setup = async () => {
 
     UIController.changeLoadStatus(`Joining room ${room || "default"}`);
     if (!clientController.changeRoom(room, map)) return;
+
     UIController.changeLoadStatus("Starting game");
-    clientController.startGame();
+    await clientController.connectClient();
+    clientController.joinRoom();
+
     UIController.hideLoadingScreen();
   } catch (err) {
     console.log(err);

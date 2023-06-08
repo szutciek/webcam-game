@@ -10,7 +10,7 @@ export default class GameController {
   #vw = window.innerWidth;
   #vh = window.innerHeight;
 
-  #interval = undefined;
+  #runGame = true;
   #iteration = 0;
 
   lastTimeStamp = 0.015;
@@ -41,8 +41,9 @@ export default class GameController {
       this.renderFrame();
     });
   }
+
   stopGame() {
-    clearInterval(this.#interval);
+    this.#runGame = false;
     this.player.deactivateMovement();
   }
 
@@ -156,6 +157,7 @@ export default class GameController {
       if (this.#iteration === 120) this.#iteration === 0;
       this.lastTimeStamp = performance.now();
 
+      if (this.#runGame === false) return;
       requestAnimationFrame(() => {
         this.renderFrame();
       });
@@ -246,6 +248,10 @@ export default class GameController {
 
   handleClick(e) {
     // console.log(`Canvas clicked at ${e.clientX}, ${e.clientY}`);
+  }
+
+  handleMouseMove(e) {
+    // console.log(`Mouse moved at ${e.clientX}, ${e.clientY}`);
   }
 
   get secondsPassed() {

@@ -92,7 +92,11 @@ export default class MenuController {
   }
 
   createNewGame(map, roomCode) {
-    window.location = `${window.location.origin}/?room=${roomCode}&map=${map}`;
+    const newUrl = window.location.origin + `/?room=${roomCode}&map=${map}`;
+    window.history.pushState({ path: newUrl }, "", newUrl);
+
+    const change = this.clientController.changeRoom(roomCode, map);
+    if (change === true) this.clientController.joinRoom();
   }
 
   handleClick(e) {
@@ -111,6 +115,8 @@ export default class MenuController {
       if (map) {
         const roomCode = crypto.randomUUID().split("-")[0];
         this.createNewGame(map, roomCode);
+
+        this.closeMenu();
       }
     }
   }
@@ -118,8 +124,21 @@ export default class MenuController {
     const option = e.target.closest(".roomOption");
     if (option !== null) {
       const code = option.dataset.code;
-      if (code) window.location = `${window.location.origin}/?room=${code}`;
+
+      if (code) {
+        const newUrl = window.location.origin + `/?room=${code}`;
+        window.history.pushState({ path: newUrl }, "", newUrl);
+
+        this.clientController.changeRoom(code);
+        if (change === true) this.clientController.joinRoom();
+
+        this.closeMenu();
+      }
     }
+  }
+
+  closeMenu() {
+    this.clientController.UIController.closeMenu();
   }
 
   spinRefrashRoomIcon() {

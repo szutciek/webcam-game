@@ -81,19 +81,30 @@ export default class ShooterV1 {
   }
 
   handleClick(e) {
-    const centerPlayerWorld = [
-      this.controller.player.position.x + this.controller.player.position.w / 2,
-      this.controller.player.position.y + this.controller.player.position.h / 2,
-    ];
-    const clickedWorld = [
-      window.innerWidth / 2 - e.clientX + centerPlayerWorld[0],
-      window.innerHeight / 2 - e.clientY + centerPlayerWorld[1],
-    ];
+    // const clickedWorld = [
+    //   window.innerWidth / 2 - e.clientX + this.centerPlayerWorld[0],
+    //   window.innerHeight / 2 - e.clientY + this.centerPlayerWorld[1],
+    // ];
+    // const angle = Math.atan2(
+    //   clickedWorld[0] - centerPlayerWorld[0],
+    //   clickedWorld[1] - centerPlayerWorld[1]
+    // );
+    // this.shoot(angle, centerPlayerWorld);
+
     const angle = Math.atan2(
-      clickedWorld[0] - centerPlayerWorld[0],
-      clickedWorld[1] - centerPlayerWorld[1]
+      window.innerWidth / 2 - e.clientX,
+      window.innerHeight / 2 - e.clientY
     );
-    this.shoot(angle, centerPlayerWorld);
+    this.shoot(angle, this.centerPlayerWorld);
+  }
+
+  handleMouseMove(e) {
+    const angle = Math.atan2(
+      window.innerWidth / 2 - e.clientX,
+      window.innerHeight / 2 - e.clientY
+    );
+    this.facingAngle = angle;
+    console.log(this.facingAngle);
   }
 
   tick() {
