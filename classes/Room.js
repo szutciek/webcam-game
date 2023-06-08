@@ -51,7 +51,7 @@ module.exports = class Room {
   }
 
   startGameClock() {
-    this.syncStartTime = performance.timeOrigin;
+    this.syncStartTime = performance.timeOrigin + performance.now();
     this.#running = true;
     this.#clock = setInterval(() => {
       if (this.#players.size === 0) this.stopGameClock();
@@ -83,6 +83,7 @@ module.exports = class Room {
           clients.find(player.uuid)?.sendTo({
             type: "movovd",
             position: correction,
+            room: this.code,
           });
         }
       });
@@ -324,13 +325,12 @@ module.exports = class Room {
       players: pList,
       game: this.game.mode,
       gameInfo: this.game.info,
+      syncStartTime: this.syncStartTime,
     };
   }
 
   sendRoomInfo(uuid) {
-    clients
-      .find(uuid)
-      .sendTo({ ...this.getRoomInfo(), syncStartTime: this.syncStartTime });
+    clients.find(uuid).sendTo(this.getRoomInfo());
   }
 
   broadcastRoomInfo() {

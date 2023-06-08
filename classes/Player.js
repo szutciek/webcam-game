@@ -2,7 +2,7 @@ const UserError = require("../utils/UserError");
 const clients = require("../state/clients");
 
 const maxS = 15;
-const errorMargin = 3;
+const errorMargin = 2;
 
 const f = (x) => {
   // 2 is vert stretch, 1 is horizontal translation, using change of base

@@ -9,6 +9,10 @@ const Open = require("../classes/GameModes/Open.js");
 
 exports.handleRoomJoin = async (message, ws, client) => {
   try {
+    if (client.roomRef !== undefined) {
+      this.handleRoomLeave(ws, client);
+    }
+
     let room = rooms.find(message.room);
 
     if (!room) {
@@ -84,15 +88,14 @@ exports.handleRoomJoin = async (message, ws, client) => {
   }
 };
 
-exports.handleRoomLeave = (message, ws, client) => {
+exports.handleRoomLeave = (ws, client) => {
   try {
     // leaves in room and client
-    client.leaveRoom(message.room);
+    client.leaveRoom();
 
     ws?.send(
       JSON.stringify({
         type: "roomleaveOk",
-        room: message.room,
       })
     );
   } catch (err) {

@@ -28,6 +28,7 @@ export default class Soccer {
 
   createElement() {
     this.element = document.getElementById("soccer");
+    this.element.innerHTML = "";
     const score = document.createElement("div");
     score.classList.add("score");
 
@@ -100,7 +101,11 @@ export default class Soccer {
   }
 
   handleClick(e) {
-    console.log(e);
+    // console.log(e);
+  }
+
+  handleMouseMove(e) {
+    // console.log(e);
   }
 
   tick() {

@@ -56,7 +56,7 @@ export default class GameController {
       this.currentTick++;
       const now = performance.now();
       const secondsPassed = (now - this.lastTimeStamp) / 1000;
-      const notRounded = this.serverTimeOrigin - performance.timeOrigin + now;
+      const notRounded = performance.timeOrigin + now - this.serverTimeOrigin;
       const milisecondsServerStart = Math.round(notRounded * 1000) / 1000;
 
       // ==========================================================================
@@ -203,6 +203,7 @@ export default class GameController {
 
   setServerTimeOrigin(time) {
     this.serverTimeOrigin = time;
+    console.log(this.serverTimeOrigin);
   }
 
   syncCamera() {
@@ -246,6 +247,10 @@ export default class GameController {
 
   handleClick(e) {
     // console.log(`Canvas clicked at ${e.clientX}, ${e.clientY}`);
+  }
+
+  handleMouseMove(e) {
+    // console.log(`Mouse moved at ${e.clientX}, ${e.clientY}`);
   }
 
   get secondsPassed() {

@@ -55,8 +55,11 @@ const setup = async () => {
 
     UIController.changeLoadStatus(`Joining room ${room || "default"}`);
     if (!clientController.changeRoom(room, map)) return;
+
     UIController.changeLoadStatus("Starting game");
-    clientController.startGame();
+    await clientController.connectClient();
+    clientController.joinRoom();
+
     UIController.hideLoadingScreen();
   } catch (err) {
     console.log(err);
