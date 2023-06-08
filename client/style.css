@@ -327,6 +327,10 @@ body {
   animation: spin 1s linear infinite;
 }
 
+.gameUI {
+  transition: 0.2s !important;
+}
+
 @keyframes logDismiss {
   0% {
     opacity: 1;

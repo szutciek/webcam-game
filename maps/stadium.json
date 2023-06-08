@@ -1,5 +1,8 @@
 {
   "name": "stadium",
+  "displayName": "Stadium",
+  "displayGameMode": "Soccer",
+  "preview": "https://assets.kanapka.eu/images/stadiumMapPreviewWCGAME.png",
   "config": {
     "gameMode": "soccer"
   },

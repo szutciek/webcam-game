@@ -7,6 +7,7 @@ const gameModes = ["soccer", "open", "shooterV1"];
 import Soccer from "/classes/GameModes/Soccer.js";
 import Open from "/classes/GameModes/Open.js";
 import ShooterV1 from "/classes/GameModes/ShooterV1.js";
+import MenuController from "/classes/MenuController.js";
 
 export default class ClientController {
   #ws = undefined;
@@ -19,12 +20,16 @@ export default class ClientController {
   player = undefined;
   serverTimeOrigin = undefined;
 
+  #ignoreGameInput = false;
+
   constructor(user, UIController) {
     if (!user) throw new Error("User required to run client");
     this.user = user;
 
     this.UIController = UIController;
     UIController.setClientController(this);
+
+    this.createMenuController();
   }
 
   changeRoom(room, map) {
@@ -298,12 +303,26 @@ export default class ClientController {
   }
 
   showMessage(message) {
-    this.this.UIController.showMessage(message);
+    this.UIController.showMessage(message);
   }
 
   handleGameClick(e) {
     this.gameController.handleClick(e);
     this.gameModeController.handleClick(e);
+  }
+
+  createMenuController() {
+    this.menuController = new MenuController(this);
+  }
+
+  set ignoreGameInput(value) {
+    this.#ignoreGameInput = value;
+    if (value === true) {
+      this.player.deactivateMovement();
+    }
+    if (value === false) {
+      this.player.activateMovement();
+    }
   }
 
   async waitForUUID() {

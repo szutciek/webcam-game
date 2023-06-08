@@ -1,6 +1,33 @@
 import "/classes/UIListener.js";
 import Message from "/classes/UIMessage.js";
-import GameUIController from "/classes/GameUIController.js";
+
+const animationOverlay = [
+  {
+    opacity: 0,
+    display: "block",
+    backdropFilter: "blur(0px)",
+    webkitBackdropFilter: "blur(0px)",
+  },
+  {
+    opacity: 1,
+    display: "block",
+    backdropFilter: "blur(5px)",
+    webkitBackdropFilter: "blur(5px)",
+  },
+];
+
+const animationLayer = [
+  {
+    transform: "translateY(-25px) scale(1.1)",
+    opacity: 0,
+    display: "block",
+  },
+  {
+    transform: "translateY(0) scale(1)",
+    opacity: 1,
+    display: "block",
+  },
+];
 
 class UIController {
   messages = [];
@@ -14,7 +41,7 @@ class UIController {
     this.roomPlayersElement = document.getElementById("players");
     this.menuScreen = document.getElementById("menuScreen");
 
-    this.createUIController();
+    this.addEventListeners();
   }
 
   hideLoadingScreen = () => {
@@ -100,9 +127,93 @@ class UIController {
     this.clientController = controller;
   }
 
-  createUIController() {
-    this.gameUIController = new GameUIController(this);
-    this.gameUIController.addEventListeners();
+  addEventListeners() {
+    document.addEventListener("click", (e) => this.handleClick(e));
+  }
+
+  removeEventListeners() {
+    document.removeEventListener("click", (e) => this.handleClick(e));
+  }
+
+  handleClick(e) {
+    if (e.target.closest(".gameIgnoreClick") === null) {
+      return this.handleGameClick(e);
+    }
+    if (e.target.closest(".openMenu") !== null) {
+      return this.openMenu();
+    }
+    if (e.target.closest(".closeMenu") !== null) {
+      return this.closeMenu();
+    }
+    if (e.target.closest(".menuScreen") !== null) {
+      return this.clientController.menuController.handleClick(e);
+    }
+  }
+
+  openMenu() {
+    this.menuScreen.querySelector(".username").innerText =
+      this.clientController.user.username;
+    this.menuScreen.querySelector(".email").innerText =
+      this.clientController.user.email;
+    this.clientController.menuController.getDisplayPublicRooms();
+
+    this.clientController.ignoreGameInput = true;
+    this.menuScreen.style.opacity = 1;
+    this.menuScreen.style.pointerEvents = "auto";
+
+    this.menuScreen
+      .querySelector(".overlay")
+      .animate(animationOverlay, { duration: 200, fill: "forwards" });
+
+    const animationLayers = this.menuScreen.querySelectorAll(".animationLayer");
+    animationLayers.forEach((layer, i) => {
+      layer.style.opacity = 0;
+      layer.animate(animationLayer, {
+        duration: 400,
+        delay: i * 100,
+        fill: "forwards",
+        easing: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+      });
+    });
+
+    this.hideGameUI();
+  }
+
+  closeMenu() {
+    this.clientController.ignoreGameInput = false;
+    this.menuScreen.style.opacity = 0;
+    this.menuScreen.style.pointerEvents = "none";
+
+    this.menuScreen.querySelector(".overlay").animate(animationOverlay, {
+      duration: 100,
+      fill: "forwards",
+      direction: "reverse",
+    });
+
+    const animationLayers = this.menuScreen.querySelectorAll(".animationLayer");
+    animationLayers.forEach((layer) => {
+      layer.animate(animationLayer, {
+        duration: 0,
+        fill: "forwards",
+        direction: "reverse",
+      });
+    });
+
+    this.showGameUI();
+  }
+
+  hideGameUI() {
+    document.querySelectorAll(".gameUI").forEach((element) => {
+      element.style.scale = 0.9;
+      element.style.filter = "blur(10px)";
+    });
+  }
+
+  showGameUI() {
+    document.querySelectorAll(".gameUI").forEach((element) => {
+      element.style.scale = 1;
+      element.style.filter = "blur(0)";
+    });
   }
 
   handleGameClick(e) {

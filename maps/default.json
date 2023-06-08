@@ -1,5 +1,8 @@
 {
   "name": "default",
+  "displayName": "Lobby",
+  "displayGameMode": "Open",
+  "preview": "https://assets.kanapka.eu/images/defaultMapPreviewWCGAME.png",
   "config": {
     "gameMode": "open"
   },

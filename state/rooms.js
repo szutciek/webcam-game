@@ -32,6 +32,32 @@ class Rooms {
     return this.#rooms;
   }
 
+  publicRoomData() {
+    const list = [];
+    this.#rooms.forEach((room) => {
+      const playerList = [];
+      let creatorUsername = undefined;
+      room.players.forEach((player) => {
+        if (player.user._id === room.creatorId) {
+          creatorUsername = player.user.username;
+        }
+        playerList.push({
+          uuid: player.uuid,
+          username: player.username,
+        });
+      });
+
+      list.push({
+        code: room.code,
+        map: room.map,
+        gameMode: room.game.mode,
+        creator: creatorUsername,
+        players: playerList,
+      });
+    });
+    return list;
+  }
+
   get size() {
     return this.#rooms.size;
   }

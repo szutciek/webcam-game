@@ -1,5 +1,8 @@
 {
   "name": "shooting_range",
+  "displayName": "Shooting Range",
+  "displayGameMode": "Shooter V1",
+  "preview": "https://assets.kanapka.eu/images/shooting_rangeMapPreviewWCGAME.png",
   "config": {
     "gameMode": "shooterV1"
   },
