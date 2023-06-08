@@ -154,6 +154,8 @@ export default class ShooterV1 {
     });
   }
 
+  cleanUpUI() {}
+
   get centerPlayerWorld() {
     return [
       this.controller.player.position.x + this.controller.player.position.w / 2,

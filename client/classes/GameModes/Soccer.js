@@ -44,6 +44,12 @@ export default class Soccer {
     this.element.insertAdjacentElement("afterbegin", score);
   }
 
+  cleanUpUI() {
+    this.element.innerHTML = "";
+    const mapDiv = document.getElementById("mapDiv");
+    mapDiv.innerHTML = "";
+  }
+
   updateScore(home, guests) {
     this.homeElement.innerText = home;
     this.guestsElement.innerText = guests;

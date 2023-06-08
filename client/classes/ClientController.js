@@ -41,7 +41,11 @@ export default class ClientController {
   }
 
   joinRoom() {
-    console.warn(`Joining room ${this.room}`);
+    if (this.gameModeController) {
+      console.log("Cleaning up UI");
+      this.gameModeController.cleanUpUI();
+    }
+    console.log(`Joining room ${this.room}`);
     if (!this.user.uuid || !this.room) return;
     this.#ws.send(
       JSON.stringify({
@@ -67,7 +71,6 @@ export default class ClientController {
 
   async connectClient() {
     try {
-      if (!this.room) return;
       console.log("Connecting to server...");
       await this.connectServer();
       console.log(`Successfully connected to ${wsURL}`);
@@ -149,7 +152,7 @@ export default class ClientController {
   }
 
   stopRender() {
-    console.log("Stopping game & removing Game Controller");
+    console.log("Stopping & Removing Game Controller");
     if (this.gameController) this.gameController.stopGame();
     this.gameController = undefined;
     console.log("Removing Player");

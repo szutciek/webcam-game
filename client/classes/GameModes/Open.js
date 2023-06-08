@@ -20,5 +20,7 @@ export default class Open {
     // console.log(e)
   }
 
+  cleanUpUI() {}
+
   tick() {}
 }

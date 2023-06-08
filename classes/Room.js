@@ -295,6 +295,10 @@ module.exports = class Room {
     this.game.playerLeave(player);
     this.#players.delete(uuid);
 
+    if (String(player.user._id) === String(this.creatorId)) {
+      this.changeHost();
+    }
+
     this.broadcastRoomInfo();
     this.broadcast(
       {
@@ -305,6 +309,12 @@ module.exports = class Room {
       },
       uuid
     );
+  }
+
+  changeHost() {
+    // for now keep it simple
+    if (this.#players.size === 0) return;
+    this.creatorId = this.#players.values().next().value.user._id;
   }
 
   handleEvent(uuid, data) {
