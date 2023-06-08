@@ -1,5 +1,5 @@
-import "/classes/UIListener.js";
-import Message from "/classes/UIMessage.js";
+import "./UIListener.js";
+import Message from "./UIMessage.js";
 
 const animationOverlay = [
   {

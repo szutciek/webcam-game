@@ -1,5 +1,4 @@
-// import UIMessages from "/classes/UIMessages.js";
-import { clientController } from "/script.js";
+import { clientController } from "../script.js";
 
 const chatInput = document.getElementById("chatMessage");
 

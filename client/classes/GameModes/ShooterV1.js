@@ -1,4 +1,4 @@
-import Bullet from "/classes/Bullet.js";
+import Bullet from "../Bullet.js";
 
 export default class ShooterV1 {
   #ws = undefined;

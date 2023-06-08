@@ -1,5 +1,5 @@
-import Canvas from "/classes/Canvas.js";
-import { takePicture } from "/camera.js";
+import Canvas from "./Canvas.js";
+import { takePicture } from "../camera.js";
 
 export default class GameController {
   #ws = undefined;

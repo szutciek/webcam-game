@@ -1,4 +1,4 @@
-import GameObject from "/classes/GameObjects/GameObject.js";
+import GameObject from "./GameObject.js";
 
 export default class Circle extends GameObject {
   shape = "circ";

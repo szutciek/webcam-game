@@ -6,4 +6,5 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     filename: "webpack.bundle.js",
   },
+  mode: "production",
 };

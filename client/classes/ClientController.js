@@ -1,13 +1,14 @@
-import { wsURL } from "/config.js";
-import Player from "/classes/Player.js";
-import GameObjects from "/classes/GameObjects.js";
-import GameController from "/classes/GameController.js";
+import { wsURL } from "../config.js";
+import Player from "./Player.js";
+import GameObjects from "./GameObjects.js";
+import GameController from "./GameController.js";
+
+import Soccer from "./GameModes/Soccer.js";
+import Open from "./GameModes/Open.js";
+import ShooterV1 from "./GameModes/ShooterV1.js";
+import MenuController from "./MenuController.js";
 
 const gameModes = ["soccer", "open", "shooterV1"];
-import Soccer from "/classes/GameModes/Soccer.js";
-import Open from "/classes/GameModes/Open.js";
-import ShooterV1 from "/classes/GameModes/ShooterV1.js";
-import MenuController from "/classes/MenuController.js";
 
 export default class ClientController {
   #ws = undefined;

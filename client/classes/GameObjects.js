@@ -1,5 +1,5 @@
-import Rectangle from "/classes/GameObjects/Rectangle.js";
-import Circle from "/classes/GameObjects/Circle.js";
+import Rectangle from "./GameObjects/Rectangle.js";
+import Circle from "./GameObjects/Circle.js";
 import Player from "./GameObjects/Player.js";
 
 export default class GameObjects {

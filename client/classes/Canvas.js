@@ -1,4 +1,4 @@
-import { drawFace, drawBody, drawTag } from "/canvasMethods.js";
+import { drawFace, drawBody, drawTag } from "../canvasMethods.js";
 
 const loadedTextures = new Map();
 

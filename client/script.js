@@ -1,6 +1,6 @@
-import ClientController from "/classes/ClientController.js";
-import UIControllerClass from "/classes/UIController.js";
-import { requestCameraPermission, startStream, stream } from "/camera.js";
+import ClientController from "./classes/ClientController.js";
+import UIControllerClass from "./classes/UIController.js";
+import { requestCameraPermission, startStream, stream } from "./camera.js";
 
 let clientController;
 
