@@ -119,12 +119,11 @@ export default class ShooterV1 {
   handleMouseMove(e) {
     const angle = Math.atan2(
       window.innerWidth / 2 - e.clientX,
-      window.innerHeight / 2 - e.clientY
+      window.innerHeight / 2 - e.clientY,
       window.innerWidth / 2 - e.clientX,
       window.innerHeight / 2 - e.clientY
     );
     this.facingAngle = angle;
-    console.log(this.facingAngle);
   }
 
   tick() {

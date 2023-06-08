@@ -136,8 +136,6 @@ export default class ClientController {
     }
     this.UIController.updateRoomInfo(info);
 
-    console.table(info);
-
     if (info.game !== this.currentGameMode) {
       this.changeGameMode(info.game);
     }
@@ -163,7 +161,6 @@ export default class ClientController {
     if (this.gameController !== undefined) {
       this.gameController.setServerTimeOrigin(time);
     }
-    console.log(this.serverTimeOrigin);
   }
 
   sendChat(message) {

@@ -205,7 +205,6 @@ export default class GameController {
 
   setServerTimeOrigin(time) {
     this.serverTimeOrigin = time;
-    console.log(this.serverTimeOrigin);
   }
 
   syncCamera() {

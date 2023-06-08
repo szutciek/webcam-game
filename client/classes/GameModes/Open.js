@@ -7,7 +7,7 @@ export default class Open {
   }
 
   handleMessage(message) {
-    console.table(message);
+    // console.table(message);
   }
 
   predictMovement(secondsPassed) {}

@@ -129,7 +129,7 @@ export default class MenuController {
         const newUrl = window.location.origin + `/?room=${code}`;
         window.history.pushState({ path: newUrl }, "", newUrl);
 
-        this.clientController.changeRoom(code);
+        const change = this.clientController.changeRoom(code);
         if (change === true) this.clientController.joinRoom();
 
         this.closeMenu();
