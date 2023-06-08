@@ -1,0 +1,59 @@
+{
+  "name": "meme_gallery",
+  "displayName": "Meme Gallery",
+  "displayGameMode": "Open",
+  "preview": "https://assets.kanapka.eu/images/meme_galleryMapPreviewWCGAME.png",
+  "config": {
+    "gameMode": "open"
+  },
+  "spawnPoints": [
+    { "x": 0, "y": -200 },
+    { "x": 150, "y": -200 },
+    { "x": 300, "y": -200 },
+    { "x": 450, "y": -200 },
+    { "x": 600, "y": -200 }
+  ],
+  "objects": [
+    {
+      "coords": { "x": 0, "y": -650, "w": 400, "h": 400 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/top_gear_at_home_meme.jpg"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    },
+    {
+      "coords": { "x": 450, "y": -650, "w": 400, "h": 400 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/redemption_oven_meme.jpg"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    },
+
+    {
+      "coords": { "x": 0, "y": 50, "w": 400, "h": 400 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/avatar_staring_cargo_meme.jpg"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    },
+    {
+      "coords": { "x": 450, "y": 50, "w": 400, "h": 400 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/avatar_staring_chocolate_meme.jpg"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": false
+    }
+  ]
+}
