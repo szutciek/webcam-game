@@ -179,6 +179,7 @@ export default class ClientController {
 
   handleMessage(mes) {
     const message = JSON.parse(mes.data);
+
     if (message.type === "pinfo") {
       message.data.forEach((player) => {
         if (player.id !== this.user.uuid) {

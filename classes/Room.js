@@ -36,7 +36,6 @@ module.exports = class Room {
 
   changeGameMode(mode) {
     this.game = mode;
-    // console.log(`Game mode changed to ${this.game.mode} in room ${this.code}`);
     this.broadcast({
       type: "event",
       event: `Game mode changed to ${this.game.mode}`,
