@@ -95,6 +95,7 @@ export default class ShooterV1 {
       window.innerWidth / 2 - e.clientX,
       window.innerHeight / 2 - e.clientY
     );
+
     this.shoot(angle, this.centerPlayerWorld);
   }
 

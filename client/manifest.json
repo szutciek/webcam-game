@@ -1,0 +1,10 @@
+{
+  "short_name": "Webcam Game",
+  "name": "Webcam Game - Kanapka Studios",
+  "start_url": "/",
+  "background_color": "#ec7837",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#ec7837",
+  "description": "Webcam Game. Fun play"
+}

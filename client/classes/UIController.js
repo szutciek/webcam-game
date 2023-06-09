@@ -128,12 +128,12 @@ class UIController {
   }
 
   addEventListeners() {
-    document.addEventListener("click", (e) => this.handleClick(e));
+    document.addEventListener("mousedown", (e) => this.handleClick(e));
     document.addEventListener("mousemove", (e) => this.handleGameMouseMove(e));
   }
 
   removeEventListeners() {
-    document.removeEventListener("click", (e) => this.handleClick(e));
+    document.removeEventListener("mousedown", (e) => this.handleClick(e));
     document.removeEventListener("mousemove", (e) =>
       this.handleGameMouseMove(e)
     );
