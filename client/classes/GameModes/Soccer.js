@@ -67,8 +67,8 @@ export default class Soccer {
     }
   }
 
-  predictMovement(secondsPassed) {
-    this.predictBallMovement(secondsPassed);
+  predictMovement(secondsPassed, milisecondsServerStart) {
+    this.predictBallMovement(secondsPassed, milisecondsServerStart);
   }
 
   findBall() {
@@ -80,18 +80,20 @@ export default class Soccer {
     });
   }
 
-  predictBallMovement(secondsPassed) {
-    // if (this.ball === undefined) return;
-    // const [diffX, diffY] = this.calculateBallMovement();
-    // if (diffX === 0 && diffY === 0) return;
-    // const time =
-    //   this.controller.gameController.milisecondsServerStart - this.lastBallMove;
-    // const velX = diffX / time;
-    // const velY = diffX / time;
-    // console.log(velX * secondsPassed, velY);
-    // // this.ball.x += velX * secondsPassed;
-    // // this.ball.y += velY * secondsPassed;
-    // this.updateLastBallPosition(this.ball.x, this.ball.y);
+  predictBallMovement(secondsPassed, milisecondsServerStart) {
+    if (!this.ball) return;
+    const [diffX, diffY] = this.calculateBallMovement();
+    const timePassed = milisecondsServerStart - this.lastBallMove;
+
+    const velY = diffY / timePassed;
+    const velX = diffX / timePassed;
+
+    this.ball.x += velX * secondsPassed * 600;
+    this.ball.y += velY * secondsPassed * 600;
+
+    this.ball.rotation += diffX * Math.sign(diffX);
+
+    this.updateLastBallPosition(this.ball.x, this.ball.y);
   }
 
   calculateBallMovement() {

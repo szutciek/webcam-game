@@ -108,7 +108,10 @@ export default class GameController {
       // ==========================================================================
 
       this.gameObjects.predictMovement(secondsPassed);
-      this.controller.gameModeController.predictMovement(secondsPassed);
+      this.controller.gameModeController.predictMovement(
+        secondsPassed,
+        milisecondsServerStart
+      );
 
       // ==========================================================================
       // RENDERING PROCESS ========================================================
