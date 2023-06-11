@@ -54,6 +54,8 @@ export default class GameController {
 
   async renderFrame() {
     try {
+      if (this.#runGame === false) return;
+
       this.currentTick++;
       const now = performance.now();
       const secondsPassed = (now - this.lastTimeStamp) / 1000;
@@ -160,7 +162,6 @@ export default class GameController {
       if (this.#iteration === 120) this.#iteration === 0;
       this.lastTimeStamp = performance.now();
 
-      if (this.#runGame === false) return;
       requestAnimationFrame(() => {
         this.renderFrame();
       });
