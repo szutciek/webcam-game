@@ -3,14 +3,14 @@
   "name": "Webcam Game - Kanapka Studios",
   "start_url": "/",
   "background_color": "#ec7837",
-  "display": "standalone",
+  "display": "fullscreen",
   "scope": "/",
   "theme_color": "#ec7837",
   "description": "Webcam Game. Fun play",
   "icons": [
     {
-      "src": "images/touch/homescreen48.png",
-      "sizes": "48x48",
+      "src": "./icon-144.png",
+      "sizes": "144x144",
       "type": "image/png"
     }
   ]

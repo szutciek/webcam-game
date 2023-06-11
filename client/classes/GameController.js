@@ -57,6 +57,7 @@ export default class GameController {
       if (this.#runGame === false) return;
 
       this.currentTick++;
+
       const now = performance.now();
       const secondsPassed = (now - this.lastTimeStamp) / 1000;
       const notRounded = performance.timeOrigin + now - this.serverTimeOrigin;
@@ -93,27 +94,14 @@ export default class GameController {
       // SENDING POSITION TO SERVER (for validation) ==============================
       // ==========================================================================
 
-      if (this.#ws.readyState === WebSocket.OPEN) {
-        if (this.#iteration % 15 === 0) {
-          if (!this.player) return;
-          this.player.camera = takePicture();
-          this.syncCamera();
-        }
-        if (this.#iteration % 100 === 0) {
-          this.ping();
-        }
-        this.syncMovement(milisecondsServerStart);
-      }
+      if (this.#ws.readyState === WebSocket.OPEN)
+        this.handleSync(milisecondsServerStart);
 
       // ==========================================================================
       // PREDICTING CHANGES =======================================================
       // ==========================================================================
 
-      this.gameObjects.predictMovement(secondsPassed);
-      this.controller.gameModeController.predictMovement(
-        secondsPassed,
-        milisecondsServerStart
-      );
+      this.handlePrediction(secondsPassed, milisecondsServerStart);
 
       // ==========================================================================
       // RENDERING PROCESS ========================================================
@@ -144,27 +132,17 @@ export default class GameController {
       this.controller.gameModeController.tick();
 
       // ==========================================================================
-      // DISPLAYING STATS =========================================================
-      // ==========================================================================
-
-      // document.getElementById(
-      //   "renderedPlayers"
-      // ).innerText = `${prepared.length} Players`;
-      // document.getElementById(
-      //   "renderedItems"
-      // ).innerText = `${items.length} Objects, `;
-
-      // ==========================================================================
       // FINISHING TOUCHES ========================================================
       // ==========================================================================
 
       this.#iteration++;
       if (this.#iteration === 120) this.#iteration === 0;
-      this.lastTimeStamp = performance.now();
 
       requestAnimationFrame(() => {
         this.renderFrame();
       });
+
+      this.lastTimeStamp = performance.now();
     } catch (err) {
       console.warn(err);
     }
@@ -221,6 +199,36 @@ export default class GameController {
 
   setServerTimeOrigin(time) {
     this.serverTimeOrigin = time;
+  }
+
+  handlePrediction(secondsPassed, milisecondsServerStart) {
+    this.gameObjects.predictMovement(secondsPassed);
+    this.controller.gameModeController.predictMovement(
+      secondsPassed,
+      milisecondsServerStart
+    );
+  }
+
+  handleSync(milisecondsServerStart) {
+    this.handleCameraSync();
+    this.handlePing();
+    this.handleMovementSync(milisecondsServerStart);
+  }
+
+  handleCameraSync() {
+    if (this.#iteration % 15 === 0) {
+      if (!this.player) return;
+      this.player.camera = takePicture();
+      this.syncCamera();
+    }
+  }
+
+  handlePing() {
+    if (this.#iteration % 100 === 0) this.ping();
+  }
+
+  handleMovementSync(milisecondsServerStart) {
+    this.syncMovement(milisecondsServerStart);
   }
 
   syncCamera() {
