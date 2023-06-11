@@ -12,10 +12,6 @@ module.exports = class Ball {
     this.texture = texture;
   }
 
-  updatePosition(position) {
-    console.log(position);
-  }
-
   impact(playerPos, playerVel, playerId) {
     const colliding = this.rectangleCollision(playerPos);
     if (!colliding) return;
@@ -53,15 +49,8 @@ module.exports = class Ball {
   }
 
   slowDown() {
-    // this.ball.velocity.x =
-    //   Math.sign(this.ball.velocity.x) *
-    //   Math.floor(Math.abs((79 * this.ball.velocity.x) / 80));
-    // this.ball.velocity.y =
-    //   Math.sign(this.ball.velocity.y) *
-    //   Math.floor(Math.abs((79 * this.ball.velocity.y) / 80));
-
-    this.velocity.x *= 0.97;
-    this.velocity.y *= 0.97;
+    this.velocity.x *= 0.98;
+    this.velocity.y *= 0.98;
   }
 
   reset() {

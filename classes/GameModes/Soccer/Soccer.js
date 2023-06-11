@@ -8,7 +8,6 @@ const lerp = (s, e, t) => {
 module.exports = class Soccer extends GameMode {
   mode = "soccer";
 
-  lastContact = undefined;
   score = [0, 0];
 
   ballVelocity = {
@@ -128,7 +127,7 @@ module.exports = class Soccer extends GameMode {
   handleGoal(goalNr) {
     let player;
     this.room.players.forEach((p) => {
-      if (p.uuid === this.lastContact) player = p.username;
+      if (p.uuid === this.ball.lastContact) player = p.username;
     });
     if (!player) {
       player = "Anonymous";

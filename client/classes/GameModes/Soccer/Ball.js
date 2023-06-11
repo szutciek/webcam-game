@@ -23,19 +23,21 @@ export default class Ball {
     this.y += diffY;
   }
 
-  get rotation() {
-    this.rotation += this.velocities.x / 2;
+  calcRotation() {
+    this.rotation += this.velocities.x / 20;
+    return this.rotation;
   }
 
   get renderInfo() {
     // for canvas drawItem method
     const pos =
       this.gameModeController.controller.gC.translateCircleInView(this);
+    const rotation = this.calcRotation();
     return {
       x: pos.x,
       y: pos.y,
       r: pos.r,
-      rotation: this.rotation,
+      rotation: rotation,
       shape: "circ",
       texture: this.texture,
     };
