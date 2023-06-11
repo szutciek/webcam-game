@@ -17,6 +17,11 @@ export const requestCameraPermission = () => {
   });
 };
 
+const setupWorker = () => {
+  if (!window.Worker) throw new Error("Web worker not supported");
+  // cook later because can't record in worker
+};
+
 export const startStream = () => {
   return new Promise(async (res, rej) => {
     try {

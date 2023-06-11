@@ -82,18 +82,26 @@ module.exports = class Soccer extends GameMode {
 
   spawnBall() {
     try {
-      this.ball = this.room.addSpecialObject(
-        { x: -30, y: -30, r: 30 },
-        { type: "graphic", value: "https://assets.kanapka.eu/images/ball.png" },
-        {
-          shape: "circ",
-          dynamic: true,
-          colliding: false,
-          class: "soccer_ball",
-        }
-      );
+      // this.ball = this.room.addSpecialObject(
+      //   { x: -30, y: -30, r: 30 },
+      //   { type: "graphic", value: "https://assets.kanapka.eu/images/ball.png" },
+      //   {
+      //     shape: "circ",
+      //     dynamic: true,
+      //     colliding: false,
+      //     class: "soccer_ball",
+      //   }
+      // );
 
-      this.ball.room = this.room;
+      this.ball = {
+        x: -30,
+        y: -30,
+        r: 30,
+        velocities: {
+          x: 0,
+          y: 0,
+        },
+      };
     } catch (err) {
       throw err;
     }
