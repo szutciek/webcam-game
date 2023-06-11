@@ -59,6 +59,8 @@ const setup = async () => {
     clientController.joinRoom();
 
     UIController.hideLoadingScreen();
+
+    console.log("Finished loading");
   } catch (err) {
     console.log(err);
   }
