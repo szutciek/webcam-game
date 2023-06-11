@@ -4,7 +4,6 @@
   "start_url": "/",
   "background_color": "#ec7837",
   "display": "fullscreen",
-  "scope": "/",
   "theme_color": "#ec7837",
   "description": "Webcam Game. Fun play",
   "icons": [
