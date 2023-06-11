@@ -1,4 +1,7 @@
 export default class Ball {
+  playerMass = 50;
+  mass = 0.5;
+
   rotation = 0;
   velocities = { x: 0, y: 0 };
   texture = {
@@ -16,11 +19,46 @@ export default class Ball {
     this.texture.image.src = this.texture.value;
   }
 
+  impact(playerPos, playerVel) {
+    const colliding = this.rectangleCollision(playerPos);
+    if (!colliding) return;
+
+    const momentumXPlayer = Number(this.playerMass * playerVel.x);
+    this.velocities.x = momentumXPlayer / this.mass;
+
+    const momentumYPlayer = Number(this.playerMass * playerVel.y);
+    this.velocities.y = momentumYPlayer / this.mass;
+  }
+
+  rectangleCollision(rectangle) {
+    const intXLeft = Math.abs(this.x + this.r - rectangle.x) < this.r;
+    const intXRight =
+      Math.abs(rectangle.x + rectangle.w - this.x - this.r) < this.r;
+    const intXMiddle =
+      rectangle.x < this.x && rectangle.x + rectangle.w > this.x + this.r;
+
+    const intYTop = Math.abs(this.y + this.r - rectangle.y) < this.r;
+    const intYBottom =
+      Math.abs(rectangle.y + rectangle.h - this.y - this.r) < this.r;
+    const intYMiddle =
+      rectangle.y < this.y && rectangle.y + rectangle.h > this.y + this.r;
+
+    return (
+      (intXLeft || intXMiddle || intXRight) &&
+      (intYTop || intYMiddle || intYBottom)
+    );
+  }
+
   predictMovement(secondsPassed, milisecondsServerStart) {
-    const diffX = this.velocities.x * secondsPassed;
-    const diffY = this.velocities.y * secondsPassed;
-    this.x += diffX;
-    this.y += diffY;
+    const player = this.gameModeController.controller.gC.player;
+    if (!this.rectangleCollision(player.position)) {
+      const diffX = this.velocities.x * secondsPassed * 0.98;
+      const diffY = this.velocities.y * secondsPassed * 0.98;
+      this.x += diffX;
+      this.y += diffY;
+    } else {
+      this.impact(player.position, player.velocities);
+    }
   }
 
   calcRotation() {
