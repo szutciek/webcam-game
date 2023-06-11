@@ -1,4 +1,5 @@
-const GameMode = require("./GameMode.js");
+const GameMode = require("../GameMode.js");
+const Ball = require("./Ball.js");
 
 const lerp = (s, e, t) => {
   return (1 - t) * s + t * e;
@@ -93,57 +94,35 @@ module.exports = class Soccer extends GameMode {
       //   }
       // );
 
-      this.ball = {
-        x: -30,
-        y: -30,
-        r: 30,
-        velocities: {
-          x: 0,
-          y: 0,
-        },
-      };
+      this.ball = new Ball(
+        { x: -30, y: -30, r: 30 },
+        { x: 0, y: 0 },
+        { type: "graphic", value: "https://assets.kanapka.eu/images/ball.png" }
+      );
     } catch (err) {
       throw err;
     }
   }
 
-  tick(currentTime) {
-    // check if touching any players
+  tick(currentTime, syncTick) {
     this.room.players.forEach((p) => {
-      this.ballImpact(p.position, p.velocities, p.uuid);
+      this.ball.impact(p.position, p.velocities, p.uuid);
     });
 
-    // check if on border to bounce
-
-    // reset if gone too far off
     this.controlBallPosition();
 
     const timeBetween = currentTime - this.lastBallMove;
 
-    const newX = this.ball.x + (this.ballVelocity.x * timeBetween) / 1000;
-    const newY = this.ball.y + (this.ballVelocity.y * timeBetween) / 1000;
+    const newX = this.ball.x + (this.ball.velocity.x * timeBetween) / 1000;
+    const newY = this.ball.y + (this.ball.velocity.y * timeBetween) / 1000;
 
-    this.slowBallDown();
+    this.ball.slowDown();
 
-    this.ball.updatePosition({ x: newX, y: newY });
+    this.ball.x = newX;
+    this.ball.y = newY;
     this.lastBallMove = currentTime;
-  }
 
-  slowBallDown() {
-    this.ballVelocity.x =
-      Math.sign(this.ballVelocity.x) *
-      Math.floor(Math.abs((79 * this.ballVelocity.x) / 80));
-    this.ballVelocity.y =
-      Math.sign(this.ballVelocity.y) *
-      Math.floor(Math.abs((79 * this.ballVelocity.y) / 80));
-  }
-
-  resetBall() {
-    this.inGoal = false;
-    this.ballVelocity.x = 0;
-    this.ballVelocity.y = 0;
-    this.ball.r = 30;
-    this.ball.updatePosition({ x: -30, y: -30 });
+    if (syncTick === true) this.sendBallPosition();
   }
 
   handleGoal(goalNr) {
@@ -151,12 +130,17 @@ module.exports = class Soccer extends GameMode {
     this.room.players.forEach((p) => {
       if (p.uuid === this.lastContact) player = p.username;
     });
-    if (!player) player = "Anonymous";
+    if (!player) {
+      player = "Anonymous";
+    } else {
+      // update Players statistics
+    }
 
     this.inGoal = true;
     this.score[goalNr]++;
     setTimeout(() => {
-      this.resetBall();
+      this.ball.reset();
+      this.inGoal = false;
     }, 1000);
     this.room.broadcast({
       type: "game",
@@ -171,11 +155,11 @@ module.exports = class Soccer extends GameMode {
       if (this.inGoal === true) return;
       if (wall.y < 0) {
         if (this.ball.y < wall.y + wall.h) {
-          this.ballVelocity.y = Math.abs(this.ballVelocity.y);
+          this.ball.velocity.y = Math.abs(this.ball.velocity.y);
         }
       } else {
         if (this.ball.y + this.ball.r * 2 > wall.y) {
-          this.ballVelocity.y = -Math.abs(this.ballVelocity.y);
+          this.ball.velocity.y = -Math.abs(this.ball.velocity.y);
         }
       }
     });
@@ -188,11 +172,11 @@ module.exports = class Soccer extends GameMode {
       ) {
         if (wall.x < 0) {
           if (this.ball.x < wall.x + wall.w) {
-            this.ballVelocity.x = Math.abs(this.ballVelocity.x);
+            this.ball.velocity.x = Math.abs(this.ball.velocity.x);
           }
         } else {
           if (this.ball.x + this.ball.r * 2 > wall.x) {
-            this.ballVelocity.x = -Math.abs(this.ballVelocity.x);
+            this.ball.velocity.x = -Math.abs(this.ball.velocity.x);
           }
         }
       }
@@ -213,50 +197,18 @@ module.exports = class Soccer extends GameMode {
     });
   }
 
-  ballImpact(position, velocities, uuid) {
-    const colliding = this.circleRectangleCollision(
-      {
+  sendBallPosition() {
+    this.room.broadcast({
+      type: "game",
+      subType: "ball",
+      data: {
         x: this.ball.x,
         y: this.ball.y,
         r: this.ball.r,
+        velX: this.ball.velocity.x,
+        velY: this.ball.velocity.y,
       },
-      position
-    );
-
-    if (!colliding) return;
-
-    const momentumXPlayer = Number(this.playerMass * velocities.x);
-    // const momentumXBall = Number(this.ballMass * this.ballVelocity.x);
-    this.ballVelocity.x = momentumXPlayer / this.ballMass;
-
-    const momentumYPlayer = Number(this.playerMass * velocities.y);
-    // const momentumYBall = Number(this.ballMass * this.ballVelocity.y);
-    this.ballVelocity.y = momentumYPlayer / this.ballMass;
-
-    this.lastContact = uuid;
-  }
-
-  circleRectangleCollision(circle, rectangle) {
-    // if either x distance of y distance to
-    // between center of circle and nearest side
-    // of rectangle < radius of circle, intersection
-
-    const intXLeft = Math.abs(circle.x + circle.r - rectangle.x) < circle.r;
-    const intXRight =
-      Math.abs(rectangle.x + rectangle.w - circle.x - circle.r) < circle.r;
-    const intXMiddle =
-      rectangle.x < circle.x && rectangle.x + rectangle.w > circle.x + circle.r;
-
-    const intYTop = Math.abs(circle.y + circle.r - rectangle.y) < circle.r;
-    const intYBottom =
-      Math.abs(rectangle.y + rectangle.h - circle.y - circle.r) < circle.r;
-    const intYMiddle =
-      rectangle.y < circle.y && rectangle.y + rectangle.h > circle.y + circle.r;
-
-    return (
-      (intXLeft || intXMiddle || intXRight) &&
-      (intYTop || intYMiddle || intYBottom)
-    );
+    });
   }
 
   handleEvent(player, data) {}

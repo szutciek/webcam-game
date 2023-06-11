@@ -87,10 +87,12 @@ module.exports = class Room {
         }
       });
 
-      this.game.tick(currentTime);
+      const syncTick = this.#sendPackets % 4 === 0;
+
+      this.game.tick(currentTime, syncTick);
 
       // reduce the frequency of sending packets
-      if (this.#sendPackets % 4 === 0) {
+      if (syncTick === true) {
         let list = [];
         if (this.#includeCam % 3 === 0) {
           list = this.getAllPlayersQuickData(true);

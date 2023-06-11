@@ -1,4 +1,4 @@
-const GameMode = require("./GameMode.js");
+const GameMode = require("../GameMode.js");
 
 module.exports = class Open extends GameMode {
   mode = "open";

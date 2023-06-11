@@ -3,9 +3,9 @@ import Player from "./Player.js";
 import GameObjects from "./GameObjects.js";
 import GameController from "./GameController.js";
 
-import Soccer from "./GameModes/Soccer.js";
-import Open from "./GameModes/Open.js";
-import ShooterV1 from "./GameModes/ShooterV1.js";
+import Soccer from "./GameModes/Soccer/Soccer.js";
+import Open from "./GameModes/Open/Open.js";
+import ShooterV1 from "./GameModes/ShooterV1/ShooterV1.js";
 import MenuController from "./MenuController.js";
 
 const gameModes = ["soccer", "open", "shooterV1"];
@@ -326,6 +326,10 @@ export default class ClientController {
     this.menuController = new MenuController(this);
   }
 
+  drawItem(item) {
+    this.gameController.drawItem(item);
+  }
+
   set ignoreGameInput(value) {
     this.#ignoreGameInput = value;
     if (value === true) {
@@ -346,5 +350,9 @@ export default class ClientController {
         // reject if some time passes
       }, 50);
     });
+  }
+
+  get gC() {
+    return this.gameController;
   }
 }

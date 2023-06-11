@@ -179,6 +179,14 @@ export default class GameController {
     return change;
   }
 
+  translateCircleInView(item) {
+    const change = { ...item };
+    change.x = item.x - this.#x;
+    change.y = item.y - this.#y;
+    change.r = item.r;
+    return change;
+  }
+
   translateToCanvas([x, y]) {
     return [x - this.#x, y - this.#y];
   }
@@ -206,6 +214,10 @@ export default class GameController {
     });
     return list;
   };
+
+  drawItem(item) {
+    this.canvas.drawItem(item);
+  }
 
   setServerTimeOrigin(time) {
     this.serverTimeOrigin = time;
@@ -277,6 +289,14 @@ export default class GameController {
       w: this.#vw,
       h: this.#vh,
     };
+  }
+
+  get x() {
+    return this.#x;
+  }
+
+  get y() {
+    return this.#y;
   }
 
   ping() {

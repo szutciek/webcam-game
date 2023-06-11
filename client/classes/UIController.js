@@ -175,7 +175,7 @@ class UIController {
       layer.style.opacity = 0;
       layer.animate(animationLayer, {
         duration: 400,
-        delay: i * 100,
+        delay: i * 80,
         fill: "forwards",
         easing: "cubic-bezier(0.34, 1.56, 0.64, 1)",
       });

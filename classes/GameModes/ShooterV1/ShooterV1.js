@@ -1,7 +1,7 @@
-const UserError = require("../../utils/UserError.js");
+const UserError = require("../../../utils/UserError.js");
 
-const GameMode = require("./GameMode.js");
-const Bullet = require("../Bullet.js");
+const GameMode = require("../GameMode.js");
+const Bullet = require("./Bullet.js");
 
 module.exports = class Open extends GameMode {
   mode = "shooterV1";

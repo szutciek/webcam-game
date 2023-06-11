@@ -3,9 +3,9 @@ const UserError = require("../utils/UserError");
 const { loadMap, findAvalibleMaps } = require("./gameMapController");
 
 const GameMode = require("../classes/GameModes/GameMode.js");
-const Soccer = require("../classes/GameModes/Soccer.js");
-const ShooterV1 = require("../classes/GameModes/ShooterV1.js");
-const Open = require("../classes/GameModes/Open.js");
+const Soccer = require("../classes/GameModes/Soccer/Soccer.js");
+const ShooterV1 = require("../classes/GameModes/ShooterV1/ShooterV1.js");
+const Open = require("../classes/GameModes/Open/Open.js");
 
 exports.handleRoomJoin = async (message, ws, client) => {
   try {
