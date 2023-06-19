@@ -351,6 +351,10 @@ module.exports = class Room {
     clients.find(uuid).sendTo(this.getRoomInfo());
   }
 
+  findClient(uuid) {
+    return clients.find(uuid);
+  }
+
   broadcastRoomInfo() {
     this.broadcast(this.getRoomInfo());
   }

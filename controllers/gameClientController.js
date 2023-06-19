@@ -15,7 +15,7 @@ exports.handleAuthClient = async (data, ws) => {
     if (!_id) throw new UserError("Error while decoding token", 400);
 
     const user = await Authentication.findUserId(_id);
-    if (!user) throw new UserError("Error while finding user", 400);
+    if (!user) throw new UserError("Error while finding user", 404);
 
     if (clients.alreadyOnline(user._id))
       throw new UserError("User is already online", 403);

@@ -4,6 +4,7 @@ const { loadMap, findAvalibleMaps } = require("./gameMapController");
 
 const GameMode = require("../classes/GameModes/GameMode.js");
 const Soccer = require("../classes/GameModes/Soccer/Soccer.js");
+const Sus = require("../classes/GameModes/Sus/Sus.js");
 const ShooterV1 = require("../classes/GameModes/ShooterV1/ShooterV1.js");
 const Open = require("../classes/GameModes/Open/Open.js");
 
@@ -48,6 +49,8 @@ exports.handleRoomJoin = async (message, ws, client) => {
           room.changeGameMode(new Soccer(client.user._id, room));
         } else if (data.config.gameMode === "shooterV1") {
           room.changeGameMode(new ShooterV1(client.user._id, room));
+        } else if (data.config.gameMode === "sus") {
+          room.changeGameMode(new Sus(client.user._id, room));
         } else {
           room.changeGameMode(new Open(client.user._id, room));
         }

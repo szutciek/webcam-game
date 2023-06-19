@@ -4,11 +4,12 @@ import GameObjects from "./GameObjects.js";
 import GameController from "./GameController.js";
 
 import Soccer from "./GameModes/Soccer/Soccer.js";
+import Sus from "./GameModes/Sus/Sus.js";
 import Open from "./GameModes/Open/Open.js";
 import ShooterV1 from "./GameModes/ShooterV1/ShooterV1.js";
 import MenuController from "./MenuController.js";
 
-const gameModes = ["soccer", "open", "shooterV1"];
+const gameModes = ["soccer", "open", "shooterV1", "sus"];
 
 export default class ClientController {
   #ws = undefined;
@@ -128,6 +129,10 @@ export default class ClientController {
       this.currentGameMode = "shooterV1";
       this.gameModeController = new ShooterV1(this, this.#ws);
     }
+    if (gameMode === "sus") {
+      this.currentGameMode = "sus";
+      this.gameModeController = new Sus(this, this.#ws);
+    }
     if (gameMode === "open") {
       this.currentGameMode = "open";
       this.gameModeController = new Open(this, this.#ws);
@@ -237,7 +242,7 @@ export default class ClientController {
     }
 
     if (message.type === "error") {
-      if ([401, 403].includes(message.code)) {
+      if ([400, 401, 402, 403, 404].includes(message.code)) {
         const search = new URLSearchParams(document.location.search);
         const room = search.get("room");
         const map = search.get("map");

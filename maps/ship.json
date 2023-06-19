@@ -1,0 +1,24 @@
+{
+  "name": "ship",
+  "displayName": "Ship",
+  "displayGameMode": "Amogus",
+  "preview": "https://assets.kanapka.eu/images/defaultMapPreviewWCGAME.png",
+  "config": {
+    "gameMode": "sus"
+  },
+  "spawnPoints": [
+    { "x": -10000, "y": -10000 },
+    { "x": -10200, "y": -10000 },
+    { "x": -10400, "y": -10000 },
+    { "x": -10600, "y": -10000 },
+    { "x": -10800, "y": -10000 },
+    { "x": -11000, "y": -10000 },
+    { "x": -10000, "y": -10300 },
+    { "x": -10200, "y": -10300 },
+    { "x": -10400, "y": -10300 },
+    { "x": -10600, "y": -10300 },
+    { "x": -10800, "y": -10300 },
+    { "x": -11000, "y": -10300 }
+  ],
+  "objects": []
+}
