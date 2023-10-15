@@ -1,5 +1,8 @@
 import Canvas from "./Canvas.js";
 import { takePicture } from "../camera.js";
+import { getRecordedAudio } from "../voice.js";
+
+const testAudio = new Audio();
 
 export default class GameController {
   #ws = undefined;
@@ -16,6 +19,8 @@ export default class GameController {
   lastTimeStamp = 0.015;
   serverTimeOrigin = 0;
   currentTick = 0;
+
+  audio = [];
 
   constructor(controller, ws) {
     if (!controller.player)
@@ -54,6 +59,7 @@ export default class GameController {
 
   async renderFrame() {
     try {
+      const time = performance.now();
       if (this.#runGame === false) return;
 
       this.currentTick++;
@@ -143,6 +149,7 @@ export default class GameController {
       });
 
       this.lastTimeStamp = performance.now();
+      // console.log(performance.now() - time);
     } catch (err) {
       console.warn(err);
     }
@@ -213,6 +220,7 @@ export default class GameController {
     this.handleCameraSync();
     this.handlePing();
     this.handleMovementSync(milisecondsServerStart);
+    this.handleAudioSync();
   }
 
   handleCameraSync() {
@@ -220,6 +228,25 @@ export default class GameController {
       if (!this.player) return;
       this.player.camera = takePicture();
       this.syncCamera();
+    }
+  }
+
+  handleAudioSync() {
+    if (this.#iteration % 15 === 0) {
+      if (!this.player) return;
+      const [blob, time] = getRecordedAudio();
+      this.audio.push(blob);
+
+      const audioURL = URL.createObjectURL(new Blob(this.audio));
+      testAudio.src = audioURL;
+      testAudio
+        .play()
+        .then(() => {
+          testAudio.currentTime = time / 1000 - 0.5;
+        })
+        .catch((err) => console.log("Play error"));
+      this.player.addAudioBlob(blob);
+      this.syncAudio();
     }
   }
 
@@ -236,6 +263,16 @@ export default class GameController {
       JSON.stringify({
         type: "cam",
         camera: this.player?.camera,
+      })
+    );
+  }
+
+  async syncAudio() {
+    this.send(
+      JSON.stringify({
+        type: "aud",
+        audio: await this.player?.latestAudio.text(),
+        // the timestamp should probably also be sent but idk
       })
     );
   }

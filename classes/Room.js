@@ -380,6 +380,21 @@ module.exports = class Room {
     }
   }
 
+  updatePlayerAudio(uuid, audio) {
+    if (audio != undefined) {
+      const player = this.getPlayer(uuid);
+      if (!player) return;
+      this.broadcast(
+        {
+          type: "aud",
+          uuid,
+          audio,
+        },
+        uuid
+      );
+    }
+  }
+
   getPlayerChunks(player, preview = true) {
     const chunkX = this.identifyChunk(player.position.x);
     const chunkY = this.identifyChunk(player.position.y);

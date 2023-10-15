@@ -47,6 +47,8 @@ export default class Player {
 
   lastTimeStamp = undefined;
 
+  audio = [];
+
   constructor(position = [0, 0, 100, 200], username = "Anonymous") {
     this.#x = position[0];
     this.#y = position[1];
@@ -54,6 +56,10 @@ export default class Player {
     this.#h = position[3];
 
     this.username = username;
+  }
+
+  addAudioBlob(blob) {
+    this.audio.push(blob);
   }
 
   subtractVelocity = () => {
@@ -368,5 +374,9 @@ export default class Player {
       s: this.#inpS,
       w: this.#inpW,
     };
+  }
+
+  get latestAudio() {
+    return this.audio[this.audio.length - 1];
   }
 }

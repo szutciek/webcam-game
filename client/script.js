@@ -1,6 +1,11 @@
 import ClientController from "./classes/ClientController.js";
 import UIControllerClass from "./classes/UIController.js";
-import { requestCameraPermission, startStream, stream } from "./camera.js";
+import {
+  requestCameraPermission,
+  startVideoStream,
+  videoStream,
+} from "./camera.js";
+import { requestMicPermission, startAudioStream } from "./voice.js";
 
 let clientController;
 
@@ -33,12 +38,14 @@ const setup = async () => {
       user?.panelColor
     );
 
-    UIController.changeLoadStatus("Starting camera stream");
+    UIController.changeLoadStatus("Starting media streams");
     await requestCameraPermission();
-    await startStream();
+    await requestMicPermission();
+    await startVideoStream();
+    await startAudioStream();
 
-    UIController.showCameraLoadingScreen(stream);
-    UIController.showCameraMenuScreen(stream);
+    UIController.showCameraLoadingScreen(videoStream);
+    UIController.showCameraMenuScreen(videoStream);
 
     UIController.changeLoadStatus("Connecting to server");
     clientController = new ClientController(

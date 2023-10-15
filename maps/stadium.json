@@ -152,7 +152,7 @@
       "coords": { "x": 140, "y": -800, "w": 100, "h": 140 },
       "texture": {
         "type": "graphic",
-        "value": "https://kanapka.eu/assets/ceo.png"
+        "value": "https://assets.kanapka.eu/images/ceo.png"
       },
       "shape": "rect",
       "dynamic": false,

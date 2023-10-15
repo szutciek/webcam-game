@@ -33,6 +33,20 @@ exports.handleSyncCam = (data, client, ws) => {
   }
 };
 
+exports.handleSyncAud = (data, client, ws) => {
+  try {
+    if (!client.roomRef || !client.room)
+      throw new UserError("Join a room first");
+
+    if (typeof data.audio !== "string")
+      throw new UserError("Audio data should be a string");
+
+    client.roomRef.updatePlayerAudio(ws.uuid, data.audio);
+  } catch (err) {
+    throw err;
+  }
+};
+
 exports.handleGameEvent = (data, client) => {
   try {
     if (!client.roomRef || !client.room)

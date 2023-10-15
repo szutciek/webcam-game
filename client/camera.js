@@ -3,7 +3,7 @@ const canvasStream = document.createElement("canvas");
 const context = canvasStream.getContext("2d");
 
 const [width, height] = [100, 100];
-export let stream = undefined;
+export let videoStream = undefined;
 
 export const requestCameraPermission = () => {
   return new Promise(async (res, rej) => {
@@ -22,10 +22,10 @@ const setupWorker = () => {
   // cook later because can't record in worker
 };
 
-export const startStream = () => {
+export const startVideoStream = () => {
   return new Promise(async (res, rej) => {
     try {
-      stream = await navigator.mediaDevices.getUserMedia({
+      videoStream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: 100,
           height: 100,
@@ -34,7 +34,7 @@ export const startStream = () => {
         },
         audio: false,
       });
-      video.srcObject = stream;
+      video.srcObject = videoStream;
       video.play();
       res(true);
     } catch (err) {
