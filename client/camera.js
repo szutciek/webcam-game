@@ -12,7 +12,7 @@ export const requestCameraPermission = () => {
       if (permission.state !== "denied") res();
       rej(new Error("Couldn't get camera permissions"));
     } catch (err) {
-      rej(new Error("Couldn't get camera permissions"));
+      rej(new Error(`Error while getting camera permissions: ${err}`));
     }
   });
 };
