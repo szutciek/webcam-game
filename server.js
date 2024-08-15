@@ -6,11 +6,12 @@ const errorSender = require("./utils/errorSender.js");
 const {
   database,
   expressPort,
+  dbAddress,
+  dbName,
   dbAuthOn,
   dbUser,
   dbPwd,
-  dbAddress,
-  dbName,
+  dbAuthDB,
 } = require("./config.js");
 
 const dbConn = dbAuthOn
