@@ -153,7 +153,7 @@ module.exports = class Player {
       valid = false;
     }
 
-    if (clientTimeBetween > 100) {
+    if (clientTimeBetween > 500) {
       clients.find(this.uuid).sendTo({
         type: "latwarn",
         latency: clientTimeBetween,

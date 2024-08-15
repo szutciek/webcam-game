@@ -29,8 +29,10 @@ export default class GameObjects {
       );
 
     player.updatePosition(data.position);
-    player.updatePose(data.pose);
     player.updateInfo(data);
+    if (data.pose) {
+      player.updatePose(data.pose);
+    }
 
     this.#players.set(id, player);
   }

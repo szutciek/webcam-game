@@ -87,6 +87,24 @@ module.exports = class Room {
         }
       });
 
+      // check if players are close to each other and reacts
+      const playersList = Array.from(this.#players.values());
+      for (let i = 0; i < playersList.length; i++) {
+        for (let j = 0; j < playersList.length; j++) {
+          if (i >= j) continue;
+          const player1 = playersList[i];
+          const player2 = playersList[j];
+          if (Math.abs(player1.y - player2.y) > 200) continue;
+          if (Math.abs(player1.x - player2.x) < 150) {
+            const p1OnLeft = player1.x < player2.x;
+            player1.pose.madLeft = p1OnLeft;
+            player1.pose.madRight = !p1OnLeft;
+            player2.pose.madLeft = !p1OnLeft;
+            player2.pose.madRight = p1OnLeft;
+          }
+        }
+      }
+
       const syncTick = this.#sendPackets % 4 === 0;
 
       this.game.tick(currentTime, syncTick);
