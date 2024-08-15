@@ -5,6 +5,16 @@ let recorder = undefined;
 export const requestMicPermission = () => {
   return new Promise(async (res, rej) => {
     try {
+      const isFirefox = navigator.userAgent.includes("Firefox");
+      if (isFirefox === true) {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        if (!devices) rej(new Error("FIREFOX: No devices detected"));
+        const microphone = devices.find((d) => d.kind === "audioinput");
+        if (!microphone)
+          rej(new Error("FIREFOX:Audio input device not available"));
+        return res();
+      }
+
       const permission = await navigator.permissions.query({
         name: "microphone",
       });

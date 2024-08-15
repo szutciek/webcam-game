@@ -42,7 +42,7 @@ const setup = async () => {
     await requestCameraPermission();
     await requestMicPermission();
     await startVideoStream();
-    await startAudioStream();
+    // await startAudioStream();
 
     UIController.showCameraLoadingScreen(videoStream);
     UIController.showCameraMenuScreen(videoStream);

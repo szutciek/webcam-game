@@ -8,6 +8,16 @@ export let videoStream = undefined;
 export const requestCameraPermission = () => {
   return new Promise(async (res, rej) => {
     try {
+      const isFirefox = navigator.userAgent.includes("Firefox");
+      if (isFirefox === true) {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        if (!devices) rej(new Error("FIREFOX: No devices detected"));
+        const camera = devices.find((d) => d.kind === "videoinput");
+        if (!camera)
+          rej(new Error("FIREFOX: Video input device not available"));
+        return res();
+      }
+
       const permission = await navigator.permissions.query({ name: "camera" });
       if (permission.state !== "denied") res();
       rej(new Error("Couldn't get camera permissions"));
