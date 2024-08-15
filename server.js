@@ -3,11 +3,23 @@ const express = require("express");
 const app = express();
 
 const errorSender = require("./utils/errorSender.js");
-const { database, expressPort } = require("./config.js");
+const {
+  database,
+  expressPort,
+  dbAuthOn,
+  dbUser,
+  dbPwd,
+  dbAddress,
+  dbName,
+} = require("./config.js");
+
+const dbConn = dbAuthOn
+  ? `mongodb://${dbUser}:${dbPwd}@${dbAddress}/${dbName}?authSource=${dbAuthDB}`
+  : `mongodb://${dbAddress}/${dbName}`;
 
 mongoose.set("strictQuery", false);
 mongoose
-  .connect(`mongodb://127.0.0.1:27017/${database}`)
+  .connect(dbConn)
   .then(() => {
     console.log(`Connected to ${database} database`);
   })
