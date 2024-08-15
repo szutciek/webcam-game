@@ -49,10 +49,12 @@ export const drawBody = (ctx, player) => {
   const rightHandEnd = [x + w - 15, y + h / 2 + 30];
 
   const leftLegStart = [centerX, y + h - 60];
-  const leftLegEnd = [x + w / 3, y + h];
+  // const leftLegEnd = [x + w / 3, y + h];
+  const leftLegEnd = [x + w / 2, y + h];
 
   const rightLegStart = [centerX, y + h - 60];
-  const rightLegEnd = [x + (2 * w) / 3, y + h];
+  // const rightLegEnd = [x + (2 * w) / 3, y + h];
+  const rightLegEnd = [x + w / 2, y + h];
 
   ctx.font = " 30pt Poppins";
   ctx.fillStyle = "black";
@@ -98,46 +100,41 @@ export const drawBody = (ctx, player) => {
     ctx.drawImage(handR, rightHandEnd[0] - 15, rightHandEnd[1] - 30, 30, 40);
   }
 
-  if (player.animationMovement.state === "idle") {
-    ctx.beginPath();
-    ctx.moveTo(...leftLegStart);
-    ctx.lineTo(...leftLegEnd);
-    ctx.moveTo(...rightLegStart);
-    ctx.lineTo(...rightLegEnd);
-    ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(...leftLegStart);
+  ctx.lineTo(
+    leftLegEnd[0] + player.animationMovement.left.disp,
+    leftLegEnd[1] + player.animationMovement.left.lift
+  );
+  ctx.moveTo(...rightLegStart);
+  ctx.lineTo(
+    rightLegEnd[0] + player.animationMovement.right.disp,
+    rightLegEnd[1] + player.animationMovement.right.lift
+  );
+  ctx.stroke();
 
-    ctx.drawImage(footL, leftLegEnd[0] - 30, leftLegEnd[1] - 25, 40, 30);
-    ctx.drawImage(footR, rightLegEnd[0] - 10, rightLegEnd[1] - 25, 40, 30);
-  } else {
-    ctx.beginPath();
-    ctx.moveTo(...leftLegStart);
-    ctx.lineTo(
-      leftLegEnd[0] + player.animationMovement.left.disp,
-      leftLegEnd[1]
-    );
-    ctx.moveTo(...rightLegStart);
-    ctx.lineTo(
-      rightLegEnd[0] + player.animationMovement.right.disp,
-      rightLegEnd[1]
-    );
-    ctx.stroke();
+  let leftImage = player.velX > 0 ? footR : footL;
+  let rightImage = player.velX > 0 ? footR : footL;
 
-    const footImage = player.velX > 0 ? footR : footL;
-    ctx.drawImage(
-      footImage,
-      leftLegEnd[0] + player.animationMovement.left.disp - 30,
-      leftLegEnd[1] - 25,
-      40,
-      30
-    );
-    ctx.drawImage(
-      footImage,
-      rightLegEnd[0] + player.animationMovement.right.disp - 10,
-      rightLegEnd[1] - 25,
-      40,
-      30
-    );
+  if (player.velX === 0) {
+    leftImage = footL;
+    rightImage = footR;
   }
+
+  ctx.drawImage(
+    leftImage,
+    leftLegEnd[0] + player.animationMovement.left.disp - 30,
+    leftLegEnd[1] + player.animationMovement.left.lift - 25,
+    40,
+    30
+  );
+  ctx.drawImage(
+    rightImage,
+    rightLegEnd[0] + player.animationMovement.right.disp - 10,
+    rightLegEnd[1] + player.animationMovement.right.lift - 25,
+    40,
+    30
+  );
 };
 
 export const drawTag = (ctx, x, y, w, _, name) => {

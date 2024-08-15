@@ -10,6 +10,12 @@ const lerp = (s, e, t) => {
   return (1 - t) * s + t * e;
 };
 
+const clamp = (x, min, max) => {
+  if (x < min) return min;
+  if (x > max) return max;
+  return x;
+};
+
 export default class Player {
   #x = 0;
   #y = 0;
@@ -37,13 +43,18 @@ export default class Player {
     state: "idle",
     left: {
       disp: 0,
-      returning: false,
+      lift: 0,
+      mult: 1,
     },
     right: {
       disp: 0,
-      returning: false,
+      lift: 0,
+      mult: -1,
     },
   };
+  legRange = 30;
+  legReturnProgress = 0;
+  legReturnTime = 1;
 
   lastTimeStamp = undefined;
 
@@ -259,85 +270,87 @@ export default class Player {
     this.#x += Math.sign(this.velX) * f(Math.abs(this.velX * secondsPassed));
     this.#y += Math.sign(this.velY) * f(Math.abs(this.velY * secondsPassed));
 
-    this.updateAnimation();
+    this.updateAnimation(secondsPassed);
 
     document.getElementById("position").innerText = `${Math.floor(
       this.#x
     )}, ${Math.floor(this.#y)}`;
   };
 
-  updateAnimation() {
-    if (this.velX) {
-      if (this.animationMovement.state === "idle") {
-        if (this.velX < 0) {
-          this.animationMovement.left.returning = true;
-          this.animationMovement.left.disp = -30;
-        } else {
-          this.animationMovement.right.returning = true;
-          this.animationMovement.right.disp = 30;
-        }
+  liftFunction = (x, isOnGround) => {
+    if (isOnGround === true) return 0;
+    if (x < -1) return 0;
+    if (x > 1) return 0;
+    return 10 * (x - 1) * (x + 1);
+  };
+
+  updateAnimation(delta) {
+    if (this.velX === 0) {
+      if (this.animationMovement.state === "moving") {
+        this.legReturnProgress = 0;
+        this.animationMovement.state = "idle";
       }
 
-      this.animationMovement.state = "moving";
+      if (this.legReturnProgress < this.legReturnTime) {
+        const decimal = this.legReturnProgress / this.legReturnTime;
+        const anim = this.animationMovement;
 
-      if (this.animationMovement.left.returning) {
-        this.animationMovement.left.disp -= this.velX / 2;
-      } else {
-        this.animationMovement.left.disp += this.velX / 10;
+        const leftDelay = anim.left.lift > anim.right.lift ? 0.2 : 0;
+        const rightDelay = anim.right.lift > anim.left.lift ? 0.2 : 0;
+
+        anim.left.disp = lerp(
+          anim.left.disp,
+          -20,
+          clamp(decimal - leftDelay, 0, 1)
+        );
+        anim.right.disp = lerp(
+          anim.right.disp,
+          20,
+          clamp(decimal - rightDelay, 0, 1)
+        );
+        anim.left.lift = lerp(
+          anim.left.lift,
+          0,
+          clamp(decimal - leftDelay, 0, 1)
+        );
+        anim.right.lift = lerp(
+          anim.right.lift,
+          0,
+          clamp(decimal - rightDelay, 0, 1)
+        );
+
+        this.legReturnProgress += delta;
+        return;
       }
 
-      if (this.animationMovement.left.disp > 30) {
-        this.animationMovement.left.disp = 30;
-        if (!this.animationMovement.left.returning) {
-          this.animationMovement.left.returning = true;
-        } else {
-          this.animationMovement.left.returning = false;
-        }
-      }
-      if (this.animationMovement.left.disp < -30) {
-        this.animationMovement.left.disp = -30;
-        if (!this.animationMovement.left.returning) {
-          this.animationMovement.left.returning = true;
-        } else {
-          this.animationMovement.left.returning = false;
-        }
-      }
-
-      if (this.animationMovement.right.returning) {
-        this.animationMovement.right.disp -= this.velX / 2;
-      } else {
-        this.animationMovement.right.disp += this.velX / 10;
-      }
-
-      if (this.animationMovement.right.disp > 30) {
-        this.animationMovement.right.disp = 30;
-        if (!this.animationMovement.right.returning) {
-          this.animationMovement.right.returning = true;
-        } else {
-          this.animationMovement.right.returning = false;
-        }
-      }
-      if (this.animationMovement.right.disp < -30) {
-        this.animationMovement.right.disp = -30;
-        if (!this.animationMovement.right.returning) {
-          this.animationMovement.right.returning = true;
-        } else {
-          this.animationMovement.right.returning = false;
-        }
-      }
-    } else {
-      this.animationMovement = {
-        state: "idle",
-        left: {
-          disp: 0,
-          returning: false,
-        },
-        right: {
-          disp: 0,
-          returning: false,
-        },
-      };
+      return;
     }
+
+    const flip = this.velX > 0 ? true : false;
+
+    const anim = this.animationMovement;
+    anim.state = "moving";
+    const disp = Math.abs(this.velX * 10 * delta);
+
+    anim.left.disp += disp * anim.left.mult;
+    const decimalL = anim.left.disp / this.legRange;
+    const liftL = this.liftFunction(
+      decimalL,
+      flip ? anim.left.mult < 0 : anim.left.mult > 0
+    );
+    anim.left.lift = liftL;
+    if (decimalL > 1) anim.left.mult = -1;
+    if (decimalL < -1) anim.left.mult = 1;
+
+    anim.right.disp += disp * anim.right.mult;
+    const decimalR = anim.right.disp / this.legRange;
+    const liftR = this.liftFunction(
+      decimalR,
+      flip ? anim.left.mult > 0 : anim.left.mult < 0
+    );
+    anim.right.lift = liftR;
+    if (decimalR > 1) anim.right.mult = -1;
+    if (decimalR < -1) anim.right.mult = 1;
   }
 
   updatePose(pose) {

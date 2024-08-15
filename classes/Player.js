@@ -42,8 +42,14 @@ module.exports = class Player {
   }
 
   updatePose(pose) {
-    if (this.gameOverrideReaction !== false) return;
-    this.pose = pose;
+    if (this.gameOverrideReaction !== true) {
+      this.pose = pose;
+    } else {
+      const { madLeft, madRight } = pose;
+      this.pose = pose;
+      this.pose.madLeft = madLeft;
+      this.pose.madRight = madRight;
+    }
   }
 
   addClientTick(tick) {
