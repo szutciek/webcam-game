@@ -127,24 +127,35 @@ module.exports = class Soccer extends GameMode {
   handleGoal(goalNr) {
     let player;
     this.room.players.forEach((p) => {
-      if (p.uuid === this.ball.lastContact) player = p.username;
+      if (p.uuid === this.ball.lastContact) player = p;
     });
-    if (!player) {
-      player = "Anonymous";
+    if (!player.username) {
+      player = { username: "Anonymous" };
     } else {
       // update Players statistics
     }
 
+    player.gameOverrideReaction = true;
+    player.pose = {
+      madLeft: true,
+      madRight: true,
+      crouching: false,
+    };
+
     this.inGoal = true;
     this.score[goalNr]++;
+
     setTimeout(() => {
       this.ball.reset();
       this.inGoal = false;
-    }, 1000);
+
+      // requires FIX
+      player.gameOverrideReaction = false;
+    }, 5000);
     this.room.broadcast({
       type: "game",
       event: "goal",
-      message: `${player} scored a goal! ${this.score[0]}:${this.score[1]}`,
+      message: `${player.username} scored a goal! ${this.score[0]}:${this.score[1]}`,
       score: this.score,
     });
   }

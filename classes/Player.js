@@ -29,6 +29,7 @@ module.exports = class Player {
     madLeft: false,
     madRight: false,
   };
+  gameOverrideReaction = false;
   camera = "";
 
   clientTicks = [];
@@ -41,6 +42,7 @@ module.exports = class Player {
   }
 
   updatePose(pose) {
+    if (this.gameOverrideReaction !== false) return;
     this.pose = pose;
   }
 
@@ -303,6 +305,13 @@ module.exports = class Player {
   }
   get h() {
     return this.position.h;
+  }
+
+  notifyPoseChange() {
+    clients.find(this.uuid).sendTo({
+      type: "pose",
+      pose: this.pose,
+    });
   }
 
   quickData(camera) {

@@ -136,7 +136,6 @@ export default class Player {
   }
 
   updatePose(pose) {
-    console.log(pose.madLeft);
     this.pose = pose;
   }
 

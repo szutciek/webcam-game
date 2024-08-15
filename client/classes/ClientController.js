@@ -190,6 +190,8 @@ export default class ClientController {
       message.data.forEach((player) => {
         if (player.id !== this.user.uuid) {
           this.gameObjects.updatePlayer(player.id, player);
+        } else {
+          this.player.updatePose(player.pose);
         }
       });
       return;

@@ -340,6 +340,10 @@ export default class Player {
     }
   }
 
+  updatePose(pose) {
+    this.pose = pose;
+  }
+
   get x() {
     return this.#x;
   }

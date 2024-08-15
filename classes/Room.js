@@ -87,6 +87,8 @@ module.exports = class Room {
         }
       });
 
+      // code removed - gets sent anyway
+      // const newPlayerPoses = {};
       // check if players are close to each other and reacts
       const playersList = Array.from(this.#players.values());
       for (let i = 0; i < playersList.length; i++) {
@@ -94,16 +96,59 @@ module.exports = class Room {
           if (i >= j) continue;
           const player1 = playersList[i];
           const player2 = playersList[j];
-          if (Math.abs(player1.y - player2.y) > 200) continue;
-          if (Math.abs(player1.x - player2.x) < 150) {
+          if (
+            Math.abs(player1.y - player2.y) < 200 &&
+            Math.abs(player1.x - player2.x) < 150
+          ) {
             const p1OnLeft = player1.x < player2.x;
-            player1.pose.madLeft = p1OnLeft;
-            player1.pose.madRight = !p1OnLeft;
-            player2.pose.madLeft = !p1OnLeft;
-            player2.pose.madRight = p1OnLeft;
+            // code removed - gets sent anyway
+            // newPlayerPoses[player1.uuid] = {
+            //   madLeft: !p1OnLeft,
+            //   madRight: p1OnLeft,
+            // };
+            // newPlayerPoses[player2.uuid] = {
+            //   madLeft: p1OnLeft,
+            //   madRight: !p1OnLeft,
+            // };
+            if (player1.gameOverrideReaction !== true) {
+              player1.pose.madLeft = !p1OnLeft;
+              player1.pose.madRight = p1OnLeft;
+            }
+            if (player2.gameOverrideReaction !== true) {
+              player2.pose.madLeft = p1OnLeft;
+              player2.pose.madRight = !p1OnLeft;
+            }
+          } else {
+            // code removed - gets sent anyway
+            // newPlayerPoses[player1.uuid] = {
+            //   madLeft: false,
+            //   madRight: false,
+            // };
+            // newPlayerPoses[player2.uuid] = {
+            //   madLeft: false,
+            //   madRight: false,
+            // };
+            if (player1.gameOverrideReaction !== true) {
+              player1.pose.madLeft = false;
+              player1.pose.madRight = false;
+            }
+            if (player2.gameOverrideReaction !== true) {
+              player2.pose.madLeft = false;
+              player2.pose.madRight = false;
+            }
           }
         }
       }
+      // method removed - gets sent anyway
+      // Object.entries(newPlayerPoses).forEach(([uuid, pose]) => {
+      //   const player = this.#players.get(uuid);
+      //   let changed = false;
+      //   if (player.pose.madLeft !== pose.madLeft) changed = true;
+      //   if (player.pose.madRight !== pose.madRight) changed = true;
+      //   player.pose.madLeft = pose.madLeft;
+      //   player.pose.madRight = pose.madRight;
+      //   if (changed) player.notifyPoseChange();
+      // });
 
       const syncTick = this.#sendPackets % 4 === 0;
 
@@ -112,7 +157,7 @@ module.exports = class Room {
       // reduce the frequency of sending packets
       if (syncTick === true) {
         let list = [];
-        if (this.#includeCam % 3 === 0) {
+        if (this.#includeCam % 4 === 0) {
           list = this.getAllPlayersQuickData(true);
           this.#includeCam = 0;
         } else {
