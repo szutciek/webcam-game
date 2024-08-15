@@ -220,7 +220,7 @@ export default class GameController {
     this.handleCameraSync();
     this.handlePing();
     this.handleMovementSync(milisecondsServerStart);
-    this.handleAudioSync();
+    // this.handleAudioSync();
   }
 
   handleCameraSync() {
