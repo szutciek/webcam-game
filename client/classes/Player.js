@@ -150,8 +150,8 @@ export default class Player {
     }
 
     if (e.key === "Shift") {
-      this.pose.crouching = true;
-
+      // DISABLED CROUCING
+      // this.pose.crouching = true;
       // // doesnt work with current collisions
       // if (this.#h !== 150) this.#y += 50;
       // this.#h = 150;
