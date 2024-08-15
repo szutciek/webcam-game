@@ -42,12 +42,12 @@ export default class Player {
   animationMovement = {
     state: "idle",
     left: {
-      disp: 0,
+      disp: -20,
       lift: 0,
       mult: 1,
     },
     right: {
-      disp: 0,
+      disp: 20,
       lift: 0,
       mult: -1,
     },

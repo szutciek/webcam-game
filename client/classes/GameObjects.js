@@ -28,7 +28,9 @@ export default class GameObjects {
         }
       );
 
-    player.updatePosition(data.position);
+    const secondsPassed = (new Date().getTime() - player.lastUpdate) / 1000;
+
+    player.updatePosition(data.position, secondsPassed);
     player.updateInfo(data);
     if (data.pose) {
       player.updatePose(data.pose);

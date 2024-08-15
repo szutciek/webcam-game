@@ -113,10 +113,12 @@ export const drawBody = (ctx, player) => {
   );
   ctx.stroke();
 
-  let leftImage = player.velX > 0 ? footR : footL;
-  let rightImage = player.velX > 0 ? footR : footL;
+  const actualVelX = Math.abs(player.velX) < 1 ? 0 : player.velX;
 
-  if (player.velX === 0) {
+  let leftImage = actualVelX > 0 ? footR : footL;
+  let rightImage = actualVelX > 0 ? footR : footL;
+
+  if (actualVelX === 0) {
     leftImage = footL;
     rightImage = footR;
   }
