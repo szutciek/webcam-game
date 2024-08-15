@@ -4,7 +4,6 @@ const app = express();
 
 const errorSender = require("./utils/errorSender.js");
 const {
-  database,
   expressPort,
   dbAddress,
   dbName,
@@ -22,7 +21,7 @@ mongoose.set("strictQuery", false);
 mongoose
   .connect(dbConn)
   .then(() => {
-    console.log(`Connected to ${database} database`);
+    console.log(`Connected to ${dbName} database`);
   })
   .catch((err) => {
     console.log(err);
