@@ -54,7 +54,7 @@ export default class Player {
   };
   legRange = 30;
   legReturnProgress = 0;
-  legReturnTime = 1;
+  legReturnTime = 0.4;
 
   lastTimeStamp = undefined;
 
@@ -295,8 +295,10 @@ export default class Player {
         const decimal = this.legReturnProgress / this.legReturnTime;
         const anim = this.animationMovement;
 
-        const leftDelay = anim.left.lift > anim.right.lift ? 0.2 : 0;
-        const rightDelay = anim.right.lift > anim.left.lift ? 0.2 : 0;
+        const leftDelay =
+          anim.left.lift > anim.right.lift ? this.legReturnTime / 5 : 0;
+        const rightDelay =
+          anim.right.lift > anim.left.lift ? this.legReturnTime / 5 : 0;
 
         anim.left.disp = lerp(
           anim.left.disp,
