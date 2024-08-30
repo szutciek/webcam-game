@@ -1,10 +1,14 @@
-import { requestCameraPermission, startStream, stream } from "/camera.js";
+import {
+  requestCameraPermission,
+  startVideoStream,
+  videoStream,
+} from "/camera.js";
 
 requestCameraPermission()
   .then(() => {
-    startStream().then(() => {
+    startVideoStream().then(() => {
       const cameraPreview = document.getElementById("cameraPreview");
-      cameraPreview.srcObject = stream;
+      cameraPreview.srcObject = videoStream;
       cameraPreview.play();
     });
   })
