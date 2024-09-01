@@ -47,13 +47,16 @@ class UIController {
   hideLoadingScreen = () => {
     const visible = new Date().getTime() - this.timeShown;
     // show for minimum 2.5 seconds to avoid flash
-    setTimeout(() => {
-      setTimeout(() => {
-        this.screen.style.display = "none";
-      }, 300);
-      this.screen.style.opacity = 0;
-      this.screen.style.pointerEvents = "none";
-    }, 0 * 1000 - visible);
+    setTimeout(
+      () => {
+        setTimeout(() => {
+          this.screen.style.display = "none";
+        }, 300);
+        this.screen.style.opacity = 0;
+        this.screen.style.pointerEvents = "none";
+      },
+      0 * 1000 - visible,
+    );
   };
 
   updateRoomInfo(info) {
@@ -81,8 +84,13 @@ class UIController {
     camera.play();
   };
 
-  changeLoadStatus = (status) => {
+  changeLoadStatus = (status, isError) => {
     this.screen.querySelector("#loadStatusDisplay").innerText = status;
+
+    if (isError === true) {
+      this.screen.querySelector("#loadStatusDisplay").style.color = "#ff0000";
+      this.screen.querySelector(".center").style.display = "none";
+    }
   };
 
   createMessage(content, icon, type) {
@@ -135,7 +143,7 @@ class UIController {
   removeEventListeners() {
     document.removeEventListener("mousedown", (e) => this.handleClick(e));
     document.removeEventListener("mousemove", (e) =>
-      this.handleGameMouseMove(e)
+      this.handleGameMouseMove(e),
     );
   }
 

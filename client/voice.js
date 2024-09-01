@@ -10,8 +10,7 @@ export const requestMicPermission = () => {
         const devices = await navigator.mediaDevices.enumerateDevices();
         if (!devices) rej(new Error("FIREFOX: No devices detected"));
         const microphone = devices.find((d) => d.kind === "audioinput");
-        if (!microphone)
-          rej(new Error("FIREFOX:Audio input device not available"));
+        if (!microphone) rej(new Error("FIREFOX: Audio device not available"));
         return res();
       }
 

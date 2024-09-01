@@ -13,8 +13,7 @@ export const requestCameraPermission = () => {
         const devices = await navigator.mediaDevices.enumerateDevices();
         if (!devices) rej(new Error("FIREFOX: No devices detected"));
         const camera = devices.find((d) => d.kind === "videoinput");
-        if (!camera)
-          rej(new Error("FIREFOX: Video input device not available"));
+        if (!camera) rej(new Error("FIREFOX: Video device not available"));
         return res();
       }
 

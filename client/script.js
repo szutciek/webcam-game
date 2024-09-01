@@ -16,8 +16,9 @@ const redirectToSignin = (message, room, map) => {
 };
 
 const setup = async () => {
+  const UIController = new UIControllerClass();
+
   try {
-    // handle room selection with ui
     const search = new URLSearchParams(window.location.search);
     const room = search.get("room");
     const map = search.get("map");
@@ -31,11 +32,10 @@ const setup = async () => {
       redirectToSignin("Please log in to play", room, map);
     }
 
-    const UIController = new UIControllerClass();
     UIController.showLoadingScreen(
       user.username,
       user?.profile,
-      user?.panelColor
+      user?.panelColor,
     );
 
     UIController.changeLoadStatus("Starting media streams");
@@ -53,7 +53,7 @@ const setup = async () => {
         token,
         username: user.username,
       },
-      UIController
+      UIController,
     );
 
     UIController.showUser(user.username, user.panelColor);
@@ -67,6 +67,7 @@ const setup = async () => {
 
     UIController.hideLoadingScreen();
   } catch (err) {
+    UIController.changeLoadStatus(`${err}`, true);
     console.log(err);
   }
 };
