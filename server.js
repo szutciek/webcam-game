@@ -11,6 +11,7 @@ const {
   dbUser,
   dbPwd,
   dbAuthDB,
+  inProduction,
 } = require("./config.js");
 
 const dbConn = dbAuthOn
@@ -31,18 +32,24 @@ const apiRouter = require("./routes/apiRouter.js");
 
 require("./websocket");
 
-app.use(express.static("client/"));
-
-app.get("/", (_, res) => res.send(index));
+if (inProduction === true) {
+  app.get("/", (_, res) => res.sendFile(__dirname + "/dist/index.html"));
+  app.get("/webpack.bundle.js", (_, res) =>
+    res.sendFile(__dirname + "/dist/webpack.bundle.js"),
+  );
+} else {
+  app.get("/", (_, res) => res.sendFile(__dirname + "/client/index.html"));
+}
 app.get("/signin", (_, res) =>
-  res.sendFile(__dirname + "/client/pages/signin.html")
+  res.sendFile(__dirname + "/client/pages/signin.html"),
 );
 app.get("/signup", (_, res) =>
-  res.sendFile(__dirname + "/client/pages/signup.html")
+  res.sendFile(__dirname + "/client/pages/signup.html"),
 );
 
-app.use(express.json());
 app.use("/api", apiRouter);
+
+app.use(express.static("client/"));
 
 app.use(errorSender);
 

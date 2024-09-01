@@ -14,8 +14,9 @@ const {
   handleChatMessage,
 } = require("./controllers/gameSyncController.js");
 const { handleRoomJoin } = require("./controllers/gameRoomController");
+const { wsPort } = require("./config.js");
 
-const wss = new WSS({ port: 5501 });
+const wss = new WSS({ port: wsPort });
 
 wss.on("connection", function connection(ws) {
   ws.on("message", async function message(data) {

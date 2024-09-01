@@ -19,6 +19,8 @@ const {
 } = require("../controllers/gameMapController.js");
 const { rooms } = require("../controllers/gameRoomController.js");
 
+router.use(express.json());
+
 router.post("/login", async (req, res, next) => {
   try {
     let ok = true;
@@ -59,7 +61,7 @@ router.post("/login", async (req, res, next) => {
     }
 
     const user = await User.findOne({ email: req.body.email }).select(
-      "+password"
+      "+password",
     );
 
     if (!user) {
@@ -238,8 +240,8 @@ router.post("/signup", async (req, res, next) => {
       next(
         new UserError(
           `Couldn't validate ${Object.keys(err.errors).join(", ")}`,
-          400
-        )
+          400,
+        ),
       );
     } else if (err.code === 11000) {
       let duplicates = [];
@@ -252,7 +254,7 @@ router.post("/signup", async (req, res, next) => {
       next(
         new UserError("Bad request", 400, {
           fields: duplicates,
-        })
+        }),
       );
     } else {
       next(err);
@@ -264,7 +266,7 @@ router.get("/maps", async (req, res, next) => {
   try {
     const availibleMaps = await findAvalibleMaps();
     const promises = availibleMaps.map(async (name) =>
-      JSON.parse(await loadMap(name.split(".")[0]))
+      JSON.parse(await loadMap(name.split(".")[0])),
     );
     const maps = await Promise.all(promises);
 
@@ -272,7 +274,7 @@ router.get("/maps", async (req, res, next) => {
       status: "success",
       message: "Maps recieved",
       data: maps.map((map) =>
-        choose(map, ["name", "displayName", "preview", "displayGameMode"])
+        choose(map, ["name", "displayName", "preview", "displayGameMode"]),
       ),
     });
   } catch (err) {
