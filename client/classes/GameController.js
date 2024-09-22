@@ -283,7 +283,6 @@ export default class GameController {
         type: "mov",
         velocities: this.player.velocities,
         position: this.player.position,
-        pose: this.player.pose,
         relativeTimeStamp: timeStamp,
         tick: this.currentTick,
       })

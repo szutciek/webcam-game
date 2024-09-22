@@ -53,11 +53,11 @@ module.exports = class Player {
   }
 
   addClientTick(tick) {
-    this.clientTicks.length = 10;
+    // WTF IS THIS???
+    // this.clientTicks.length = 10;
     this.clientTicks.unshift({
       velocities: tick.velocities,
       position: tick.position,
-      pose: tick.pose,
       tick: tick.tick,
       relativeTimeStamp: tick.relativeTimeStamp,
     });
@@ -123,7 +123,6 @@ module.exports = class Player {
 
     const newestPos = this.clientTicks[0].position;
     const newestVel = this.clientTicks[0].velocities;
-    const newestPose = this.clientTicks[0].pose;
     const newestTick = this.clientTicks[0].tick;
     const newestClientTime = this.clientTicks[0].relativeTimeStamp;
 
@@ -131,10 +130,6 @@ module.exports = class Player {
     if (newestClientTime >= currentTime) {
       valid = false;
     }
-
-    // validate pose
-    const pose = this.validatePose(newestPose);
-    this.pose = pose;
 
     // validate velocities so never exceed 15
     const { x: vX, y: vY } = this.validateVelocity(newestVel);

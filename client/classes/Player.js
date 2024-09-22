@@ -356,6 +356,7 @@ export default class Player {
   }
 
   updatePose(pose) {
+    if (!pose) return;
     this.pose = pose;
   }
 
@@ -374,16 +375,16 @@ export default class Player {
 
   get position() {
     return {
-      x: this.#x,
-      y: this.#y,
+      x: Math.round(this.#x),
+      y: Math.round(this.#y),
       w: this.#w,
       h: this.#h,
     };
   }
   get velocities() {
     return {
-      x: this.velX,
-      y: this.velY,
+      x: Math.round(this.velX),
+      y: Math.round(this.velY),
     };
   }
   get inputs() {
