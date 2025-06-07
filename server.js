@@ -35,16 +35,22 @@ require("./websocket");
 if (inProduction === true) {
   app.get("/", (_, res) => res.sendFile(__dirname + "/dist/index.html"));
   app.get("/webpack.bundle.js", (_, res) =>
-    res.sendFile(__dirname + "/dist/webpack.bundle.js"),
+    res.sendFile(__dirname + "/dist/webpack.bundle.js")
   );
 } else {
   app.get("/", (_, res) => res.sendFile(__dirname + "/client/index.html"));
 }
 app.get("/signin", (_, res) =>
-  res.sendFile(__dirname + "/client/pages/signin.html"),
+  res.sendFile(__dirname + "/client/pages/signin.html")
 );
 app.get("/signup", (_, res) =>
-  res.sendFile(__dirname + "/client/pages/signup.html"),
+  res.sendFile(__dirname + "/client/pages/signup.html")
+);
+app.get("/recover", (_, res) =>
+  res.sendFile(__dirname + "/client/pages/recover.html")
+);
+app.get("/reset", (_, res) =>
+  res.sendFile(__dirname + "/client/pages/reset.html")
 );
 
 app.use("/api", apiRouter);

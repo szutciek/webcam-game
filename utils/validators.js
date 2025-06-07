@@ -45,7 +45,7 @@ exports.validateNumbers = (str) => {
 exports.validateCharacters = (str) => {
   if (!["number", "string"].includes(typeof str) || str.length > 200)
     return false;
-  const pattern = /^[A-Za-z0-9 .ąćęłńóśżźĄĆĘŁŃÓŚŻŹ-]*$/;
+  const pattern = /^[A-Za-z0-9 ._ąćęłńóśżźĄĆĘŁŃÓŚŻŹ-]*$/;
   return pattern.test(str);
 };
 

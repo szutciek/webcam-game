@@ -14,26 +14,6 @@
   ],
   "objects": [
     {
-      "coords": { "x": -800, "y": -400, "w": 600, "h": 800 },
-      "texture": {
-        "type": "graphic",
-        "value": "https://assets.kanapka.eu/images/jaehee.jpg"
-      },
-      "shape": "rect",
-      "dynamic": false,
-      "colliding": false
-    },
-    {
-      "coords": { "x": 250, "y": -400, "w": 600, "h": 800 },
-      "texture": {
-        "type": "graphic",
-        "value": "https://assets.kanapka.eu/images/jaehee.jpg"
-      },
-      "shape": "rect",
-      "dynamic": false,
-      "colliding": false
-    },
-    {
       "coords": { "x": -870, "y": -500, "w": 20, "h": 320 },
       "texture": { "type": "color", "value": "#aaaaaa" },
       "shape": "rect",

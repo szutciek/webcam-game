@@ -1,5 +1,4 @@
 let waiting = false;
-let loggedIn = false;
 const inputs = [...document.querySelectorAll(".fancyInput")];
 
 const search = new URLSearchParams(document.location.search);
@@ -119,7 +118,7 @@ const handleInputChange = (i) => {
 const animateButton = (state) => {
   const button = document.getElementById("submit");
   if (state === "default") {
-    button.innerHTML = "Sign in";
+    button.innerHTML = "Send email";
     button.style.backgroundColor = "#97acdf";
     button.style.cursor = "pointer";
   }
@@ -135,38 +134,28 @@ const animateButton = (state) => {
   }
 };
 
-const saveUserData = (user) => {
-  if (!user) return;
-  window.localStorage.setItem("token", user.token);
-  window.localStorage.setItem("user", JSON.stringify(user));
-};
-
-const login = () => {
+const recover = () => {
   return new Promise(async (resolve, reject) => {
     try {
       if (waiting) throw new Error("Still waiting for response");
-      if (loggedIn) throw new Error("Already logged in");
       let valid = true;
 
       const email = inputs.find((i) => i.dataset.field === "email");
-      const password = inputs.find((i) => i.dataset.field === "password");
 
       const emailInput = email.querySelector("input");
-      const passwordInput = password.querySelector("input");
 
-      if (!valid) throw new Error("Login request not valid");
+      if (!valid) throw new Error("Recovery request not valid");
 
       animateButton("loading");
 
       waiting = true;
-      const res = await fetch("/api/login", {
+      const res = await fetch("/api/initiate-password-reset", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: emailInput.value,
-          password: passwordInput.value,
         }),
       });
       waiting = false;
@@ -180,13 +169,13 @@ const login = () => {
         message.additional?.fields?.forEach((err) => {
           handleInputError(err.field, err.message);
         });
+        renderMessage(message.message);
       }
       if (res.status === 200) {
         animateButton("success");
-        saveUserData(message.user);
-        loggedIn = true;
+        const apiMessage = message.message;
         setTimeout(() => {
-          window.location = `/${query.length ? `?${query.join("&")}` : ""}`;
+          window.location = `/recover?email=${emailInput.value}&message=${apiMessage}`;
         }, 1 * 1000);
         resolve();
       }
@@ -202,20 +191,13 @@ document.addEventListener("click", (e) => {
   }
 
   if (e.target.id === "submit") {
-    login();
-  }
-
-  if (e.target.closest("#recover")) {
-    const emailField = inputs
-      .find((i) => i.dataset.field === "email")
-      .querySelector("input");
-    window.location = `/recover?email=${emailField.value}`;
+    recover();
   }
 });
 
 document.addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
-    login();
+    recover();
   }
 });
 

@@ -35,12 +35,12 @@ const setup = async () => {
     UIController.showLoadingScreen(
       user.username,
       user?.profile,
-      user?.panelColor,
+      user?.panelColor
     );
 
     UIController.changeLoadStatus("Starting media streams");
     await requestCameraPermission();
-    await requestMicPermission();
+    // await requestMicPermission();
     await startVideoStream();
     // await startAudioStream();
 
@@ -53,7 +53,7 @@ const setup = async () => {
         token,
         username: user.username,
       },
-      UIController,
+      UIController
     );
 
     UIController.showUser(user.username, user.panelColor);

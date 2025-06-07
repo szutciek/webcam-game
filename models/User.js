@@ -40,9 +40,22 @@ const userSchema = new mongoose.Schema({
     minlength: [8, "Password must be longer than 8 characters"],
     select: false,
   },
+  passwordLastChanged: {
+    type: Date,
+    select: false,
+  },
+  passwordChangeCodeExpiration: {
+    type: Date,
+    select: false,
+  },
+  passwordChangeCode: {
+    type: String,
+    select: false,
+  },
 });
 
 userSchema.methods.setPassword = function (password) {
+  this.passwordLastChanged = new Date();
   this.password = bcrypt.hashSync(password, 9);
 };
 

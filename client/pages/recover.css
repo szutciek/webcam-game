@@ -71,7 +71,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   list-style: none;
-  min-width: 300px;
+  min-width: 400px;
   max-height: 200px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -110,7 +110,7 @@ body {
 
 .container {
   margin: 10px;
-  max-width: 300px;
+  max-width: 400px;
 }
 
 .title {
@@ -214,13 +214,12 @@ body {
   margin: 0.5rem 0;
   text-align: right;
 }
-.password p {
-  cursor: pointer;
+.password a {
   color: #8c8c8c;
   font-size: 0.8rem;
   text-decoration: none;
 }
-.password p:hover {
+.password a:hover {
   color: #92a1ba;
   text-decoration: underline;
 }

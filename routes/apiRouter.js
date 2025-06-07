@@ -10,6 +10,7 @@ const {
   validateCharacters,
   rgbMap,
 } = require("../utils/validators.js");
+const { sendRecoveryEmail } = require("../utils/mailer.js");
 const User = require("../models/User.js");
 const Authentication = require("../classes/Authentication.js");
 
@@ -61,7 +62,7 @@ router.post("/login", async (req, res, next) => {
     }
 
     const user = await User.findOne({ email: req.body.email }).select(
-      "+password",
+      "+password"
     );
 
     if (!user) {
@@ -240,8 +241,8 @@ router.post("/signup", async (req, res, next) => {
       next(
         new UserError(
           `Couldn't validate ${Object.keys(err.errors).join(", ")}`,
-          400,
-        ),
+          400
+        )
       );
     } else if (err.code === 11000) {
       let duplicates = [];
@@ -254,7 +255,7 @@ router.post("/signup", async (req, res, next) => {
       next(
         new UserError("Bad request", 400, {
           fields: duplicates,
-        }),
+        })
       );
     } else {
       next(err);
@@ -262,11 +263,180 @@ router.post("/signup", async (req, res, next) => {
   }
 });
 
+router.post("/initiate-password-reset", async (req, res, next) => {
+  try {
+    let ok = true;
+    let errors = [];
+
+    if (req.body.email === undefined || req.body.email.length === 0) {
+      ok = false;
+      errors.push({
+        field: "email",
+        message: "Required",
+      });
+    } else if (!validateEmail(req.body.email)) {
+      ok = false;
+      errors.push({
+        field: "email",
+        message: "The provided email is not valid",
+      });
+    }
+
+    if (ok !== true) {
+      throw new UserError("Bad request", 400, {
+        fields: errors,
+      });
+    }
+
+    const user = await User.findOne({ email: req.body.email }).select([
+      "+passwordChangeCode",
+      "+passwordChangeCodeExpiration",
+    ]);
+
+    if (!user) {
+      throw new UserError("User not found", 404, {
+        fields: [
+          {
+            field: "email",
+            message: "Account with this email not found",
+          },
+        ],
+      });
+    }
+
+    if (new Date(user.passwordChangeCodeExpiration).getTime() > Date.now()) {
+      throw new UserError(
+        `Password reset already initiated. Check your inbox for a link valid until ${new Date(
+          user.passwordChangeCodeExpiration
+        )}`
+      );
+    }
+
+    const resetPasswordCode = crypto.randomUUID();
+    user.passwordChangeCode = resetPasswordCode;
+    const resetPasswordCodeExpiration = new Date(Date.now() + 5 * 60 * 1000);
+    user.passwordChangeCodeExpiration = resetPasswordCodeExpiration;
+    await user.save();
+
+    await sendRecoveryEmail(user);
+
+    res.status(200).json({
+      status: "success",
+      message: "Password reset initiated",
+      displayMessage: "The reset link should arrive in your inbox",
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+});
+
+router.post("/complete-password-reset", async (req, res, next) => {
+  try {
+    let ok = true;
+    let errors = [];
+
+    if (req.body.email === undefined || req.body.email.length === 0) {
+      ok = false;
+      errors.push({
+        field: "email",
+        message: "Required",
+      });
+    } else if (!validateEmail(req.body.email)) {
+      ok = false;
+      errors.push({
+        field: "email",
+        message: "The provided email is not valid",
+      });
+    }
+
+    if (req.body.password === undefined || req.body.password.length === 0) {
+      ok = false;
+      errors.push({
+        field: "password",
+        message: "Required",
+      });
+    } else if (!validateManyCharacters(req.body.password)) {
+      ok = false;
+      errors.push({
+        field: "password",
+        message: "Password includes invalid characters",
+      });
+    }
+
+    if (req.body.code === undefined || req.body.code.length === 0) {
+      ok = false;
+      errors.push({
+        field: "code",
+        message: "Required",
+      });
+    } else if (!validateManyCharacters(req.body.code)) {
+      ok = false;
+      errors.push({
+        field: "code",
+        message: "Code includes invalid characters",
+      });
+    }
+
+    if (ok !== true) {
+      throw new UserError("Bad request", 400, {
+        fields: errors,
+      });
+    }
+
+    const user = await User.findOne({ email: req.body.email }).select([
+      "+passwordChangeCode",
+      "+passwordChangeCodeExpiration",
+    ]);
+
+    if (!user) {
+      throw new UserError("User not found", 404, {
+        fields: [
+          {
+            field: "email",
+            message: "Account with this email not found",
+          },
+        ],
+      });
+    }
+
+    if (!user.passwordChangeCode) {
+      throw new UserError(
+        `The password reset sequence has not been started. Please try again.`
+      );
+    }
+
+    if (new Date(user.passwordChangeCodeExpiration).getTime() < Date.now()) {
+      throw new UserError(`Password reset code expired. Please try again.`);
+    }
+
+    if (user.passwordChangeCode !== req.body.code) {
+      throw new UserError(`The provided code is not valid. Please try again.`);
+    }
+
+    user.setPassword(req.body.password);
+    await user.save();
+
+    user.passwordChangeCode = "";
+    user.passwordChangeCodeExpiration = new Date();
+    await user.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "Password reset completed",
+      displayMessage: "You can now log in with your new password",
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+});
+
 router.get("/maps", async (req, res, next) => {
   try {
     const availibleMaps = await findAvalibleMaps();
     const promises = availibleMaps.map(async (name) =>
-      JSON.parse(await loadMap(name.split(".")[0])),
+      JSON.parse(await loadMap(name.split(".")[0]))
     );
     const maps = await Promise.all(promises);
 
@@ -274,7 +444,7 @@ router.get("/maps", async (req, res, next) => {
       status: "success",
       message: "Maps recieved",
       data: maps.map((map) =>
-        choose(map, ["name", "displayName", "preview", "displayGameMode"]),
+        choose(map, ["name", "displayName", "preview", "displayGameMode"])
       ),
     });
   } catch (err) {
