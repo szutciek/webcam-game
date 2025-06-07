@@ -2,6 +2,13 @@ const mongoose = require("mongoose");
 const express = require("express");
 const app = express();
 
+const rateLimit = require("express-rate-limit");
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: "Too many requests from this IP, please try again after 15 minutes",
+});
+
 const errorSender = require("./utils/errorSender.js");
 const {
   expressPort,
@@ -56,6 +63,7 @@ app.get("/verify", (_, res) =>
   res.sendFile(__dirname + "/client/pages/verify.html")
 );
 
+app.use("/api", limiter);
 app.use("/api", apiRouter);
 
 app.use(express.static("client/"));

@@ -202,6 +202,11 @@ const signup = () => {
       });
       waiting = false;
 
+      if (res.status === 429) {
+        animateButton("default");
+        return res(renderMessage(res.statusText));
+      }
+
       const message = await res.json();
 
       inputs.forEach((i) => handleInputChange(i));
