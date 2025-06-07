@@ -96,7 +96,7 @@ router.post("/login", async (req, res, next) => {
     // User created account before email verification was intruduced
     if (
       user.verifiedEmail !== true &&
-      user.emailVerificationCode?.length === 0
+      user.emailVerificationCode == undefined
     ) {
       user.emailVerificationCode = crypto.randomUUID();
       await user.save();
@@ -539,7 +539,6 @@ router.post("/verify-email", async (req, res, next) => {
     }
 
     user.verifiedEmail = true;
-    user.emailVerificationCode = "";
     await user.save();
 
     const token = Authentication.encodeToken(user._id);
