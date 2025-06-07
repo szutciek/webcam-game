@@ -168,7 +168,7 @@ const reset = () => {
 
       if (res.status === 429) {
         animateButton("default");
-        return res(renderMessage(res.statusText));
+        return resolve(renderMessage(res.statusText));
       }
 
       const message = await res.json();
