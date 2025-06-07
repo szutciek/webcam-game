@@ -93,6 +93,17 @@ router.post("/login", async (req, res, next) => {
       });
     }
 
+    // User created account before email verification was intruduced
+    if (
+      user.verifiedEmail !== true &&
+      user.emailVerificationCode?.length === 0
+    ) {
+      user.emailVerificationCode = crypto.randomUUID();
+      await user.save();
+
+      await sendVerificationEmail(user);
+    }
+
     if (enforceEmailVerification === true && user.verifiedEmail !== true) {
       throw new UserError("Verify your email before logging in", 401, {
         fields: [
@@ -434,17 +445,6 @@ router.post("/complete-password-reset", async (req, res, next) => {
           },
         ],
       });
-    }
-
-    if (!user.passwordChangeCode) {
-      user.emailVerificationCode = crypto.randomUUID();
-      await user.save();
-
-      sendVerificationEmail(user);
-
-      throw new UserError(
-        `You received a new link in your inbox. Please try again using it.`
-      );
     }
 
     if (new Date(user.passwordChangeCodeExpiration).getTime() < Date.now()) {
