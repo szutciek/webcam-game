@@ -10,9 +10,13 @@ const {
   validateCharacters,
   rgbMap,
 } = require("../utils/validators.js");
-const { sendRecoveryEmail } = require("../utils/mailer.js");
+const {
+  sendRecoveryEmail,
+  sendVerificationEmail,
+} = require("../utils/mailer.js");
 const User = require("../models/User.js");
 const Authentication = require("../classes/Authentication.js");
+const { enforceEmailVerification } = require("../config.js");
 
 const {
   findAvalibleMaps,
@@ -61,9 +65,11 @@ router.post("/login", async (req, res, next) => {
       });
     }
 
-    const user = await User.findOne({ email: req.body.email }).select(
-      "+password"
-    );
+    const user = await User.findOne({ email: req.body.email }).select([
+      "+password",
+      "+verifiedEmail",
+      "+emailVerificationCode",
+    ]);
 
     if (!user) {
       throw new UserError("User not found", 404, {
@@ -82,6 +88,18 @@ router.post("/login", async (req, res, next) => {
           {
             field: "password",
             message: "Incorrect password",
+          },
+        ],
+      });
+    }
+
+    if (enforceEmailVerification === true && user.verifiedEmail !== true) {
+      throw new UserError("Verify your email before logging in", 401, {
+        fields: [
+          {
+            field: "email",
+            message:
+              "Click the link in your inbox to confirm ownership of this email",
           },
         ],
       });
@@ -221,21 +239,39 @@ router.post("/signup", async (req, res, next) => {
       email: req.body.email,
       panelColor: req.body.panelColor,
       password: crypto.randomUUID(),
+      verifiedEmail: false,
+      emailVerificationCode: crypto.randomUUID(),
     });
 
     user.setPassword(req.body.password);
     await user.save();
 
-    const token = Authentication.encodeToken(user._id);
+    await sendVerificationEmail(user);
 
-    res.status(200).json({
-      status: "success",
-      message: "User created",
-      user: {
-        token,
-        ...choose(user, ["email", "username", "profile", "panelColor"]),
-      },
-    });
+    if (enforceEmailVerification !== true) {
+      const token = Authentication.encodeToken(user._id);
+
+      res.status(200).json({
+        status: "success",
+        message: "User created",
+        enforceEmailVerification: false,
+        user: {
+          token,
+          ...choose(user, ["email", "username", "profile", "panelColor"]),
+        },
+      });
+    } else {
+      res.status(200).json({
+        status: "success",
+        message: "User created",
+        displayMessage: "Please verify your email via the link in your inbox",
+        enforceEmailVerification: true,
+        user: {
+          token: null,
+          ...choose(user, ["email", "username", "profile", "panelColor"]),
+        },
+      });
+    }
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       next(
@@ -401,8 +437,13 @@ router.post("/complete-password-reset", async (req, res, next) => {
     }
 
     if (!user.passwordChangeCode) {
+      user.emailVerificationCode = crypto.randomUUID();
+      await user.save();
+
+      sendVerificationEmail(user);
+
       throw new UserError(
-        `The password reset sequence has not been started. Please try again.`
+        `You received a new link in your inbox. Please try again using it.`
       );
     }
 
@@ -425,6 +466,91 @@ router.post("/complete-password-reset", async (req, res, next) => {
       status: "success",
       message: "Password reset completed",
       displayMessage: "You can now log in with your new password",
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+});
+
+router.post("/verify-email", async (req, res, next) => {
+  try {
+    let ok = true;
+    let errors = [];
+
+    if (req.body.email === undefined || req.body.email.length === 0) {
+      ok = false;
+      errors.push({
+        field: "email",
+        message: "Required",
+      });
+    } else if (!validateEmail(req.body.email)) {
+      ok = false;
+      errors.push({
+        field: "email",
+        message: "The provided email is not valid",
+      });
+    }
+
+    if (req.body.code === undefined || req.body.code.length === 0) {
+      ok = false;
+      errors.push({
+        field: "code",
+        message: "Required",
+      });
+    } else if (!validateManyCharacters(req.body.code)) {
+      ok = false;
+      errors.push({
+        field: "code",
+        message: "Code includes invalid characters",
+      });
+    }
+
+    if (ok !== true) {
+      throw new UserError("Bad request", 400, {
+        fields: errors,
+      });
+    }
+
+    const user = await User.findOne({ email: req.body.email }).select([
+      "+verifiedEmail",
+      "+emailVerificationCode",
+    ]);
+
+    if (!user) {
+      throw new UserError("User not found", 404, {
+        fields: [
+          {
+            field: "email",
+            message: "Account with this email not found",
+          },
+        ],
+      });
+    }
+
+    if (user.verifiedEmail === true) {
+      return new UserError(
+        `This email has already been verified. You can log in.`
+      );
+    }
+
+    if (user.emailVerificationCode !== req.body.code) {
+      throw new UserError(`The provided code is not valid. Please try again.`);
+    }
+
+    user.verifiedEmail = true;
+    user.emailVerificationCode = "";
+    await user.save();
+
+    const token = Authentication.encodeToken(user._id);
+
+    res.status(200).json({
+      status: "success",
+      message: "Email verification complete",
+      user: {
+        token,
+        ...choose(user, ["email", "username", "profile", "panelColor"]),
+      },
     });
   } catch (err) {
     console.log(err);

@@ -1,24 +1,17 @@
-import {
-  requestCameraPermission,
-  startVideoStream,
-  videoStream,
-} from "/camera.js";
-
-requestCameraPermission()
-  .then(() => {
-    startVideoStream().then(() => {
-      const cameraPreview = document.getElementById("cameraPreview");
-      cameraPreview.srcObject = videoStream;
-      cameraPreview.play();
-    });
-  })
-  .catch(console.log);
-
 let waiting = false;
-let loggedIn = false;
 const inputs = [...document.querySelectorAll(".fancyInput")];
 
-const message = new URLSearchParams(document.location.search).get("message");
+const search = new URLSearchParams(document.location.search);
+const message = search.get("message");
+const initialEmail = search.get("email");
+const initialCode = search.get("code");
+
+const query = [];
+const gameRoom = search.get("room");
+if (gameRoom) query.push(`room=${gameRoom}`);
+const gameMap = search.get("map");
+if (gameMap) query.push(`map=${gameMap}`);
+
 const newUrl = window.location.origin + window.location.pathname;
 window.history.pushState({ path: newUrl }, "", newUrl);
 
@@ -90,7 +83,6 @@ const handleInputLeave = (i) => {
 
 const handleInputError = (field, message) => {
   const i = inputs.find((i) => {
-    changePage(i.dataset.page);
     return i.dataset.field === field;
   });
   if (!i) return;
@@ -111,18 +103,6 @@ const handleInputChange = (i) => {
   const input = i.querySelector("input");
   const errorArea = i.querySelector(".errorArea");
 
-  if (i.dataset.field === "username") {
-    document.getElementById("usernamePreview").innerText = input.value;
-  }
-  if (i.dataset.field === "email") {
-    document.getElementById("emailPreview").innerText = input.value;
-  }
-  if (i.dataset.field === "panelColor") {
-    document.getElementById(
-      "colorPreview"
-    ).style.backgroundColor = `${input.value}`;
-  }
-
   if (input === document.activeElement) {
     input.style.borderColor = "#97acdf";
     placeholder.style.color = "#97acdf";
@@ -139,7 +119,7 @@ const handleInputChange = (i) => {
 const animateButton = (state) => {
   const button = document.getElementById("submit");
   if (state === "default") {
-    button.innerHTML = "Sign up";
+    button.innerHTML = "Verify email";
     button.style.backgroundColor = "#97acdf";
     button.style.cursor = "pointer";
   }
@@ -161,43 +141,30 @@ const saveUserData = (user) => {
   window.localStorage.setItem("user", JSON.stringify(user));
 };
 
-const signup = () => {
+const verify = () => {
   return new Promise(async (resolve, reject) => {
     try {
       if (waiting) throw new Error("Still waiting for response");
-      if (loggedIn) throw new Error("Already logged in");
       let valid = true;
 
-      const username = inputs.find((i) => i.dataset.field === "username");
-      const panelColor = inputs.find((i) => i.dataset.field === "panelColor");
+      const code = inputs.find((i) => i.dataset.field === "code");
+      const codeField = code.querySelector("input");
       const email = inputs.find((i) => i.dataset.field === "email");
-      const password = inputs.find((i) => i.dataset.field === "password");
-      const passwordRepeat = inputs.find(
-        (i) => i.dataset.field === "passwordRepeat"
-      );
+      const emailField = email.querySelector("input");
 
-      const usernameInput = username.querySelector("input");
-      const panelColorInput = panelColor.querySelector("input");
-      const emailInput = email.querySelector("input");
-      const passwordInput = password.querySelector("input");
-      const passwordRepeatInput = passwordRepeat.querySelector("input");
-
-      if (!valid) throw new Error("Login request not valid");
+      if (!valid) throw new Error("Validation request not valid");
 
       animateButton("loading");
 
       waiting = true;
-      const res = await fetch("/api/signup", {
+      const res = await fetch("/api/verify-email", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: usernameInput.value,
-          panelColor: panelColorInput.value,
-          email: emailInput.value,
-          password: passwordInput.value,
-          passwordRepeat: passwordRepeatInput.value,
+          code: codeField.value,
+          email: emailField.value,
         }),
       });
       waiting = false;
@@ -211,21 +178,14 @@ const signup = () => {
         message.additional?.fields?.forEach((err) => {
           handleInputError(err.field, err.message);
         });
+        renderMessage(message.message);
       }
       if (res.status === 200) {
         animateButton("success");
-        if (message.enforceEmailVerification !== true) {
-          saveUserData(message.user);
-          loggedIn = true;
-          setTimeout(() => {
-            window.location = "/";
-          }, 1 * 1000);
-        } else {
-          renderMessage(message.displayMessage);
-          setTimeout(() => {
-            window.location = `/signin?message=${message.displayMessage}`;
-          }, 1 * 1000);
-        }
+        saveUserData(message.user);
+        setTimeout(() => {
+          window.location = `/${query.length ? `?${query.join("&")}` : ""}`;
+        }, 1 * 1000);
         resolve();
       }
     } catch (err) {
@@ -234,42 +194,29 @@ const signup = () => {
   });
 };
 
-const changePage = (page) => {
-  const sliding = document.getElementById("sliding");
-  const bar = document.getElementById("indicator");
-  const titles = [...document.querySelectorAll(".progress li")];
-
-  titles.forEach((title) => {
-    title.classList.remove("active");
-    if (title.dataset.page === page) {
-      title.classList.add("active");
-    }
-  });
-
-  if (page === "customization") {
-    sliding.style.transform = "translateX(0)";
-    bar.style.transform = "translateX(0)";
-  }
-  if (page === "information") {
-    sliding.style.transform = "translateX(-100%)";
-    bar.style.transform = "translateX(100%)";
-  }
-  if (page === "authentication") {
-    sliding.style.transform = "translateX(-200%)";
-    bar.style.transform = "translateX(200%)";
-  }
-};
-
 document.addEventListener("click", (e) => {
   if (e.target.closest(".fancyInput")) {
     handleInputEnter(e.target.closest(".fancyInput"));
   }
 
-  if (e.target.classList.contains("pageChange")) {
-    changePage(e.target.dataset.page);
-  }
-
   if (e.target.id === "submit") {
-    signup();
+    verify();
   }
 });
+
+document.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    verify();
+  }
+});
+
+if (initialEmail) {
+  const emailField = inputs.find((i) => i.dataset.field === "email");
+  handleInputEnter(emailField);
+  emailField.querySelector("input").value = initialEmail;
+}
+if (initialCode) {
+  const codeField = inputs.find((i) => i.dataset.field === "code");
+  handleInputEnter(codeField);
+  codeField.querySelector("input").value = initialCode;
+}

@@ -52,6 +52,9 @@ app.get("/recover", (_, res) =>
 app.get("/reset", (_, res) =>
   res.sendFile(__dirname + "/client/pages/reset.html")
 );
+app.get("/verify", (_, res) =>
+  res.sendFile(__dirname + "/client/pages/verify.html")
+);
 
 app.use("/api", apiRouter);
 

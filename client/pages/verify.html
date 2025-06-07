@@ -4,37 +4,27 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reset Password - Webcam game</title>
+    <title>Verify Email - Webcam game</title>
     <link rel="stylesheet" href="/font.css" />
-    <link rel="stylesheet" href="/pages/reset.css" />
+    <link rel="stylesheet" href="/pages/verify.css" />
     <link rel="stylesheet" href="/pages/fancyInput.css" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <script src="/pages/reset.js" defer></script>
+    <script src="/pages/verify.js" defer></script>
   </head>
   <body>
-    <ul class="navigation flexVert">
-      <li class="flexVert">
-        <img
-          src="https://assets.kanapka.eu/icons/chevron-back-outline.svg"
-          alt="Back icon"
-        />
-        <a href="/">Player</a>
-      </li>
-    </ul>
-
     <ul class="messages" id="messages"></ul>
 
     <div class="container">
       <div class="title">
         <div class="top">
-          <h1>Reset Password</h1>
+          <h1>Verify Email</h1>
           <img
             src="https://assets.kanapka.eu/images/user.png"
             alt="Profile Picture"
           />
         </div>
         <h2>
-          Enter your current email and a new password below to recover your
+          Enter your email and verification code below to start using your
           account.
         </h2>
       </div>
@@ -42,7 +32,7 @@
       <div class="form">
         <div class="fancyInput" data-field="code">
           <div class="inputArea">
-            <p id="placeholder">Security Code</p>
+            <p id="placeholder">Verification Code</p>
             <input readonly />
           </div>
           <div class="errorArea hidden">
@@ -63,30 +53,12 @@
             <h6 id="error"></h6>
           </div>
         </div>
-
-        <div class="fancyInput" data-field="password">
-          <div class="inputArea">
-            <p id="placeholder">New Password</p>
-            <input type="password" />
-          </div>
-          <div class="errorArea hidden">
-            <!-- prettier-ignore -->
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M248,64C146.39,64,64,146.39,64,248s82.39,184,184,184,184-82.39,184-184S349.61,64,248,64Z" style="fill:none;stroke:#FFF;stroke-miterlimit:10;stroke-width:32px"/><polyline points="220 220 252 220 252 336" style="fill:none;stroke:#FFF;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/><line x1="208" y1="340" x2="296" y2="340" style="fill:none;stroke:#FFF;stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px"/><path style="fill:#FFF" d="M248,130a26,26,0,1,0,26,26A26,26,0,0,0,248,130Z"/></svg>
-            <h6 id="error"></h6>
-          </div>
-        </div>
       </div>
 
-      <div class="password">
-        <a href="/signin">Remember password?</a>
-      </div>
+      <div class="placeholder"></div>
 
       <div class="submit">
-        <button class="submit" id="submit">Reset password</button>
-      </div>
-
-      <div class="other">
-        <a href="/signup">Create account</a>
+        <button class="submit" id="submit">Verify email</button>
       </div>
     </div>
   </body>
