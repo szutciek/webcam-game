@@ -2,13 +2,6 @@ const mongoose = require("mongoose");
 const express = require("express");
 const app = express();
 
-const rateLimit = require("express-rate-limit");
-const limiter = rateLimit({
-  windowMs: 10 * 60 * 1000,
-  max: 30,
-  message: "Too many requests from this IP, please try again after 15 minutes",
-});
-
 const errorSender = require("./utils/errorSender.js");
 const {
   expressPort,
@@ -20,6 +13,17 @@ const {
   dbAuthDB,
   inProduction,
 } = require("./config.js");
+
+if (inProduction === true) {
+  app.set("trust proxy", 1);
+}
+
+const rateLimit = require("express-rate-limit");
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 30,
+  message: "Too many requests from this IP, please try again after 15 minutes",
+});
 
 const dbConn = dbAuthOn
   ? `mongodb://${dbUser}:${dbPwd}@${dbAddress}/${dbName}?authSource=${dbAuthDB}`
