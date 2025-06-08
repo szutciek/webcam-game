@@ -4,6 +4,12 @@ export default class Open {
   constructor(controller, ws) {
     this.controller = controller;
     this.#ws = ws;
+
+    this.changeBackground();
+  }
+
+  changeBackground() {
+    document.body.style.background = "#55a155";
   }
 
   handleMessage(message) {

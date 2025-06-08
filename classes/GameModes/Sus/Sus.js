@@ -5,6 +5,8 @@ module.exports = class Sus extends GameMode {
 
   #inRound = false;
   #currentRoundPlayers = new Map();
+  #waitingPlayers = new Map();
+  #rejoinRoundIds = new Set();
 
   constructor(host, room) {
     super(host, room);
@@ -13,14 +15,86 @@ module.exports = class Sus extends GameMode {
   playerJoin(player) {
     if (this.#inRound === false) {
       this.#currentRoundPlayers.set(player.uuid, player);
+    } else {
+      this.#waitingPlayers.set(player.uuid, player);
+    }
+
+    setTimeout(() => {
+      this.announceHost();
+    }, 1000);
+  }
+
+  playerLeave(player) {
+    if (this.#currentRoundPlayers.has(player.uuid)) {
+      this.#currentRoundPlayers.delete(player.uuid);
+      if (this.#inRound === true) {
+        this.#rejoinRoundIds.add(player.user._id);
+      }
+    }
+    if (this.#waitingPlayers.has(player.uuid)) {
+      this.#waitingPlayers.delete(player.uuid);
     }
   }
 
-  playerLeave(player) {}
+  announceHost() {
+    const host = this.#currentRoundPlayers.values().find((p) => this.isHost(p));
+    if (!host) return;
+    host.sendTo({
+      event: "announceHost",
+      isHost: true,
+      inRound: this.#inRound,
+      nWaiting: this.#currentRoundPlayers.size,
+    });
+  }
 
-  handleEvent(player, data) {}
+  startRound() {
+    this.#inRound = true;
 
-  tick() {}
+    this.room.broadcast({
+      type: "game",
+      event: "roundStart",
+      message: `The round is starting with ${
+        this.#currentRoundPlayers.size
+      } players!`,
+    });
+
+    this.#currentRoundPlayers.values().forEach((p, i) => {
+      p.teleport(-50, -300);
+    });
+  }
+
+  endRound() {
+    this.#inRound = false;
+    this.#waitingPlayers.values().forEach((p) => {
+      this.#waitingPlayers.delete(p.uuid);
+      this.#currentRoundPlayers.set(p.uuid, p);
+    });
+
+    this.room.broadcast({
+      type: "game",
+      event: "roundEnd",
+      message: `The round has ended!`,
+    });
+
+    setTimeout(() => {
+      this.announceHost();
+    }, 1000);
+  }
+
+  isHost(player) {
+    return player.user._id === this.room.creatorId;
+  }
+
+  handleEvent(player, data) {
+    console.log(player.user.username, data);
+    if (data.startRound === true && this.isHost(player)) {
+      this.startRound();
+    }
+  }
+
+  tick(currentTime, syncTick) {
+    // console.log(currentTime);
+  }
 
   get info() {
     return {};

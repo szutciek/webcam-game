@@ -18,9 +18,14 @@ export default class Soccer {
     this.controller = controller;
     this.#ws = ws;
 
+    this.changeBackground();
     this.initializeMap();
     this.createElement();
     this.createBall();
+  }
+
+  changeBackground() {
+    document.body.style.background = "#55a155";
   }
 
   initializeMap() {

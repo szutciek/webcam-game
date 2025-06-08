@@ -37,6 +37,12 @@ export default class ShooterV1 {
   constructor(controller, ws) {
     this.controller = controller;
     this.#ws = ws;
+
+    this.changeBackground();
+  }
+
+  changeBackground() {
+    document.body.style.background = "#55a155";
   }
 
   handleMessage(message) {

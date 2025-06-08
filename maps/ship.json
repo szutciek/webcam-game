@@ -20,5 +20,93 @@
     { "x": -10800, "y": -10300 },
     { "x": -11000, "y": -10300 }
   ],
-  "objects": []
+  "objects": [
+    {
+      "coords": { "x": -400, "y": -400, "w": 400, "h": 20 },
+      "texture": { "type": "color", "value": "#eeeeee" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true,
+      "class": "wall"
+    },
+    {
+      "coords": { "x": 0, "y": -400, "w": 400, "h": 20 },
+      "texture": { "type": "color", "value": "#eeeeee" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true,
+      "class": "wall"
+    },
+
+    {
+      "coords": { "x": -400, "y": -400, "w": 20, "h": 400 },
+      "texture": { "type": "color", "value": "#eeeeee" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true,
+      "class": "wall"
+    },
+    {
+      "coords": { "x": -400, "y": 0, "w": 20, "h": 400 },
+      "texture": { "type": "color", "value": "#eeeeee" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true,
+      "class": "wall"
+    },
+
+    {
+      "coords": { "x": -400, "y": 400, "w": 400, "h": 20 },
+      "texture": { "type": "color", "value": "#eeeeee" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true,
+      "class": "wall"
+    },
+    {
+      "coords": { "x": 0, "y": 400, "w": 400, "h": 20 },
+      "texture": { "type": "color", "value": "#eeeeee" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true,
+      "class": "wall"
+    },
+
+    {
+      "coords": { "x": 400, "y": -400, "w": 20, "h": 400 },
+      "texture": { "type": "color", "value": "#eeeeee" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true,
+      "class": "wall"
+    },
+    {
+      "coords": { "x": 400, "y": 0, "w": 20, "h": 400 },
+      "texture": { "type": "color", "value": "#eeeeee" },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true,
+      "class": "wall"
+    },
+
+    {
+      "coords": { "x": -40, "y": -40, "w": 80, "h": 80 },
+      "texture": {
+        "type": "graphic",
+        "value": "https://assets.kanapka.eu/images/emergencyButton.png"
+      },
+      "shape": "rect",
+      "dynamic": false,
+      "colliding": true,
+      "class": "button"
+    },
+    {
+      "coords": { "x": -150, "y": -150, "r": 150 },
+      "texture": { "type": "color", "value": "#fff3" },
+      "shape": "circ",
+      "dynamic": false,
+      "colliding": false,
+      "class": "button_zone"
+    }
+  ]
 }

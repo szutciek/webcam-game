@@ -138,11 +138,15 @@ module.exports = class Chunk {
       let object = undefined;
 
       const inBounds = this.checkIfInBounds(coordinates);
-      if (!inBounds)
-        throw new UserError(
-          "Error while adding object: Out of chunk bounds.",
-          400
-        );
+      if (!inBounds) {
+        console.log("ERROR!!!");
+        console.log(coordinates);
+        return;
+        // throw new UserError(
+        //   "Error while adding object: Out of chunk bounds.",
+        //   400
+        // );
+      }
 
       // handle errors when too wide
       // we dont care about existing

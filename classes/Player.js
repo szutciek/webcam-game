@@ -295,6 +295,13 @@ module.exports = class Player {
     }
   }
 
+  teleport(x, y) {
+    this.position.x = x;
+    this.position.y = y;
+    this.velocities.x = 0;
+    this.velocities.y = 0;
+  }
+
   get x() {
     return this.position.x;
   }
@@ -313,6 +320,13 @@ module.exports = class Player {
       type: "pose",
       pose: this.pose,
     });
+  }
+
+  sendTo(data, keepType = false) {
+    if (keepType !== true) {
+      data.type = "game";
+    }
+    clients.find(this.uuid).sendTo(data);
   }
 
   quickData(camera) {

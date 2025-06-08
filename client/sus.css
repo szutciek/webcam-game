@@ -1,0 +1,82 @@
+#sus_host_start {
+  user-select: auto !important;
+  pointer-events: auto !important;
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#sus_host_start button {
+  padding: 20px;
+}
+
+#sus_task_completion {
+  position: absolute;
+  bottom: 3rem;
+  left: 3rem;
+}
+
+#sus_task_completion p {
+  color: #fff;
+}
+
+#sus_task_completion .taskBar {
+  width: 25vw;
+  height: 40px;
+  background-color: #252525;
+  border: 1px solid gray;
+  padding: 4px;
+}
+
+#sus_task_completion .taskBar .progress {
+  width: 1%;
+  height: 30px;
+  background-color: #46bea4;
+  border: 1px solid rgb(117, 233, 241);
+}
+
+#sus_actions {
+  position: absolute;
+  bottom: 2rem;
+  right: 2.5rem;
+
+  display: none;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+#sus_actions div {
+  padding: 0 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0.2;
+}
+
+#sus_actions div.active {
+  opacity: 1;
+}
+
+#sus_actions div button {
+  width: 80px;
+  height: 80px;
+  background-color: #fff3;
+  border: none;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+#sus_actions div.active button {
+  cursor: pointer;
+  user-select: auto !important;
+  pointer-events: auto !important;
+}
+
+#sus_actions div:hover button {
+  background-color: #fff6;
+}
+
+#sus_actions div p {
+  color: white;
+}

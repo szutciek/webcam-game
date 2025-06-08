@@ -63,6 +63,7 @@ export default class GameObjects {
             shape: "rect",
             colliding: i.colliding,
             dynamic: i.dynamic,
+            class: i?.class,
           })
         );
       } else if (i.shape === "circ") {
@@ -72,6 +73,7 @@ export default class GameObjects {
             shape: "circ",
             colliding: i.colliding,
             dynamic: i.dynamic,
+            class: i?.class,
           })
         );
       }

@@ -92,9 +92,11 @@ export default class GameController {
         this.player.collisionDetectionSAT(item, false);
       });
 
-      players.forEach((item) => {
-        this.player.collisionDetectionSAT(item, true);
-      });
+      if (this.controller.gameModeController.disablePlayerCollision !== true) {
+        players.forEach((item) => {
+          this.player.collisionDetectionSAT(item, true);
+        });
+      }
 
       // ==========================================================================
       // SENDING POSITION TO SERVER (for validation) ==============================
