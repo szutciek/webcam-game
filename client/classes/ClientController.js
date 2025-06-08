@@ -273,12 +273,16 @@ export default class ClientController {
         "normal"
       );
       this.stopRender();
-      this.player = new Player([
-        message?.data?.position[0],
-        message?.data?.position[1],
-        message?.data?.position[2],
-        message?.data?.position[3],
-      ]);
+      this.player = new Player(
+        [
+          message?.data?.position[0],
+          message?.data?.position[1],
+          message?.data?.position[2],
+          message?.data?.position[3],
+        ],
+        this.user.username,
+        this.user.uuid
+      );
       this.startRender();
       return;
     }

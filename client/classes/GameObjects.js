@@ -23,6 +23,7 @@ export default class GameObjects {
           h: data.position[3],
         },
         {
+          uuid: data.uuid,
           username: data.username,
           camera: data?.camera,
         }

@@ -60,13 +60,14 @@ export default class Player {
 
   audio = [];
 
-  constructor(position = [0, 0, 100, 200], username = "Anonymous") {
+  constructor(position = [0, 0, 100, 200], username, uuid) {
     this.#x = position[0];
     this.#y = position[1];
     this.#w = position[2];
     this.#h = position[3];
 
     this.username = username;
+    this.uuid = uuid;
   }
 
   addAudioBlob(blob) {

@@ -5,7 +5,9 @@ module.exports = class Sus extends GameMode {
 
   #inRound = false;
   #currentRoundPlayers = new Map();
+  #playerColors = new Map();
   #waitingPlayers = new Map();
+  // finish work - replace uuid with user._id to actually let user rejoin
   #rejoinRoundIds = new Set();
 
   constructor(host, room) {
@@ -36,6 +38,25 @@ module.exports = class Sus extends GameMode {
     }
   }
 
+  assignPlayerColors() {
+    this.#playerColors = new Map();
+    this.#currentRoundPlayers.forEach((p) => {
+      this.#playerColors.set(p.uuid, p.user.panelColor);
+    });
+  }
+
+  broadcastPlayerColors() {
+    const data = {};
+    this.#playerColors
+      .entries()
+      .forEach(([uuid, color]) => (data[uuid] = color));
+    this.room.broadcast({
+      type: "game",
+      event: "playerColors",
+      colors: data,
+    });
+  }
+
   announceHost() {
     const host = this.#currentRoundPlayers.values().find((p) => this.isHost(p));
     if (!host) return;
@@ -61,6 +82,9 @@ module.exports = class Sus extends GameMode {
     this.#currentRoundPlayers.values().forEach((p, i) => {
       p.teleport(-50, -300);
     });
+
+    this.assignPlayerColors();
+    this.broadcastPlayerColors();
   }
 
   endRound() {

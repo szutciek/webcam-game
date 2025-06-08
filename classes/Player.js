@@ -331,6 +331,7 @@ module.exports = class Player {
 
   quickData(camera) {
     const data = {
+      uuid: this.uuid,
       id: this.uuid,
       position: [
         Math.floor(this.position.x),

@@ -81,7 +81,7 @@
       "class": "wall"
     },
     {
-      "coords": { "x": 400, "y": 0, "w": 20, "h": 400 },
+      "coords": { "x": 400, "y": 0, "w": 20, "h": 40 },
       "texture": { "type": "color", "value": "#eeeeee" },
       "shape": "rect",
       "dynamic": false,

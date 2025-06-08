@@ -1,7 +1,14 @@
+import { generateColoredImage } from "../../../canvasMethods.js";
+
 export default class Sus {
   #ws = undefined;
 
+  playerModelTorsoSource = null;
+  playerModelLegSource = null;
+  playerModels = new Map();
+
   disablePlayerCollision = true;
+  playerModel = "sus";
 
   emergencyButtonVisible = false;
   killButtonVisible = false;
@@ -13,6 +20,47 @@ export default class Sus {
     this.#ws = ws;
 
     this.changeBackground();
+    this.loadPlayerModel();
+  }
+
+  loadPlayerModel() {
+    const imgTorso = new Image();
+    imgTorso.src = "https://assets.kanapka.eu/images/susAlphaWCGame.png";
+    imgTorso.crossOrigin = "Anonymous";
+    imgTorso.onload = () => {
+      this.playerModelTorsoSource = imgTorso;
+    };
+    const imgLeg = new Image();
+    imgLeg.src = "https://assets.kanapka.eu/images/susLegAlphaWCGame.png";
+    imgLeg.crossOrigin = "Anonymous";
+    imgLeg.onload = () => {
+      this.playerModelLegSource = imgLeg;
+    };
+  }
+
+  getPlayerRendererData(player) {
+    const data = this.playerModels.get(player.uuid);
+    return data;
+  }
+
+  handlePlayerColors(message) {
+    Object.entries(message.colors).forEach(([uuid, color]) => {
+      const imageTorso = generateColoredImage(
+        { w: 100, h: 200 },
+        this.playerModelTorsoSource,
+        color
+      );
+      const imageLeg = generateColoredImage(
+        { w: 60, h: 120 },
+        this.playerModelLegSource,
+        color
+      );
+      this.playerModels.set(uuid, {
+        color: color,
+        modelTorso: imageTorso,
+        modelLeg: imageLeg,
+      });
+    });
   }
 
   changeBackground() {
@@ -139,13 +187,18 @@ export default class Sus {
     if (message.event === "announceHost" && message.isHost === true) {
       this.initializeHostStartUI(message.nWaiting);
     }
+    if (message.event === "playerColors") {
+      this.handlePlayerColors(message);
+    }
     if (message.event === "roundStart") {
+      this.inRound = true;
       this.controller.showMessage(message.message, "info", "normal");
       this.clearHostStartUI();
       this.initializeTaskCompletionUI();
       this.initializeActionUI();
     }
     if (message.event === "roundEnd") {
+      this.inRound = false;
       this.controller.showMessage(message.message, "info", "normal");
       this.clearTaskCompletionUI();
     }

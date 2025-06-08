@@ -131,7 +131,18 @@ export default class GameController {
 
       this.canvas.clear();
       items.forEach((i) => this.canvas.drawItem(i));
-      preparedCameras.forEach((i) => this.canvas.drawPlayer(i));
+      if (
+        this.controller.gameModeController.playerModel === "sus" &&
+        this.controller.gameModeController.inRound === true
+      ) {
+        preparedCameras.forEach((i) => {
+          const rendererData =
+            this.controller.gameModeController.getPlayerRendererData(i);
+          this.canvas.drawSusPlayer(i, rendererData);
+        });
+      } else {
+        preparedCameras.forEach((i) => this.canvas.drawPlayer(i));
+      }
 
       // ==========================================================================
       // GAME TICK ===============================================================

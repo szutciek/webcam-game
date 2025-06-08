@@ -1,4 +1,4 @@
-import { drawFace, drawBody, drawTag } from "../canvasMethods.js";
+import { drawFace, drawBody, drawSusBody, drawTag } from "../canvasMethods.js";
 
 const loadedTextures = new Map();
 
@@ -123,10 +123,29 @@ export default class Canvas {
       // this.ctx.fillStyle = "#ff9999";
       // this.ctx.fillRect(x, y, w, h);
 
-      if (player.camera != undefined)
+      if (player.camera != undefined) {
         drawFace(this.ctx, x, y, w, h, player.image);
+      }
 
       drawBody(this.ctx, player);
+
+      if (player.username !== "Anonymous") {
+        drawTag(this.ctx, x, y, w, h, player.username);
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  drawSusPlayer(player, data) {
+    try {
+      let { x, y, w, h } = player;
+
+      if (player.camera != undefined) {
+        drawFace(this.ctx, x, y, w, h, player.image);
+      }
+
+      drawSusBody(this.ctx, player, data);
 
       if (player.username !== "Anonymous") {
         drawTag(this.ctx, x, y, w, h, player.username);

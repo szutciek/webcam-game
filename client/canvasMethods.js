@@ -14,6 +14,16 @@ hand.onload = () => {
 };
 hand.src = "https://assets.kanapka.eu/images/handWCGame.png";
 
+const susLeg = new Image();
+susLeg.crossOrigin = "Anonymous";
+susLeg.onload = () => {
+  [susLeftLeg, susRightLeg] = createMirroredImages(susLeg);
+};
+susLeg.src = "https://assets.kanapka.eu/images/susLeg.png";
+
+const susTorso = new Image();
+susTorso.src = "https://assets.kanapka.eu/images/susTorsoWCGame.png";
+
 const createMirroredImages = (img) => {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
@@ -137,6 +147,71 @@ export const drawBody = (ctx, player) => {
     40,
     30
   );
+};
+
+export const drawSusBody = (ctx, player, data) => {
+  const { x, y, w, h } = player;
+  const centerX = x + w / 2;
+  const torsoBottom = [centerX, y + 140];
+
+  const legWidth = 40;
+  const legHeight = 80;
+
+  if (data?.modelLeg) {
+    let anim = player.animationMovement.left;
+
+    ctx.save();
+    ctx.translate(torsoBottom[0] - 50 + legWidth / 2, torsoBottom[1]);
+    ctx.rotate((anim.disp + 20) / 80);
+    ctx.drawImage(
+      data.modelLeg,
+      -legWidth / 2,
+      -20 - anim.lift,
+      legWidth,
+      legHeight
+    );
+    ctx.drawImage(susLeg, -legWidth / 2, -20 - anim.lift, legWidth, legHeight);
+    ctx.restore();
+
+    anim = player.animationMovement.right;
+
+    ctx.save();
+    ctx.translate(torsoBottom[0] + 10 + legWidth / 2, torsoBottom[1]);
+    ctx.rotate((anim.disp - 20) / 80);
+    ctx.drawImage(
+      data.modelLeg,
+      -legWidth / 2,
+      -20 - anim.lift,
+      legWidth,
+      legHeight
+    );
+    ctx.drawImage(susLeg, -legWidth / 2, -20 - anim.lift, legWidth, legHeight);
+    ctx.restore();
+  }
+
+  const traverseLift =
+    player.animationMovement.left.lift + player.animationMovement.right.lift;
+  if (data?.modelTorso) {
+    ctx.drawImage(data.modelTorso, x, y + traverseLift / 2, 100, 200);
+  }
+  ctx.drawImage(susTorso, x, y + traverseLift / 2, 100, 200);
+};
+
+export const generateColoredImage = (dimensions, alpha, color) => {
+  const c = document.createElement("canvas");
+  c.width = dimensions.w;
+  c.height = dimensions.h;
+  const ct = c.getContext("2d");
+
+  ct.drawImage(alpha, 0, 0, dimensions.w, dimensions.h);
+  ct.globalCompositeOperation = "source-in";
+  ct.fillStyle = color;
+  ct.fillRect(0, 0, dimensions.w, dimensions.h);
+
+  const data = c.toDataURL();
+  const i = document.createElement("img");
+  i.src = data;
+  return i;
 };
 
 export const drawTag = (ctx, x, y, w, _, name) => {

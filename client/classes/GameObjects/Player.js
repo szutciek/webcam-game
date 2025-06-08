@@ -43,6 +43,7 @@ export default class Player {
     this.h = h;
 
     this.username = info.username;
+    this.uuid = info.uuid;
     this.camera = info?.camera;
 
     this.lastUpdate = new Date().getTime();
