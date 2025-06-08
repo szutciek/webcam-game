@@ -15,10 +15,6 @@ hand.onload = () => {
 hand.src = "https://assets.kanapka.eu/images/handWCGame.png";
 
 const susLeg = new Image();
-susLeg.crossOrigin = "Anonymous";
-susLeg.onload = () => {
-  [susLeftLeg, susRightLeg] = createMirroredImages(susLeg);
-};
 susLeg.src = "https://assets.kanapka.eu/images/susLeg.png";
 
 const susTorso = new Image();
