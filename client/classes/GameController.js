@@ -115,33 +115,52 @@ export default class GameController {
       // RENDERING PROCESS ========================================================
       // ==========================================================================
 
+      // Center the player in the viewport
       this.centerPlayer();
+
+      // Prepare promises
       const promises = [];
+      // Prepare player cameras to render
       players.forEach((player) =>
         promises.push(this.canvas.prepareCamera(player))
       );
+      // Prepare obstacles with textures to render
       items.forEach((item) => {
         if (item.texture.type === "graphic") {
           this.canvas.prepareGraphic(item);
         }
       });
+      // Add players own camera to promises
       const pT = this.translateInView(this.player);
       promises.push(this.canvas.prepareCamera(pT));
+      // Await for all promises to resolve
       const preparedCameras = await Promise.all(promises);
 
+      // Clear canvas to prepare for new frame
       this.canvas.clear();
+
+      // Draw all of the items in the background
       items.forEach((i) => this.canvas.drawItem(i));
-      if (
-        this.controller.gameModeController.playerModel === "sus" &&
-        this.controller.gameModeController.inRound === true
-      ) {
-        preparedCameras.forEach((i) => {
-          const rendererData =
-            this.controller.gameModeController.getPlayerRendererData(i);
-          this.canvas.drawSusPlayer(i, rendererData);
-        });
+
+      if (this.controller.gameModeController.limitedView) {
+        // CREATE THE CLIP
+        this.canvas.ctx.save();
+
+        // Define the clip path based on the game mode controller
+        const clipPath = this.controller.gameModeController.getClipPath();
+        // Apply clip path if it is defined
+        if (clipPath instanceof Path2D) {
+          this.canvas.ctx.clip(clipPath);
+        }
+
+        // Draw the players with restricted view
+        this.handleRestrictedPlayerRendering(preparedCameras);
+
+        // RESTORE STATE OF CANVAS BEFORE CLIP
+        this.canvas.ctx.restore();
       } else {
-        preparedCameras.forEach((i) => this.canvas.drawPlayer(i));
+        // Draw player models normally
+        this.handlePlayerRendering(preparedCameras);
       }
 
       // ==========================================================================
@@ -166,6 +185,41 @@ export default class GameController {
     } catch (err) {
       console.warn(err);
     }
+  }
+
+  handlePlayerRendering(playerCameras) {
+    if (this.controller.gameModeController.drawSusPlayers === true) {
+      playerCameras.forEach((i) => {
+        const rendererData =
+          this.controller.gameModeController.getPlayerRendererData(i);
+        this.canvas.drawSusPlayer(i, rendererData);
+      });
+    } else {
+      playerCameras.forEach((i) => this.canvas.drawPlayer(i));
+    }
+  }
+
+  handleRestrictedPlayerRendering(playerCameras) {
+    this.canvas.clearVisibilityMaskCanvas();
+
+    // Draw the players on the offscreen canvas
+    if (this.controller.gameModeController.drawSusPlayers === true) {
+      playerCameras.forEach((player) => {
+        const rendererData =
+          this.controller.gameModeController.getPlayerRendererData(player);
+        this.canvas.drawSusPlayer(
+          player,
+          rendererData,
+          this.canvas.visibilityCtx
+        );
+      });
+    } else {
+      playerCameras.forEach((i) =>
+        this.canvas.drawPlayer(i, this.canvas.visibilityCtx)
+      );
+    }
+
+    this.canvas.applyVisibilityMask(100);
   }
 
   translateInView(item) {

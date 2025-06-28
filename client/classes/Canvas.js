@@ -3,11 +3,14 @@ import { drawFace, drawBody, drawSusBody, drawTag } from "../canvasMethods.js";
 const loadedTextures = new Map();
 
 export default class Canvas {
+  visionRadius = null;
+
   constructor(id) {
     this.el = document.getElementById(id);
     this.ctx = this.el.getContext("2d");
 
     this.addCustomFonts();
+    this.createVisibilityMaskCanvas();
   }
 
   addCustomFonts() {
@@ -20,6 +23,63 @@ export default class Canvas {
     );
     font.load();
     document.fonts.add(font);
+  }
+
+  createVisibilityMaskCanvas() {
+    this.visibilityCanvas = document.createElement("canvas");
+    this.visibilityCanvas.width = window.innerWidth;
+    this.visibilityCanvas.height = window.innerHeight;
+    this.visibilityCtx = this.visibilityCanvas.getContext("2d");
+  }
+
+  clearVisibilityMaskCanvas() {
+    if (!this.visibilityCtx) return;
+    this.visibilityCtx.clearRect(
+      0,
+      0,
+      this.visibilityCanvas.width,
+      this.visibilityCanvas.height
+    );
+  }
+
+  updateVisibilityDistance(visionRadius) {
+    if (visionRadius === this.visionRadius) return;
+    this.visionRadius = visionRadius;
+    this.visionGradient = this.visibilityCtx.createRadialGradient(
+      window.innerWidth / 2,
+      window.innerHeight / 2,
+      visionRadius - 30,
+      window.innerWidth / 2,
+      window.innerHeight / 2,
+      visionRadius
+    );
+    this.visionGradient.addColorStop(0, "rgba(0, 0, 0, 1)"); // Fully visible
+    this.visionGradient.addColorStop(1, "rgba(0, 0, 0, 0)"); // Invisible
+  }
+
+  applyVisibilityMask(visionRadius) {
+    this.updateVisibilityDistance(visionRadius);
+
+    const cX = window.innerWidth / 2;
+    const cY = window.innerHeight / 2;
+
+    this.visibilityCtx.globalCompositeOperation = "destination-in";
+    this.visibilityCtx.fillStyle = this.visionGradient;
+    this.visibilityCtx.fillRect(
+      cX - this.visionRadius,
+      cY - this.visionRadius,
+      this.visionRadius * 2,
+      this.visionRadius * 2
+    );
+    this.visibilityCtx.globalCompositeOperation = "source-over";
+
+    this.ctx.drawImage(
+      this.visibilityCanvas,
+      0,
+      0,
+      this.visibilityCanvas.width,
+      this.visibilityCanvas.height
+    );
   }
 
   drawItem(item) {
@@ -110,7 +170,7 @@ export default class Canvas {
     }
   }
 
-  drawPlayer(player) {
+  drawPlayer(player, ctx = this.ctx) {
     try {
       let { x, y, w, h } = player;
 
@@ -124,31 +184,31 @@ export default class Canvas {
       // this.ctx.fillRect(x, y, w, h);
 
       if (player.camera != undefined) {
-        drawFace(this.ctx, x, y, w, h, player.image);
+        drawFace(ctx, x, y, w, h, player.image);
       }
 
-      drawBody(this.ctx, player);
+      drawBody(ctx, player);
 
       if (player.username !== "Anonymous") {
-        drawTag(this.ctx, x, y, w, h, player.username);
+        drawTag(ctx, x, y, w, h, player.username);
       }
     } catch (err) {
       throw err;
     }
   }
 
-  drawSusPlayer(player, data) {
+  drawSusPlayer(player, data, ctx = this.ctx) {
     try {
       let { x, y, w, h } = player;
 
       if (player.camera != undefined) {
-        drawFace(this.ctx, x, y, w, h, player.image);
+        drawFace(ctx, x, y, w, h, player.image);
       }
 
-      drawSusBody(this.ctx, player, data);
+      drawSusBody(ctx, player, data);
 
       if (player.username !== "Anonymous") {
-        drawTag(this.ctx, x, y, w, h, player.username);
+        drawTag(ctx, x, y, w, h, player.username);
       }
     } catch (err) {
       throw err;
@@ -162,5 +222,9 @@ export default class Canvas {
   resize(width = window.innerWidth, height = window.innerHeight) {
     this.el.width = width;
     this.el.height = height;
+    if (this.visibilityCanvas) {
+      this.visibilityCanvas.width = width;
+      this.visibilityCanvas.height = height;
+    }
   }
 }

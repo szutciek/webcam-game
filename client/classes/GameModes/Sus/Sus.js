@@ -15,12 +15,23 @@ export default class Sus {
   reportButtonVisible = false;
   taskButtonVisible = false;
 
+  isImpostor = null;
+  killRange = 200;
+
   constructor(controller, ws) {
     this.controller = controller;
     this.#ws = ws;
 
     this.changeBackground();
     this.loadPlayerModel();
+  }
+
+  get drawSusPlayers() {
+    return this.playerModel === "sus" && this.inRound === true;
+  }
+
+  get limitedView() {
+    return this.inRound;
   }
 
   loadPlayerModel() {
@@ -43,8 +54,8 @@ export default class Sus {
     return data;
   }
 
-  handlePlayerColors(message) {
-    Object.entries(message.colors).forEach(([uuid, color]) => {
+  handlePlayerColors(colors) {
+    Object.entries(colors).forEach(([uuid, color]) => {
       const imageTorso = generateColoredImage(
         { w: 100, h: 200 },
         this.playerModelTorsoSource,
@@ -63,6 +74,15 @@ export default class Sus {
     });
   }
 
+  handlePlayerRole(role) {
+    this.isImpostor = role;
+    if (this.isImpostor === true) {
+      this.hideTaskButton(true);
+    } else {
+      this.hideKillButton(true);
+    }
+  }
+
   changeBackground() {
     document.body.style.background = "#333";
     document.body.style.backgroundImage =
@@ -73,9 +93,21 @@ export default class Sus {
 
   initializeActionUI() {
     const actionUI = document.getElementById("sus_actions");
-    actionUI.style.display = "grid";
+    actionUI.style.display = "flex";
     actionUI.addEventListener("click", (e) => {
-      console.log(e.target.closest("button"));
+      const action = e.target.closest(".action").dataset.action;
+      if (action === "kill" && this.canKillAny) {
+        this.sendData({ action: "kill" });
+      }
+      if (action === "emergency") {
+        this.sendData({ action: "emergency" });
+      }
+      if (action === "report" && this.canReportAny) {
+        this.sendData({ action: "report" });
+      }
+      if (action === "task") {
+        // Display Task UI
+      }
     });
   }
 
@@ -102,12 +134,16 @@ export default class Sus {
     const actionUI = document.getElementById("sus_actions");
     const element = actionUI.querySelector(".kill");
     element.classList.add("active");
+    element.style.display = "flex";
   }
-  hideKillButton() {
+  hideKillButton(completely = false) {
     this.killButtonVisible = false;
     const actionUI = document.getElementById("sus_actions");
     const element = actionUI.querySelector(".kill");
     element.classList.remove("active");
+    if (completely === true) {
+      element.style.display = "none";
+    }
   }
 
   showReportButton() {
@@ -128,12 +164,16 @@ export default class Sus {
     const actionUI = document.getElementById("sus_actions");
     const element = actionUI.querySelector(".task");
     element.classList.add("active");
+    element.style.display = "flex";
   }
-  hideTaskButton() {
+  hideTaskButton(completely = false) {
     this.taskButtonVisible = false;
     const actionUI = document.getElementById("sus_actions");
     const element = actionUI.querySelector(".task");
     element.classList.remove("active");
+    if (completely === true) {
+      element.style.display = "none";
+    }
   }
 
   initializeTaskCompletionUI() {
@@ -188,7 +228,10 @@ export default class Sus {
       this.initializeHostStartUI(message.nWaiting);
     }
     if (message.event === "playerColors") {
-      this.handlePlayerColors(message);
+      this.handlePlayerColors(message.colors);
+    }
+    if (message.event === "playerRole") {
+      this.handlePlayerRole(message.isImpostor);
     }
     if (message.event === "roundStart") {
       this.inRound = true;
@@ -220,9 +263,19 @@ export default class Sus {
     this.clearActionUI();
   }
 
-  tick() {
-    const objectsInRange = this.controller.gameObjects.allObjects.values();
+  getClipPath() {
+    const path = new Path2D();
+    path.rect(0, 0, window.innerWidth, window.innerHeight);
+    return path;
+  }
 
+  tick() {
+    if (!this.inRound) return;
+
+    const objectsInRange = this.controller.gameObjects.allObjects.values();
+    const playersInRange = this.controller.gameObjects.allPlayers.values();
+
+    // check if emergency button is in players range
     const emergencyButton = objectsInRange.find(
       (o) => o.class === "button_zone"
     );
@@ -237,5 +290,33 @@ export default class Sus {
         }
       }
     }
+
+    const centerPlayer = this.centerPlayerWorld;
+
+    // check if any player in killing range if impostor
+    if (this.isImpostor) {
+      this.canKillAny = false;
+      playersInRange.forEach((p) => {
+        const centerTarget = [p.x + p.w / 2, p.y + p.h / 2];
+        const dX = centerPlayer[0] - centerTarget[0];
+        const dY = centerPlayer[1] - centerTarget[1];
+        const distance = dX * dX + dY * dY;
+        if (distance < this.killRange * this.killRange) {
+          this.canKillAny = true;
+        }
+      });
+      if (this.canKillAny) {
+        this.showKillButton();
+      } else {
+        this.hideKillButton();
+      }
+    }
+  }
+
+  get centerPlayerWorld() {
+    return [
+      this.controller.player.position.x + this.controller.player.position.w / 2,
+      this.controller.player.position.y + this.controller.player.position.h / 2,
+    ];
   }
 }

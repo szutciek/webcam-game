@@ -75,7 +75,7 @@
         <div id="sus_host_start"></div>
         <div id="sus_task_completion"></div>
         <div id="sus_actions">
-          <div class="kill">
+          <div class="action kill" data-action="kill">
             <button
               style="
                 background-image: url(https://assets.kanapka.eu/images/killButton.png);
@@ -83,7 +83,15 @@
             ></button>
             <p>(q)</p>
           </div>
-          <div class="report">
+          <div class="action task" data-action="task">
+            <button
+              style="
+                background-image: url(https://assets.kanapka.eu/images/taskButton.png);
+              "
+            ></button>
+            <p>(t)</p>
+          </div>
+          <div class="action report" data-action="report">
             <button
               style="
                 background-image: url(https://assets.kanapka.eu/images/reportButton.png);
@@ -91,21 +99,13 @@
             ></button>
             <p>(r)</p>
           </div>
-          <div class="emergency">
+          <div class="action emergency" data-action="emergency">
             <button
               style="
                 background-image: url('https://assets.kanapka.eu/images/emergencyButton.png');
               "
             ></button>
             <p>(e)</p>
-          </div>
-          <div class="task">
-            <button
-              style="
-                background-image: url(https://assets.kanapka.eu/images/taskButton.png);
-              "
-            ></button>
-            <p>(t)</p>
           </div>
         </div>
       </div>

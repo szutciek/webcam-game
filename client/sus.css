@@ -42,7 +42,7 @@
   right: 2.5rem;
 
   display: none;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  flex-direction: row;
 }
 
 #sus_actions div {

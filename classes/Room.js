@@ -167,6 +167,8 @@ module.exports = class Room {
 
         this.#players.forEach((p) => this.sendChunks(p));
 
+        // add method to take into account this.game.spectatingPlayers
+
         this.broadcast({
           type: "pinfo",
           data: list,
