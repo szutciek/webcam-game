@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/auth", (req, res, next) => {
-  res.status(200).send("SSO not yet supported");
+  res.sendFile(__dirname + "/client/pages/sso.html");
 });
 
 module.exports = router;
