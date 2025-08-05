@@ -40,6 +40,7 @@ mongoose
   });
 
 const apiRouter = require("./routes/apiRouter.js");
+const ssoRouter = require("./routes/ssoRouter.js");
 
 require("./websocket");
 
@@ -69,6 +70,8 @@ app.get("/verify", (_, res) =>
 
 app.use("/api", limiter);
 app.use("/api", apiRouter);
+
+app.use("/sso", ssoRouter);
 
 app.use(express.static("client/"));
 
