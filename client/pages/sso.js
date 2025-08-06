@@ -20,10 +20,12 @@ if (decoded.client_id !== "wcgame") {
   throw new Error("The token was not generated for this client");
 }
 
-const saveUserData = (token, user) => {
-  if (!token || !user) return;
-  window.localStorage.setItem("token", token);
-  window.localStorage.setItem("user", JSON.stringify(user));
+const saveUserData = (t, u) => {
+  if (!t || !u) return;
+  window.localStorage.setItem("token", t);
+  window.localStorage.setItem("user", JSON.stringify(u));
 };
 
 saveUserData(accessToken, decoded.user);
+
+window.location = "/";
