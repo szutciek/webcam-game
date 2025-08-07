@@ -106,6 +106,9 @@ export default class MenuController {
       return this.getDisplayPublicRooms();
     if (e.target.closest(".roomSelection") !== null)
       return this.handleRoomSelection(e);
+    if (e.target.closest(".logout") !== null) {
+      return this.handleLogout(e);
+    }
   }
 
   handleMapSelection(e) {
@@ -135,6 +138,11 @@ export default class MenuController {
         this.closeMenu();
       }
     }
+  }
+  handleLogout(e) {
+    window.localStorage.removeItem("token");
+    window.localStorage.removeItem("user");
+    window.location = "/signin";
   }
 
   closeMenu() {

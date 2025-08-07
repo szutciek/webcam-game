@@ -29,29 +29,29 @@
   margin-bottom: 2rem;
 }
 
-#menuScreen .user {
+#menuScreen .fBox {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.8rem;
   padding: 0 0 0 0.5rem;
-  border-radius: 10px;
 }
 
-#menuScreen .user video {
+#menuScreen .fBox video {
   width: 3rem;
   height: 3rem;
   border-radius: 100%;
+  background: #0000005a;
 }
 
-#menuScreen .user h1 {
+#menuScreen .fBox h1 {
   font-size: 1.2rem;
   font-weight: 600;
   color: #ffffff;
   margin-right: 1rem;
 }
 
-#menuScreen .user p {
+#menuScreen .fBox p {
   font-size: 0.9rem;
   font-weight: 400;
   color: #d6d6d6;
@@ -63,7 +63,20 @@
   height: 3rem;
   width: 3rem;
   padding: 1rem;
-  border-radius: 100%;
+  border-radius: 100px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+  transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#menuScreen .logout {
+  background: #0000005a;
+  height: 3rem;
+  padding: 1rem;
+  border-radius: 100px;
 
   display: flex;
   justify-content: center;
@@ -73,7 +86,8 @@
   transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-#menuScreen .close:hover {
+#menuScreen .close:hover,
+#menuScreen .logout:hover {
   background: #00000067;
   scale: 0.9;
 }
@@ -83,6 +97,14 @@
   line-height: 1;
   font-weight: 300;
   color: white;
+  margin-right: 0;
+}
+#menuScreen .logout p {
+  font-size: 1rem;
+  line-height: 1;
+  font-weight: 300;
+  color: white;
+  margin-right: 0;
 }
 
 #menuScreen .grid {
