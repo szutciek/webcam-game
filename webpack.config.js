@@ -1,5 +1,4 @@
 const path = require("path");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: "./client/script.js",
@@ -8,9 +7,4 @@ module.exports = {
     filename: "webpack.bundle.js",
   },
   mode: "production",
-  plugins: [
-    new CopyWebpackPlugin({
-      patterns: [{ from: "client/index.html", to: "index.html" }],
-    }),
-  ],
 };
