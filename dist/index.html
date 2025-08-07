@@ -11,7 +11,7 @@
 
     <link rel="manifest" href="/manifest.json" />
 
-    <script src="/webpack.bundle.js" defer type="module"></script>
+    <script src="/script.js" defer type="module"></script>
 
     <link rel="stylesheet" href="/soccer.css" />
     <link rel="stylesheet" href="/sus.css" />
@@ -75,7 +75,7 @@
         <div id="sus_host_start"></div>
         <div id="sus_task_completion"></div>
         <div id="sus_actions">
-          <div class="kill">
+          <div class="action kill" data-action="kill">
             <button
               style="
                 background-image: url(https://assets.kanapka.eu/images/killButton.png);
@@ -83,7 +83,15 @@
             ></button>
             <p>(q)</p>
           </div>
-          <div class="report">
+          <div class="action task" data-action="task">
+            <button
+              style="
+                background-image: url(https://assets.kanapka.eu/images/taskButton.png);
+              "
+            ></button>
+            <p>(t)</p>
+          </div>
+          <div class="action report" data-action="report">
             <button
               style="
                 background-image: url(https://assets.kanapka.eu/images/reportButton.png);
@@ -91,21 +99,13 @@
             ></button>
             <p>(r)</p>
           </div>
-          <div class="emergency">
+          <div class="action emergency" data-action="emergency">
             <button
               style="
                 background-image: url('https://assets.kanapka.eu/images/emergencyButton.png');
               "
             ></button>
             <p>(e)</p>
-          </div>
-          <div class="task">
-            <button
-              style="
-                background-image: url(https://assets.kanapka.eu/images/taskButton.png);
-              "
-            ></button>
-            <p>(t)</p>
           </div>
         </div>
       </div>
@@ -114,7 +114,7 @@
     <div class="fixed gameIgnoreClick menuScreen" id="menuScreen">
       <div class="container overlay">
         <div class="head animationLayer">
-          <div class="user">
+          <div class="fBox">
             <video></video>
             <div class="text">
               <h1 class="username">&nbsp;</h1>
@@ -124,8 +124,13 @@
               <div class="logOut"></div>
             </div>
           </div>
-          <div class="close closeMenu">
-            <p>&#10005;</p>
+          <div class="fBox">
+            <div class="logout">
+              <p>Logout</p>
+            </div>
+            <div class="close closeMenu">
+              <p>&#10005;</p>
+            </div>
           </div>
         </div>
         <div class="grid">
