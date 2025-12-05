@@ -159,6 +159,8 @@ export default class GameController {
         this.canvas.ctx.fillStyle = "rgb(255,255,255,0.1)";
         this.canvas.ctx.fillRect(0, 0, this.#vw, this.#vh);
 
+        this.handleSpecialItemsRendering(items, players);
+
         // Draw the players with restricted view
         this.handleRestrictedPlayerRendering(preparedCameras);
 
@@ -217,6 +219,29 @@ export default class GameController {
         this.canvas.drawPlayer(i, this.canvas.visibilityCtx)
       );
     }
+  }
+
+  handleSpecialItemsRendering(objects, players) {
+    // for sus game mode
+    const sus = this.controller.gameModeController;
+    const corpses = objects.filter((o) => o.class.startsWith("corpse:"));
+
+    corpses.forEach((c) => {
+      if (this.player.uuid === c.class.split(":")[1]) {
+        const data = sus.getPlayerRendererData(this.player);
+        c.username = this.player.username;
+        this.canvas.drawCorpse(c, data);
+        return;
+      }
+
+      const victim = players.find((p) => p.uuid === c.class.split(":")[1]);
+      if (victim) {
+        const data = sus.getPlayerRendererData(victim);
+        c.username = victim.username;
+        this.canvas.drawCorpse(c, data);
+        return;
+      }
+    });
   }
 
   translateInView(item) {

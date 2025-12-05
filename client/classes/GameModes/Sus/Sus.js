@@ -48,6 +48,12 @@ export default class Sus {
     imgLeg.onload = () => {
       this.playerModelLegSource = imgLeg;
     };
+    const imgDead = new Image();
+    imgDead.src = "https://assets.kanapka.eu/images/susDeadAlphaWCGame.png";
+    imgDead.crossOrigin = "Anonymous";
+    imgDead.onload = () => {
+      this.playerModelDeadSource = imgDead;
+    };
   }
 
   getPlayerRendererData(player) {
@@ -67,10 +73,16 @@ export default class Sus {
         this.playerModelLegSource,
         color
       );
+      const imageDead = generateColoredImage(
+        { w: 100, h: 100 },
+        this.playerModelDeadSource,
+        color
+      );
       this.playerModels.set(uuid, {
         color: color,
         modelTorso: imageTorso,
         modelLeg: imageLeg,
+        modelDead: imageDead,
       });
     });
   }

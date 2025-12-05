@@ -1,4 +1,10 @@
-import { drawFace, drawBody, drawSusBody, drawTag } from "../canvasMethods.js";
+import {
+  drawFace,
+  drawBody,
+  drawSusBody,
+  drawSusCorpse,
+  drawTag,
+} from "../canvasMethods.js";
 
 const loadedTextures = new Map();
 
@@ -156,6 +162,10 @@ export default class Canvas {
     } catch (err) {
       throw err;
     }
+  }
+
+  drawCorpse(corpse, data, ctx = this.ctx) {
+    drawSusCorpse(ctx, corpse, data);
   }
 
   clear() {

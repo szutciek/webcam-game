@@ -85,13 +85,13 @@ module.exports = class Sus extends GameMode {
 
   spawnCorpse(victim) {
     this.room.addSpecialObject(
-      { x: victim.position.x, y: victim.position.y + 100, w: 100, h: 100 },
+      { x: victim.position.x, y: victim.position.y, w: 1, h: 1 },
       { type: "color", value: "#000" },
       {
         colliding: false,
-        dynamic: false,
+        dynamic: true,
         shape: "rect",
-        class: `corpse-${victim.uuid}`,
+        class: `corpse:${victim.uuid}`,
       }
     );
   }

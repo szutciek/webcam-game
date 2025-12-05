@@ -23,9 +23,6 @@ susTorso.src = "https://assets.kanapka.eu/images/susTorsoWCGame.png";
 const susDead = new Image();
 susDead.src = "https://assets.kanapka.eu/images/susDeadWCGame.png";
 
-const susDeadAlpha = new Image();
-susDeadAlpha.src = "https://assets.kanapka.eu/images/susDeadAlphaWCGame.png";
-
 const createMirroredImages = (img) => {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
@@ -199,6 +196,18 @@ export const drawSusBody = (ctx, player, data) => {
   ctx.drawImage(susTorso, x, y + traverseLift / 2, 100, 200);
 };
 
+export const drawSusCorpse = (ctx, corpse, data) => {
+  const { x, y, w, h } = corpse;
+  ctx.drawImage(susDead, x - 10, y + 90, 120, 120);
+  if (data.modelDead) {
+    ctx.drawImage(data.modelDead, x - 10, y + 90, 120, 120);
+  }
+  ctx.font = "bold 10pt Poppins";
+  ctx.fillStyle = "#444";
+  ctx.textAlign = "center";
+  ctx.fillText(corpse.username, x + 55, y + 192);
+};
+
 export const generateColoredImage = (dimensions, alpha, color) => {
   const c = document.createElement("canvas");
   c.width = dimensions.w;
@@ -217,7 +226,7 @@ export const generateColoredImage = (dimensions, alpha, color) => {
 };
 
 export const drawTag = (ctx, x, y, w, _, name) => {
-  ctx.font = " 15pt Poppins";
+  ctx.font = "15pt Poppins";
   ctx.fillStyle = "black";
   ctx.textAlign = "center";
   ctx.fillText(name, x + w / 2, y - 10);
