@@ -83,9 +83,23 @@ module.exports = class Sus extends GameMode {
     }
   }
 
+  spawnCorpse(victim) {
+    this.room.addSpecialObject(
+      { x: victim.position.x, y: victim.position.y + 100, w: 100, h: 100 },
+      { type: "color", value: "#000" },
+      {
+        colliding: false,
+        dynamic: false,
+        shape: "rect",
+        class: `corpse-${victim.uuid}`,
+      }
+    );
+  }
+
   killPlayer(attacker, victim) {
     console.log(`${attacker.user.username} killed ${victim.user.username}`);
     this.#deadPlayers.add(victim.uuid);
+    this.spawnCorpse(victim);
   }
 
   broadcastPlayerColors() {

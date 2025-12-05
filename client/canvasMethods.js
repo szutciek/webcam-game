@@ -20,6 +20,12 @@ susLeg.src = "https://assets.kanapka.eu/images/susLeg.png";
 const susTorso = new Image();
 susTorso.src = "https://assets.kanapka.eu/images/susTorsoWCGame.png";
 
+const susDead = new Image();
+susDead.src = "https://assets.kanapka.eu/images/susDeadWCGame.png";
+
+const susDeadAlpha = new Image();
+susDeadAlpha.src = "https://assets.kanapka.eu/images/susDeadAlphaWCGame.png";
+
 const createMirroredImages = (img) => {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
