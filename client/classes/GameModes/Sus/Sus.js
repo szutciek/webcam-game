@@ -15,6 +15,7 @@ export default class Sus {
   reportButtonVisible = false;
   taskButtonVisible = false;
 
+  viewRadius = 400;
   isImpostor = null;
   killRange = 200;
 
@@ -263,9 +264,66 @@ export default class Sus {
     this.clearActionUI();
   }
 
+  checkRectInRangeAnyCorner(rect, origin) {
+    for (let i = rect.x; i <= rect.x + rect.w; i += rect.w) {
+      for (let j = rect.y; j <= rect.y + rect.h; j += rect.h) {
+        const dX = origin.x - i;
+        const dY = origin.y - j;
+        const distance = dX * dX + dY * dY;
+        if (distance < origin.radius * origin.radius) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   getClipPath() {
     const path = new Path2D();
-    path.rect(0, 0, window.innerWidth, window.innerHeight);
+
+    // restrict to view radius first
+    path.arc(
+      window.innerWidth / 2,
+      window.innerHeight / 2,
+      this.viewRadius,
+      0,
+      2 * Math.PI
+    );
+
+    // then check intersections with walls and items in range that are obstructing
+    const cP = this.centerPlayerWorld;
+    const allObjects = this.controller.gameObjects.allObjects.values();
+    const objectsInRange = Array.from(allObjects).filter((o) => {
+      switch (o.shape) {
+        case "rect":
+          // run check for all corners
+          return this.checkRectInRangeAnyCorner(o, {
+            x: cP[0],
+            y: cP[1],
+            radius: this.viewRadius,
+          });
+        case "circ":
+          const cO = [o.x + o.w / 2, o.y + o.h / 2];
+          const dX = cP[0] - cO[0];
+          const dY = cP[1] - cO[1];
+          const distance = dX * dX + dY * dY;
+          return distance < this.viewRadius * this.viewRadius;
+      }
+    });
+    const obstructingObjects = objectsInRange.filter((o) => o.colliding);
+
+    obstructingObjects.forEach((o) => {
+      switch (o.shape) {
+        case "rect":
+          // clip the area between extreme points of rectangle, reaching to the edge of the view zone.
+          // if the rectangle is not fully in range, then calculate where it needs with the view circle.
+          break;
+        case "circ":
+          console.warn("Obstructing circle not implemented yet in Sus.js");
+          break;
+      }
+    });
+
     return path;
   }
 
@@ -311,6 +369,20 @@ export default class Sus {
         this.hideKillButton();
       }
     }
+  }
+
+  convertFromWorldToScreen(wX, wY) {
+    const sX =
+      wX -
+      this.controller.player.position.x -
+      this.controller.player.position.w / 2 +
+      window.innerWidth / 2;
+    const sY =
+      wY -
+      this.controller.player.position.y -
+      this.controller.player.position.h / 2 +
+      window.innerHeight / 2;
+    return [sX, sY];
   }
 
   get centerPlayerWorld() {

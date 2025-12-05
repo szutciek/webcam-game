@@ -25,7 +25,9 @@ module.exports = class Sus extends GameMode {
       this.#waitingPlayers.set(player.uuid, player);
     }
 
-    this.announceHost();
+    setTimeout(() => {
+      this.announceHost();
+    }, 1000);
   }
 
   playerLeave(player) {

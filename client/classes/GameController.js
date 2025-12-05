@@ -146,12 +146,18 @@ export default class GameController {
         // CREATE THE CLIP
         this.canvas.ctx.save();
 
+        this.canvas.ctx.fillStyle = "rgb(0,0,0,0.2)";
+        this.canvas.ctx.fillRect(0, 0, this.#vw, this.#vh);
+
         // Define the clip path based on the game mode controller
         const clipPath = this.controller.gameModeController.getClipPath();
         // Apply clip path if it is defined
         if (clipPath instanceof Path2D) {
           this.canvas.ctx.clip(clipPath);
         }
+
+        this.canvas.ctx.fillStyle = "rgb(255,255,255,0.1)";
+        this.canvas.ctx.fillRect(0, 0, this.#vw, this.#vh);
 
         // Draw the players with restricted view
         this.handleRestrictedPlayerRendering(preparedCameras);
@@ -200,26 +206,17 @@ export default class GameController {
   }
 
   handleRestrictedPlayerRendering(playerCameras) {
-    this.canvas.clearVisibilityMaskCanvas();
-
-    // Draw the players on the offscreen canvas
     if (this.controller.gameModeController.drawSusPlayers === true) {
       playerCameras.forEach((player) => {
         const rendererData =
           this.controller.gameModeController.getPlayerRendererData(player);
-        this.canvas.drawSusPlayer(
-          player,
-          rendererData,
-          this.canvas.visibilityCtx
-        );
+        this.canvas.drawSusPlayer(player, rendererData);
       });
     } else {
       playerCameras.forEach((i) =>
         this.canvas.drawPlayer(i, this.canvas.visibilityCtx)
       );
     }
-
-    this.canvas.applyVisibilityMask(100);
   }
 
   translateInView(item) {

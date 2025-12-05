@@ -71,7 +71,7 @@ const handleAuthClientSSO = async (data, ws) => {
   const fakeUser = {
     _id: payload.user.uuid,
     username: payload.user.username,
-    email: "not_provided",
+    email: payload.user?.email ? payload.user.email : "not_provided",
     profile: payload.user.profile,
     panelColor: "#ec7837",
   };
