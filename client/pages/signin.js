@@ -229,3 +229,20 @@ if (initialEmail) {
   handleInputEnter(emailField);
   emailField.querySelector("input").value = initialEmail;
 }
+
+const updateRedirect = () => {
+  const state = crypto.randomUUID().split("-")[0];
+  window.localStorage.setItem("stateKanapkaSSO", state);
+
+  document.getElementById(
+    "ssoRedirect"
+  ).href = `https://sso.kanapka.eu/authorize?response_type=token&client_id=wcgame&redirect_uri=http://localhost:5500/sso/auth&state=${state}`;
+
+  if (window.location.protocol === "http:") {
+    console.warn("Changing SSO redirect URL to development version");
+    document.getElementById(
+      "ssoRedirect"
+    ).href = `https://sso.kanapka.eu/authorize?response_type=token&client_id=wcgame&redirect_uri=http://localhost:5500/sso/auth&state=${state}`;
+  }
+};
+updateRedirect();

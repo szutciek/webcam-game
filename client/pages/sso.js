@@ -1,6 +1,14 @@
 const url = window.location.href;
 const urlObj = new URL(url);
-let accessToken = urlObj.searchParams.get("access_token");
+const accessToken = urlObj.searchParams.get("access_token");
+
+const savedState = window.localStorage.getItem("stateKanapkaSSO");
+window.localStorage.removeItem("stateKanapkaSSO");
+const receivedState = urlObj.searchParams.get("state");
+
+if (savedState !== receivedState) {
+  throw new Error("The state is not correct");
+}
 
 const decodeJwt = (token) => {
   const base64Url = token.split(".")[1];
