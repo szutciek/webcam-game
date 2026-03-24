@@ -263,6 +263,18 @@ module.exports = class Room {
     return obj;
   }
 
+  removeSpecialObjectsByClassPrefix(classPrefix) {
+    this.chunks.forEach((row) => {
+      row.forEach((chunk) => {
+        while (chunk.findObjectByClassPrefix(classPrefix)) {
+          const obj = chunk.findObjectByClassPrefix(classPrefix);
+          console.log(obj);
+          chunk.removeObjectId(obj.id);
+        }
+      });
+    });
+  }
+
   getChunk = (xI, yI) => {
     if (xI === undefined || yI === undefined) return;
     const x = this.identifyChunk(xI);

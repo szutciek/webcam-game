@@ -7,6 +7,7 @@ module.exports = class Sus extends GameMode {
   #currentRoundPlayers = new Map();
   #playerColors = new Map();
   #playerRoles = new Map();
+  #alivePlayers = new Set();
   #deadPlayers = new Set();
   #waitingPlayers = new Map();
   // finish work - replace uuid with user._id to actually let user rejoin
@@ -97,9 +98,10 @@ module.exports = class Sus extends GameMode {
   }
 
   killPlayer(attacker, victim) {
-    console.log(`${attacker.user.username} killed ${victim.user.username}`);
     this.#deadPlayers.add(victim.uuid);
+    this.#alivePlayers.delete(victim.uuid);
     this.spawnCorpse(victim);
+    this.broadcastPlayerStates();
   }
 
   broadcastPlayerColors() {
@@ -132,6 +134,26 @@ module.exports = class Sus extends GameMode {
     });
   }
 
+  broadcastPlayerStates() {
+    this.room.broadcast({
+      event: "playerStates",
+      alive: Array.from(this.#alivePlayers),
+      dead: Array.from(this.#deadPlayers),
+    });
+    this.room.removeSpecialObjectsByClassPrefix("corpse:");
+  }
+
+  callEmergencyMeeting(caller) {
+    // remove all corpses from the room
+    this.room.removeSpecialObjectsByClassPrefix("corpse:");
+
+    this.room.broadcast({
+      type: "game",
+      event: "emergencyMeeting",
+      message: `${caller.user.username} has called an emergency meeting!`,
+    });
+  }
+
   startRound() {
     this.#inRound = true;
 
@@ -142,6 +164,9 @@ module.exports = class Sus extends GameMode {
         this.#currentRoundPlayers.size
       } players!`,
     });
+
+    this.#alivePlayers = new Set(this.#currentRoundPlayers.keys());
+    this.#deadPlayers = new Set();
 
     this.#currentRoundPlayers.values().forEach((p, i) => {
       p.teleport(-50, -300);

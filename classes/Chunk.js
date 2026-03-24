@@ -93,6 +93,15 @@ module.exports = class Chunk {
     return undefined;
   }
 
+  findObjectByClassPrefix(classPrefix) {
+    for (const [, value] of this.gameObjects) {
+      if (value.class.startsWith(classPrefix)) {
+        return value;
+      }
+    }
+    return undefined;
+  }
+
   findUpdateObject({ x, y }, texture) {
     const object = this.findObject(x, y);
     if (!object) return;
